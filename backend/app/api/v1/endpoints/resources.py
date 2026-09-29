@@ -43,9 +43,6 @@ def resources_summary(factory_id: int | None = None, db: Session = Depends(get_d
     return machines.summary(db, actor, factory_id)
 
 
-# ---------- liniyalar ----------
-
-
 @router.get("/production-lines", response_model=list[LineOut])
 def list_lines(include_inactive: bool = False, factory_id: int | None = None, db: Session = Depends(get_db), actor: User = Depends(wf_view)):
     return workforce.list_lines(db, actor, include_inactive=include_inactive, factory_id=factory_id)
@@ -66,9 +63,6 @@ def delete_line(line_id: int, db: Session = Depends(get_db), actor: User = Depen
     workforce.delete_line(db, actor, line_id)
 
 
-# ---------- smenalar ----------
-
-
 @router.get("/shifts", response_model=list[ShiftOut])
 def list_shifts(include_inactive: bool = False, factory_id: int | None = None, db: Session = Depends(get_db), actor: User = Depends(wf_view)):
     return workforce.list_shifts(db, actor, include_inactive=include_inactive, factory_id=factory_id)
@@ -87,9 +81,6 @@ def update_shift(shift_id: int, data: ShiftUpdate, db: Session = Depends(get_db)
 @router.delete("/shifts/{shift_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_shift(shift_id: int, db: Session = Depends(get_db), actor: User = Depends(wf_edit)):
     workforce.delete_shift(db, actor, shift_id)
-
-
-# ---------- xodimlar ----------
 
 
 @router.get("/employees", response_model=EmployeePage)
@@ -129,9 +120,6 @@ def update_employee(employee_id: int, data: EmployeeUpdate, db: Session = Depend
 @router.delete("/employees/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_employee(employee_id: int, db: Session = Depends(get_db), actor: User = Depends(wf_edit)):
     workforce.delete_employee(db, actor, employee_id)
-
-
-# ---------- mashinalar ----------
 
 
 @router.get("/machines", response_model=MachinePage)

@@ -34,7 +34,6 @@ def test_create_normalizes_and_autocodes(client, owner):
     assert c["country"] == "UZ"
     assert c["factory"]["name"] == "Alpha"
     assert create(client, owner, name="Ikkinchi")["customer_code"] == "CUS-00002"
-    # Qo'lda berilgan kod katta harfga o'tadi va avtomatik raqamlashga ta'sir qilmaydi
     assert create(client, owner, name="Uchinchi", customer_code="vip-1")["customer_code"] == "VIP-1"
     assert create(client, owner, name="To'rtinchi")["customer_code"] == "CUS-00003"
 
@@ -68,7 +67,7 @@ def test_duplicate_code(client, owner):
     r = client.post(f"{API}/customers", headers=owner, json={**CUSTOMER, "customer_code": "c-1"})
     assert r.status_code == 409
     other, _ = register_owner(client, "b@b.uz", "Beta")
-    create(client, other, customer_code="C-1")  # boshqa fabrikada ruxsat
+    create(client, other, customer_code="C-1")
 
 
 def test_list_search_filters_pagination(client, owner):
@@ -84,7 +83,7 @@ def test_list_search_filters_pagination(client, owner):
 
     assert get()["total"] == 7
     assert get(search="zara")["total"] == 1
-    assert get(search="dilshod")["total"] == 1  # kontakt shaxs bo'yicha
+    assert get(search="dilshod")["total"] == 1
     assert get(search="CUS-00002")["total"] == 1
     assert get(status="LEAD")["total"] == 1
     assert get(customer_type="INDIVIDUAL")["total"] == 1
@@ -104,7 +103,7 @@ def test_update_and_delete(client, owner):
     body = r.json()
     assert body["status"] == "INACTIVE"
     assert body["email"] is None and body["notes"] is None
-    assert body["name"] == "Zara Uzbekistan LLC"  # majburiy maydon None bilan o'chmaydi
+    assert body["name"] == "Zara Uzbekistan LLC"
     assert client.patch(url, headers=owner, json={"email": "bad"}).status_code == 422
     assert client.delete(url, headers=owner).status_code == 204
     assert client.get(url, headers=owner).status_code == 404
@@ -154,7 +153,6 @@ def test_factory_isolation(client, owner):
     assert client.get(url, headers=other).status_code == 404
     assert client.patch(url, headers=other, json={"name": "Hack"}).status_code == 404
     assert client.delete(url, headers=other).status_code == 404
-    # super admin factory_id ni bera olmaydi — oddiy foydalanuvchi uchun e'tiborga olinmaydi
     r = client.post(f"{API}/customers", headers=other, json={**CUSTOMER, "factory_id": c["factory_id"]})
     assert r.json()["factory"]["name"] == "Beta"
 

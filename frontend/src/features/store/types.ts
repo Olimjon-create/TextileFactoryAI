@@ -12,7 +12,6 @@ export interface StoreFactoryCard {
   min_price: number | null;
 }
 
-/** Bosh sahifa kollaji: surat bosilganda shu zavod va mahsulotga o'tiladi */
 export interface StoreFeaturedProduct {
   product_id: number;
   product_name: string;

@@ -12,7 +12,6 @@ import type {
   WarehouseLocation,
 } from './types';
 
-// Bo'sh filtrlar so'rovga qo'shilmaydi
 const clean = (filters: object) =>
   Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v !== undefined && v !== null));
 

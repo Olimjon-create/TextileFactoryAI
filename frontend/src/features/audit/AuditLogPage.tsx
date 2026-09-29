@@ -97,7 +97,6 @@ function ActionChip({ action }: { action: string }) {
   return <Chip size="small" label={a.label} color={a.color} variant="outlined" />;
 }
 
-/** Audit log: kim, qachon, nimani o'zgartirdi */
 export default function AuditLogPage() {
   const isMobile = useIsMobile();
   const [items, setItems] = useState<AuditLog[]>([]);

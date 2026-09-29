@@ -15,7 +15,6 @@ const SEGMENTS: { field: keyof DailyBoard['summary']; label: string; color: stri
   { field: 'not_marked', label: tr("Hali kelmadi"), color: 'text.disabled' },
 ];
 
-/** Dashboard: bugungi davomat — nechta keldi, kechikdi, kelmadi va e'tibor talab qiladigan xodimlar */
 export default function AttendanceTodayCard() {
   const navigate = useNavigate();
   const [board, setBoard] = useState<DailyBoard | null>(null);
@@ -63,7 +62,6 @@ export default function AttendanceTodayCard() {
                 <Box sx={{ flex: 1 }} />
                 <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'primary.main' }}>{s.at_work} {tr("ishda")}</Typography>
               </Box>
-              {/* Taqsimot chizig'i */}
               <Box sx={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', bgcolor: 'action.hover', mt: 1.5, mb: 1.25 }}>
                 {SEGMENTS.map((seg) => (s[seg.field] ? <Box key={seg.field} sx={{ width: `${(s[seg.field] / s.total) * 100}%`, bgcolor: seg.color }} /> : null))}
               </Box>

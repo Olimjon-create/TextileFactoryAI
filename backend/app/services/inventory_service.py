@@ -40,7 +40,6 @@ from app.services import audit_service
 from app.core.i18n import t
 from app.services import telegram_service
 
-# Ombor ma'lumotlarini ko'rish (ishchidan tashqari hamma rahbarlar)
 INVENTORY_VIEW_ROLES = (
     Role.SUPER_ADMIN,
     Role.FACTORY_OWNER,
@@ -49,7 +48,6 @@ INVENTORY_VIEW_ROLES = (
     Role.WAREHOUSE_MANAGER,
     Role.QUALITY_MANAGER,
 )
-# Katalog, joylar va kirim-chiqim kiritish
 INVENTORY_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.WAREHOUSE_MANAGER)
 
 MOVEMENT_LABELS = {
@@ -70,11 +68,7 @@ def _qty(value: float | Decimal) -> Decimal:
     return Decimal(str(value)).quantize(QTY)
 
 
-# ---------- qoldiq hisoblash ----------
-
-
 def _stock_subquery(actor: User, factory_id: int | None = None, location_id: int | None = None):
-    # Fabrika bo'yicha cheklangan: aks holda har so'rovda barcha fabrikalar jurnali yig'iladi
     query = scoped(
         select(StockMovement.material_id, func.sum(StockMovement.quantity).label("qty")).group_by(StockMovement.material_id),
         actor, StockMovement.factory_id, factory_id,
@@ -109,9 +103,6 @@ def _material_out(material: Material, stock: Decimal | float | None, factory_nam
     return out
 
 
-# ---------- materiallar ----------
-
-
 def _get_material(db: Session, actor: User, material_id: int) -> Material:
     material = db.get(Material, material_id)
     if material is None or not can_access(actor, material.factory_id):
@@ -133,7 +124,7 @@ def list_materials(
     *,
     search: str | None = None,
     material_type: str | None = None,
-    stock_state: str | None = None,  # low | out | in
+    stock_state: str | None = None,
     is_active: bool | None = True,
     factory_id: int | None = None,
     offset: int = 0,
@@ -207,13 +198,11 @@ def update_material(db: Session, actor: User, material_id: int, data: MaterialUp
     values = {k: v for k, v in data.model_dump(exclude_unset=True).items() if v is not None or k in ("color", "notes", "unit_cost")}
     if "code" in values:
         _ensure_material_code_free(db, material.factory_id, values["code"], exclude_id=material.id)
-    # Tarixi bor materialning birligini o'zgartirish qoldiqni buzadi
     if "unit" in values and values["unit"] != material.unit and _has_movements(db, material.id):
         raise HTTPException(status.HTTP_409_CONFLICT, "Ombor tarixi bor materialning o'lchov birligini o'zgartirib bo'lmaydi")
     changes = audit_service.diff(material, values)
     for field, value in values.items():
         setattr(material, field, value)
-    # Katalog — yagona manba: BOM qatorlaridagi nom/tur/birlik ham yangilanadi
     if {"name", "material_type", "unit"} & changes.keys():
         for item in db.scalars(select(BOMItem).where(BOMItem.material_id == material.id)):
             item.material_name, item.material_type, item.unit = material.name, material.material_type, material.unit
@@ -244,9 +233,6 @@ def delete_material(db: Session, actor: User, material_id: int) -> None:
     )
     db.delete(material)
     db.commit()
-
-
-# ---------- joylashuvlar ----------
 
 
 def _get_location(db: Session, actor: User, location_id: int) -> WarehouseLocation:
@@ -333,9 +319,6 @@ def delete_location(db: Session, actor: User, location_id: int) -> None:
     db.commit()
 
 
-# ---------- harakatlar ----------
-
-
 def _movement_out(m: StockMovement, order_number: str | None = None) -> MovementOut:
     return MovementOut(
         id=m.id,
@@ -409,13 +392,12 @@ def create_movement(
     )
     rows: list[StockMovement] = []
 
-    # Chiqim/qaytarish/inventarizatsiya o'sha paytdagi tannarx bilan yoziladi — tannarx hisobi keyingi xaridlardan o'zgarmaydi
     current_cost = material.unit_cost
     if kind in _INFLOW:
         cost = _qty(data.unit_cost).quantize(Decimal("0.01")) if data.unit_cost is not None else (current_cost if kind == MovementInput.RETURN else None)
         rows.append(StockMovement(**base, location_id=location.id, movement_type=_INFLOW[kind], quantity=qty, unit_cost=cost))
         if kind == MovementInput.RECEIPT and cost is not None:
-            material.unit_cost = cost  # oxirgi xarid narxi
+            material.unit_cost = cost
     elif kind in _OUTFLOW or kind == MovementInput.TRANSFER:
         if qty > balance:
             raise HTTPException(
@@ -433,7 +415,7 @@ def create_movement(
             rows.append(StockMovement(**base, location_id=target.id, movement_type=MovementType.TRANSFER_IN, quantity=qty, transfer_group=group))
         else:
             rows.append(StockMovement(**base, location_id=location.id, movement_type=_OUTFLOW[kind], quantity=-qty, unit_cost=current_cost))
-    else:  # ADJUSTMENT: quantity — sanoq natijasi
+    else:
         delta = qty - balance
         if delta == 0:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Sanoq natijasi joriy qoldiq bilan bir xil — tuzatish kerak emas")
@@ -521,7 +503,6 @@ def summary(db: Session, actor: User, factory_id: int | None = None) -> Inventor
         ).select_from(materials)
     ).one()
 
-    # UTC, tz'siz — SQLite va PostgreSQL'da bir xil solishtiriladi
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     today = datetime.combine(now.date(), time.min)
     movements = scoped(select(StockMovement), actor, StockMovement.factory_id, factory_id).subquery()

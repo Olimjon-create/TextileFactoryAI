@@ -6,16 +6,11 @@ import { tr } from '@/i18n';
 
 const RELOAD_KEY = 'tfai_chunk_reload_at';
 
-/** Sahifa kodi (lazy chunk) yuklanmadi: yangi versiya chiqqan yoki server qayta ishga tushgan */
 function isChunkError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error ?? '');
   return /dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError/i.test(message);
 }
 
-/**
- * Router darajasidagi xato sahifasi (texnik "Unexpected Application Error" o'rniga).
- * Eski sahifa bo'lagi topilmasa — bir marta avtomatik yangilaydi (cheksiz aylanishsiz).
- */
 export default function RouteErrorPage() {
   const error = useRouteError();
   const chunk = isChunkError(error);
@@ -30,7 +25,6 @@ export default function RouteErrorPage() {
         window.location.reload();
       }
     } catch {
-      // sessionStorage yopiq — foydalanuvchi tugma orqali yangilaydi
     }
   }, [chunk]);
 

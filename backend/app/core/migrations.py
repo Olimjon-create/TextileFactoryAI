@@ -26,7 +26,6 @@ def run_migrations() -> None:
     cfg = alembic_config()
     with engine.begin() as connection:
         if connection.dialect.name == "postgresql":
-            # Serverless'da bir nechta nusxa bir vaqtda ishga tushishi mumkin — migratsiyani navbat bilan
             connection.execute(text("SELECT pg_advisory_xact_lock(724001)"))
         cfg.attributes["connection"] = connection
         tables = set(inspect(connection).get_table_names())

@@ -30,7 +30,6 @@ export const ordersApi = {
   get: (id: number) => api.get<Order>(`/orders/${id}`).then((r) => r.data),
   updateStatus: (id: number, status: OrderStatus) =>
     api.patch<Order>(`/orders/${id}/status`, { status }).then((r) => r.data),
-  /** Menejer CRM'dagi mijoz uchun buyurtma kiritadi (B2B) */
   create: (data: ManualOrderPayload) => api.post<Order>('/orders', data).then((r) => r.data),
   update: (id: number, data: OrderUpdatePayload) => api.patch<Order>(`/orders/${id}`, data).then((r) => r.data),
   recordPayment: (id: number) => api.post<Order>(`/orders/${id}/payment`).then((r) => r.data),

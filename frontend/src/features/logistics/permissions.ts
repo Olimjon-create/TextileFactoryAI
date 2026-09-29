@@ -2,7 +2,6 @@ import { useAuth } from '@/features/auth/AuthContext';
 import { INVENTORY_EDITOR_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
 import type { Role } from '@/shared/types';
 
-/** Backenddagi logistics_service.LOGISTICS_*_ROLES / FG_RECEIVE_ROLES bilan bir xil */
 export const LOGISTICS_VIEW_ROLES = INVENTORY_VIEW_ROLES;
 export const LOGISTICS_EDITOR_ROLES = INVENTORY_EDITOR_ROLES;
 export const FG_RECEIVE_ROLES: Role[] = [...INVENTORY_EDITOR_ROLES, 'PRODUCTION_MANAGER'];

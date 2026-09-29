@@ -1,6 +1,3 @@
-# TextileCore — backend va frontendni ikki alohida oynada ishga tushiradi.
-# Ishlatish (loyiha papkasida):  powershell -ExecutionPolicy Bypass -File .\start-dev.ps1
-
 $root = $PSScriptRoot
 $backend = Join-Path $root 'backend'
 $frontend = Join-Path $root 'frontend'
@@ -18,11 +15,6 @@ if (-not (Test-Path (Join-Path $frontend 'node_modules'))) {
     Push-Location $frontend; npm install; Pop-Location
 }
 
-# Windows'da `uvicorn --reload` ichki jarayoni (worker) otasi o'lganda "yetim" bo'lib qolib, 8001 portni
-# ESKI kod bilan ushlab turishi mumkin — shunda yangi o'zgarishlar ko'rinmaydi.
-# venv\Scripts\python.exe faqat ishga tushiruvchi: haqiqiy jarayonlar tizim Python'ida ishlaydi,
-# shuning uchun yo'l bo'yicha emas, buyruq va "otasi o'lganmi" bo'yicha qidiramiz.
-# Faqat 8001 band bo'lsa tozalaymiz; ishlab turgan (otasi tirik) serverlarga tegilmaydi.
 if (Get-NetTCPConnection -LocalPort 8001 -State Listen -ErrorAction SilentlyContinue) {
     Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
         Where-Object {

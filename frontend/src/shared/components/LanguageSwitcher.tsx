@@ -4,7 +4,6 @@ import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { getLang, LANGUAGES, setLang, tr } from '@/i18n';
 
-/** 🌐 UZ ▾ — til tanlash (O'zbekcha / Русский / English). Tanlanganda sahifa yangi tilda qayta yuklanadi */
 export default function LanguageSwitcher({ sx }: { sx?: SxProps<Theme> }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const current = getLang();

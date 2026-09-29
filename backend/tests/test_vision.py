@@ -10,7 +10,7 @@ V = f"{API}/vision"
 @pytest.fixture()
 def f(client):
     owner, _ = register_owner(client, "owner@v.uz", "Vision Tekstil")
-    post = lambda url, body=None: client.post(f"{API}{url}", headers=owner, json=body or {})  # noqa: E731
+    post = lambda url, body=None: client.post(f"{API}{url}", headers=owner, json=body or {})
     product = post("/products", {"name": "Polo", "code": "PL", "category": "Polo", "status": "ACTIVE", "price": 1000}).json()
     wo = post("/production/work-orders", {"product_id": product["id"], "quantity": 20}).json()
     machine = post("/machines", {"code": "JK1", "name": "Juki", "machine_type": "LOCKSTITCH"}).json()
@@ -33,10 +33,9 @@ def test_device_key_and_heartbeat(client, f):
     assert "api_key" not in listed[0] and listed[0]["key_prefix"] == cam["api_key"][:12]
     assert send(client, "tfd_wrong").status_code == 401
     assert send(client, None).status_code == 401
-    r = send(client, cam["api_key"])  # bo'sh — heartbeat
+    r = send(client, cam["api_key"])
     assert r.status_code == 200 and r.json()["accepted"] == 0
     assert client.get(f"{V}/devices/{cam['id']}", headers=f["owner"]).json()["online"] is True
-    # Kalit almashtirilsa eskisi ishlamaydi
     new = client.post(f"{V}/devices/{cam['id']}/rotate-key", headers=f["owner"]).json()["api_key"]
     assert send(client, cam["api_key"]).status_code == 401 and send(client, new).status_code == 200
     client.patch(f"{V}/devices/{cam['id']}", headers=f["owner"], json={"is_active": False})
@@ -45,11 +44,9 @@ def test_device_key_and_heartbeat(client, f):
 
 def test_review_flow_default_rule(client, f):
     key = f["cam"]["api_key"]
-    # Qoida yo'q — odam tasdiqlaydi; ish buyurtmasi qurilmaga biriktirilmagan
     res = send(client, key, {"event_type": "COUNT", "external_id": "e1", "quantity": 12, "confidence": 0.99}).json()["results"][0]
     assert res["status"] == "PENDING" and "tasdiqlash" in res["message"]
     ev = client.get(f"{V}/events", headers=f["owner"], params={"status": "PENDING"}).json()["items"][0]
-    # Tasdiqlashda ish buyurtmasi aniqlanmasa — tushunarli xato
     assert client.post(f"{V}/events/{ev['id']}/apply", headers=f["owner"], json={}).status_code == 422
     r = client.post(f"{V}/events/{ev['id']}/apply", headers=f["owner"], json={"work_order_id": f["wo"]["id"]})
     assert r.status_code == 200, r.text
@@ -58,7 +55,6 @@ def test_review_flow_default_rule(client, f):
     wo = client.get(f"{API}/production/work-orders/{f['wo']['id']}", headers=f["owner"]).json()
     log = wo["logs"][0]
     assert log["source"] == "CAMERA" and log["quantity_good"] == 12 and log["stage"] == "CUTTING"
-    # Qayta tasdiqlanmaydi; rad etish faqat kutilayotganga
     assert client.post(f"{V}/events/{ev['id']}/apply", headers=f["owner"], json={}).status_code == 409
     res = send(client, key, {"event_type": "COUNT", "external_id": "e2", "quantity": 3}).json()["results"][0]
     r = client.post(f"{V}/events/{res['event_id']}/reject", headers=f["owner"], json={"reason": "noto'g'ri sanoq"}).json()
@@ -70,14 +66,14 @@ def test_auto_apply_rules(client, f):
     client.patch(f"{V}/devices/{cam['id']}", headers=o, json={"work_order_id": f["wo"]["id"], "machine_id": f["machine"]["id"]})
     for et in ("COUNT", "DEFECT", "MACHINE_STATE"):
         assert f["post"]("/vision/rules", {"event_type": et, "action": "AUTO_APPLY", "min_confidence": 0.8}).status_code == 201
-    assert f["post"]("/vision/rules", {"event_type": "COUNT", "action": "REVIEW"}).status_code == 409  # bir xil qamrov
+    assert f["post"]("/vision/rules", {"event_type": "COUNT", "action": "REVIEW"}).status_code == 409
 
     results = send(
         client, key,
         {"event_type": "COUNT", "external_id": "a1", "quantity": 10, "confidence": 0.95, "employee_code": f["emp"]["employee_code"]},
-        {"event_type": "COUNT", "external_id": "a2", "quantity": 5, "confidence": 0.5},  # past ishonch
+        {"event_type": "COUNT", "external_id": "a2", "quantity": 5, "confidence": 0.5},
         {"event_type": "DEFECT", "external_id": "a3", "quantity": 1, "confidence": 0.9, "defect_reason": "Mato teshik"},
-        {"event_type": "COUNT", "external_id": "a4", "quantity": 50, "confidence": 0.99},  # rejadan oshadi
+        {"event_type": "COUNT", "external_id": "a4", "quantity": 50, "confidence": 0.99},
         {"event_type": "MACHINE_STATE", "external_id": "a5", "machine_state": "BROKEN", "confidence": 0.97},
         {"event_type": "CUSTOM", "external_id": "a6", "data": {"ppe": "no_gloves"}},
     ).json()["results"]
@@ -85,7 +81,6 @@ def test_auto_apply_rules(client, f):
     assert st == ["APPLIED", "PENDING", "APPLIED", "PENDING", "APPLIED", "STORED"], results
     assert "Ishonch past" in results[1]["message"] and "Qo'llanmadi" in results[3]["message"]
 
-    # Qayta yuborish — ikki marta yozilmaydi
     dup = send(client, key, {"event_type": "COUNT", "external_id": "a1", "quantity": 10, "confidence": 0.95}).json()["results"][0]
     assert dup["duplicate"] is True
     wo = client.get(f"{API}/production/work-orders/{f['wo']['id']}", headers=o).json()
@@ -93,7 +88,6 @@ def test_auto_apply_rules(client, f):
     assert cut["good"] == 10 and cut["defect"] == 1 and wo["status"] == "IN_PROGRESS"
     assert any(log["employee"] and log["employee"]["name"] == "Dilnoza" for log in wo["logs"])
     assert client.get(f"{API}/machines/{f['machine']['id']}", headers=o).json()["status"] == "BROKEN"
-    # Mashina buzilgach, kamera sanog'i ham mavjud qoidaga ko'ra rad etiladi (buzilgan mashinaga yozilmaydi)
     r = send(client, key, {"event_type": "COUNT", "external_id": "a7", "quantity": 1, "confidence": 0.99}).json()["results"][0]
     assert r["status"] == "PENDING"
 
@@ -114,12 +108,10 @@ def test_alert_rule_notification_and_isolation(client, f):
     assert client.get(f"{V}/devices", headers=other).json() == []
     assert client.get(f"{V}/events", headers=other).json()["total"] == 0
     assert client.get(f"{V}/devices/{f['cam']['id']}", headers=other).status_code == 404
-    # Boshqa fabrikaning WO raqami bilan — topilmaydi (qurilma faqat o'z fabrikasiga yozadi)
-    op = lambda url, b: client.post(f"{API}{url}", headers=other, json=b)  # noqa: E731
+    op = lambda url, b: client.post(f"{API}{url}", headers=other, json=b)
     p2 = op("/products", {"name": "Futbolka", "code": "T1", "category": "Futbolka", "status": "ACTIVE", "price": 1000}).json()
     wo2 = op("/production/work-orders", {"product_id": p2["id"], "quantity": 5}).json()
     f["post"]("/vision/rules", {"event_type": "COUNT", "action": "AUTO_APPLY", "min_confidence": 0})
-    # WO raqamlari fabrika ichida: bir xil raqam — qurilmaning O'Z fabrikasidagi ish buyurtmasi
     assert wo2["number"] == f["wo"]["number"]
     r = send(client, key, {"event_type": "COUNT", "external_id": "x1", "quantity": 1, "work_order": wo2["number"]}).json()["results"][0]
     assert r["status"] == "APPLIED" and r["message"].startswith(f["wo"]["number"])

@@ -50,12 +50,11 @@ from app.services import audit_service, machine_service, production_service
 from app.core.i18n import t
 
 VISION_VIEW_ROLES = production_service.PRODUCTION_VIEW_ROLES
-# Qurilma, qoida va hodisalarni tasdiqlash — ishlab chiqarish yozuvini kirita oladigan rahbarlar
 VISION_EDITOR_ROLES = production_service.PRODUCTION_EDITOR_ROLES
 
 KEY_PREFIX = "tfd_"
-ONLINE_SECONDS = 300  # oxirgi aloqa shundan yangi bo'lsa — "onlayn"
-DEFAULT_RULE = (RuleAction.REVIEW, Decimal("0.8"))  # qoida sozlanmagan bo'lsa — odam tasdiqlaydi
+ONLINE_SECONDS = 300
+DEFAULT_RULE = (RuleAction.REVIEW, Decimal("0.8"))
 STAGE_NAMES = production_service.STAGE_NAMES
 
 
@@ -80,9 +79,6 @@ def device_actor(device: Device) -> User:
     Audit jurnalida "Qurilma CAM-01" bo'lib ko'rinadi, created_by — bo'sh."""
     return User(id=None, email=f"device-{device.id}@local", full_name=f"Qurilma {device.code}",
                 role=Role.PRODUCTION_MANAGER, factory_id=device.factory_id, is_active=True)
-
-
-# ---------- qurilmalar ----------
 
 
 def _get_device(db: Session, actor: User, device_id: int) -> Device:
@@ -209,15 +205,12 @@ def authenticate(db: Session, key: str | None) -> Device:
     return d
 
 
-# ---------- qoidalar ----------
-
-
 def _rule_for(db: Session, device: Device, event_type: EventType) -> tuple[RuleAction, Decimal]:
     rules = db.scalars(select(VisionRule).where(
         VisionRule.factory_id == device.factory_id, VisionRule.event_type == event_type, VisionRule.is_active.is_(True),
         or_(VisionRule.device_id == device.id, VisionRule.device_id.is_(None)),
     ))
-    best = sorted(rules, key=lambda r: r.device_id is None)  # qurilmaning o'z qoidasi — birinchi
+    best = sorted(rules, key=lambda r: r.device_id is None)
     return (best[0].action, Decimal(best[0].min_confidence)) if best else DEFAULT_RULE
 
 
@@ -292,9 +285,6 @@ def delete_rule(db: Session, actor: User, rule_id: int) -> None:
                          summary=f"AI qoidasi o'chirildi: {r.event_type.value}", factory_id=r.factory_id)
     db.delete(r)
     db.commit()
-
-
-# ---------- hodisalarni qabul qilish va qayta ishlash ----------
 
 
 class _NotReady(Exception):
@@ -406,7 +396,7 @@ def ingest(db: Session, device: Device, data: IngestRequest, ip: str | None) -> 
         db.add(event)
         try:
             db.commit()
-        except IntegrityError:  # parallel qayta yuborish
+        except IntegrityError:
             db.rollback()
             existing = db.scalar(select(DeviceEvent).where(DeviceEvent.device_id == device.id, DeviceEvent.external_id == item.external_id))
             results.append(IngestResult(external_id=item.external_id, event_id=existing.id, status=existing.status,
@@ -423,7 +413,7 @@ def _new_event(device: Device, item: EventIn) -> DeviceEvent:
     if occurred.tzinfo is None:
         occurred = occurred.replace(tzinfo=timezone.utc)
     if occurred > _now() + timedelta(minutes=5):
-        occurred = _now()  # qurilma soati oldinda — qabul vaqtini olamiz
+        occurred = _now()
     payload = dict(item.data or {})
     if item.work_order:
         payload["work_order"] = item.work_order
@@ -434,9 +424,6 @@ def _new_event(device: Device, item: EventIn) -> DeviceEvent:
         unit_code=item.unit_code, employee_code=item.employee_code, image_url=item.image_url, payload=payload or None,
         status=EventStatus.PENDING, status_message="Qabul qilindi",
     )
-
-
-# ---------- hodisalar: ko'rish va tasdiqlash ----------
 
 
 def _event_out(e: DeviceEvent, wo: WorkOrder | None, reviewer: str | None) -> EventOut:

@@ -17,7 +17,6 @@ from app.core.i18n import t
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 
-# Fayl boshidagi imzo -> kengaytma
 _SIGNATURES: list[tuple[bytes, str]] = [
     (b"\xff\xd8\xff", "jpg"),
     (b"\x89PNG\r\n\x1a\n", "png"),

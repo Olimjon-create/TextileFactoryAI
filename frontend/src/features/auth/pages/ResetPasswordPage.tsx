@@ -8,7 +8,6 @@ import { authApi } from '../api';
 
 const MIN_LENGTH = 8;
 
-/** Emaildagi havola: /reset-password?token=... — yangi parol o'rnatish */
 export default function ResetPasswordPage() {
   const [params] = useSearchParams();
   const token = params.get('token') ?? '';

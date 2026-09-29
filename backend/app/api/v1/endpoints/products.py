@@ -19,7 +19,6 @@ from app.services.product_service import PRODUCT_EDITOR_ROLES
 
 router = APIRouter(prefix="/products", tags=["Products & BOM"])
 
-# O'qish — fabrikaning barcha xodimlari; o'zgartirish — faqat PRODUCT_EDITOR_ROLES
 can_edit = require_roles(*PRODUCT_EDITOR_ROLES)
 
 
@@ -69,9 +68,6 @@ def delete_product(
     product_id: int, db: Session = Depends(get_db), actor: User = Depends(can_edit)
 ):
     product_service.delete_product(db, actor, product_id)
-
-
-# ---------- BOM ----------
 
 
 @router.get("/{product_id}/bom", response_model=list[BOMItemOut])

@@ -90,7 +90,6 @@ export default function OrdersPage() {
 
   useEffect(() => {
     const t = setTimeout(load, 300);
-    // Yangi buyurtmalar o'z-o'zidan paydo bo'lishi uchun davriy yangilash
     const interval = setInterval(() => document.visibilityState === 'visible' && load(), REFRESH_MS);
     return () => {
       clearTimeout(t);
@@ -151,13 +150,11 @@ export default function OrdersPage() {
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      {/* Status bo'yicha tezkor filtr */}
       <Box
         sx={{
           display: 'flex',
           gap: 1,
           mb: 2,
-          // Telefonda — bir qatorda, yonga suriladi (ekranni egallamaydi)
           flexWrap: { xs: 'nowrap', md: 'wrap' },
           overflowX: { xs: 'auto', md: 'visible' },
           mx: { xs: -2, md: 0 },
@@ -264,7 +261,6 @@ export default function OrdersPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Birinchi yuklanishda — jadval qatorlari shaklidagi skeleton */}
               {loading && orders.length === 0 && <TableRowsSkeleton cols={isSuperAdmin ? 8 : 7} />}
               {orders.map((o) => (
                 <TableRow

@@ -12,10 +12,6 @@ interface Value {
 
 const NewOrdersContext = createContext<Value>({ newCount: 0, refresh: () => undefined });
 
-/**
- * Yangi (to'langan, hali ko'rib chiqilmagan) buyurtmalar soni — sidebar belgisi uchun.
- * Har 30 soniyada yangilanadi, shuning uchun mijoz to'lagan buyurtma zavodga darhol ko'rinadi.
- */
 export function NewOrdersProvider({ children }: { children: ReactNode }) {
   const { hasRole, user } = useAuth();
   const enabled = !!user && hasRole(...ORDER_VIEW_ROLES);

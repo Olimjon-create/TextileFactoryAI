@@ -29,7 +29,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  material: MaterialDetail | null; // null — yangi material
+  material: MaterialDetail | null;
   onClose: () => void;
   onSaved: (material: MaterialDetail) => void;
 }

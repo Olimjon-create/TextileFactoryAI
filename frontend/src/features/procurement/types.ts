@@ -154,7 +154,6 @@ export interface ProcurementSummary {
   expected_7d: number;
 }
 
-/** Xarid formasini oldindan to'ldirish (masalan, buyurtma yetishmovchiligidan) */
 export interface PurchasePrefill {
   order_id?: number | null;
   order_number?: string | null;

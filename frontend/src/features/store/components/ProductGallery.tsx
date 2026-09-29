@@ -19,10 +19,6 @@ function Caption({ children }: { children: string }) {
   );
 }
 
-/**
- * Mahsulot rasmlari: kiyimning o'zi va (bo'lsa) odam ustida turishi — yonma-yon.
- * Bosilganda ikkalasi katta ko'rinishda ochiladi.
- */
 export default function ProductGallery({ product }: { product: StoreProduct }) {
   const [open, setOpen] = useState(false);
   const images = [

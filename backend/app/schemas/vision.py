@@ -21,9 +21,6 @@ class Ref(BaseModel):
     name: str
 
 
-# ---------- qurilmalar ----------
-
-
 class DeviceCreate(BaseModel):
     code: str
     name: str = Field(min_length=2, max_length=120)
@@ -51,7 +48,7 @@ class DeviceUpdate(BaseModel):
     stage: ProductionStage | None = None
     line_id: int | None = None
     machine_id: int | None = None
-    work_order_id: int | None = None  # hozir kuzatilayotgan ish buyurtmasi
+    work_order_id: int | None = None
     is_active: bool | None = None
     notes: str | None = Field(default=None, max_length=2000)
 
@@ -73,7 +70,7 @@ class DeviceOut(BaseModel):
     work_order: Ref | None
     key_prefix: str
     is_active: bool
-    online: bool  # oxirgi aloqa yaqinda bo'lganmi
+    online: bool
     last_seen_at: datetime | None
     last_ip: str | None
     notes: str | None
@@ -87,23 +84,20 @@ class DeviceWithKey(DeviceOut):
     api_key: str
 
 
-# ---------- hodisalar (qurilma API) ----------
-
-
 class EventIn(BaseModel):
     event_type: EventType
     external_id: str | None = Field(default=None, max_length=64)
-    occurred_at: datetime | None = None  # bo'sh — qabul qilingan vaqt; vaqt zonasi bilan yuboring
-    stage: ProductionStage | None = None  # bo'sh — qurilmaning bosqichi
+    occurred_at: datetime | None = None
+    stage: ProductionStage | None = None
     quantity: int | None = Field(default=None, ge=0, le=100_000)
     defect_reason: str | None = Field(default=None, max_length=300)
     machine_state: MachineStatus | None = None
     confidence: float | None = Field(default=None, ge=0, le=1)
-    work_order: str | None = Field(default=None, max_length=20)  # WO raqami (WO-000012) — bo'sh bo'lsa qurilmaga biriktirilgan
-    unit_code: str | None = Field(default=None, max_length=40)  # partiya/quti QR kodi
-    employee_code: str | None = Field(default=None, max_length=30)  # xodim kodi (bejik/yuz tanish)
+    work_order: str | None = Field(default=None, max_length=20)
+    unit_code: str | None = Field(default=None, max_length=40)
+    employee_code: str | None = Field(default=None, max_length=30)
     image_url: str | None = Field(default=None, max_length=500)
-    data: dict[str, Any] | None = None  # modelning qo'shimcha natijalari (bbox, klasslar...)
+    data: dict[str, Any] | None = None
 
     @field_validator("external_id", "defect_reason", "work_order", "unit_code", "employee_code")
     @classmethod
@@ -124,7 +118,7 @@ class EventIn(BaseModel):
 
 
 class IngestRequest(BaseModel):
-    events: list[EventIn] = Field(default_factory=list, max_length=MAX_BATCH)  # bo'sh — faqat "tirikman" (heartbeat)
+    events: list[EventIn] = Field(default_factory=list, max_length=MAX_BATCH)
 
 
 class IngestResult(BaseModel):
@@ -182,12 +176,9 @@ class RejectRequest(BaseModel):
     reason: str | None = Field(default=None, max_length=300)
 
 
-# ---------- qoidalar ----------
-
-
 class RuleIn(BaseModel):
     event_type: EventType
-    device_id: int | None = None  # bo'sh — fabrikaning barcha qurilmalari uchun
+    device_id: int | None = None
     action: RuleAction
     min_confidence: float = Field(default=0.8, ge=0, le=1)
     alert_threshold: int | None = Field(default=None, ge=1, le=1_000_000)
@@ -228,5 +219,5 @@ class VisionSummary(BaseModel):
     pending: int
     applied_today: int
     rejected_today: int
-    counted_today: int  # kamera sanagan dona (qo'llangan)
+    counted_today: int
     defects_today: int

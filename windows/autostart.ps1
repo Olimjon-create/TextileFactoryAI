@@ -1,4 +1,3 @@
-# Kompyuterga kirganda TextileCore avtomatik (yashirin) ishga tushishi: Startup papkasiga yorliq
 param([switch]$Disable)
 $link = Join-Path ([Environment]::GetFolderPath('Startup')) 'TextileFactoryAI.lnk'
 if ($Disable) {

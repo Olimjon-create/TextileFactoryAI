@@ -1,6 +1,5 @@
 import { Box, Chip, Tooltip, Typography } from '@mui/material';
 
-/** O'lcham yoki ranglarni ixcham ko'rsatadi: birinchi `max` tasi va "+N" */
 export default function VariantChips({ values, max = 4 }: { values: string[]; max?: number }) {
   if (values.length === 0) {
     return (

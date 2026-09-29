@@ -18,8 +18,6 @@ import { USER_MANAGER_ROLES } from '@/shared/constants/roles';
 import NotFoundPage from '@/shared/pages/NotFoundPage';
 import RouteErrorPage from '@/shared/pages/RouteErrorPage';
 
-// Sahifalar alohida bo'laklarda yuklanadi (code splitting): sayt tezroq ochiladi,
-// sahifa kodi yuklanayotganda layout ichidagi Suspense skeleton ko'rsatadi.
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
@@ -63,10 +61,8 @@ const StoreFactoryPage = lazy(() => import('@/features/store/pages/StoreFactoryP
 const StoreOrdersPage = lazy(() => import('@/features/store/pages/StoreOrdersPage'));
 
 export const router = createBrowserRouter([
-  // Mijozlar uchun ochiq katalog — login talab qilinmaydi
   {
     element: <StoreLayout />,
-    // Sahifa kodi yuklanmasa (yangi versiya) yoki kutilmagan xato — tushunarli sahifa
     errorElement: <RouteErrorPage />,
     children: [
       { path: '/store', element: <StoreHomePage /> },
@@ -76,7 +72,6 @@ export const router = createBrowserRouter([
   },
   {
     element: <GuestRoute />,
-    // Sahifa kodi yuklanmasa (yangi versiya) yoki kutilmagan xato — tushunarli sahifa
     errorElement: <RouteErrorPage />,
     children: [
       {
@@ -92,7 +87,6 @@ export const router = createBrowserRouter([
   },
   {
     element: <ProtectedRoute />,
-    // Sahifa kodi yuklanmasa (yangi versiya) yoki kutilmagan xato — tushunarli sahifa
     errorElement: <RouteErrorPage />,
     children: [
       {
@@ -154,7 +148,6 @@ export const router = createBrowserRouter([
             element: <RoleGuard roles={REPORT_VIEW_ROLES} />,
             children: [{ path: '/reports', element: <ReportsPage /> }],
           },
-          // Sozlamalar — hamma uchun (profil); moliyaviy qism sahifa ichida rol bo'yicha
           { path: '/settings', element: <SettingsPage /> },
           {
             element: <RoleGuard roles={LOGISTICS_VIEW_ROLES} />,
@@ -198,7 +191,6 @@ export const router = createBrowserRouter([
             element: <RoleGuard roles={KPI_VIEW_ROLES} />,
             children: [{ path: '/production/kpi', element: <KpiPage /> }],
           },
-          // Yangi modullar sahifalari shu yerga qo'shiladi
         ],
       },
     ],

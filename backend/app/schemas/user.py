@@ -15,9 +15,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(min_length=6, max_length=128)
     role: Role = Role.WORKER
-    # SUPER_ADMIN uchun majburiy (boshqa rollarda avtomatik o'z fabrikasi olinadi)
     factory_id: int | None = None
-    # Faqat SUPER_ADMIN, zavod egasi yaratilganda: factory_id o'rniga — shu nomli yangi fabrika ochiladi
     factory_name: str | None = Field(default=None, min_length=2, max_length=200)
     is_active: bool = True
 

@@ -22,7 +22,6 @@ export default function AttendancePage() {
   const [employeeId, setEmployeeId] = useState<number | null>(null);
   const [leaveOpen, setLeaveOpen] = useState(false);
   const [pending, setPending] = useState(0);
-  // Bir tabdagi o'zgarish boshqalarini ham yangilashi uchun
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
@@ -58,7 +57,6 @@ export default function AttendancePage() {
       {tab === 'daily' && (
         <DailyTab canEdit={canEdit} canApprove={canApprove} onOpenEmployee={setEmployeeId} onLeaveChanged={refresh} refreshKey={refreshKey} />
       )}
-      {/* Kutilayotgan so'rovlar soni tab belgisida doim ko'rinishi uchun tab yashirin holatda ham yuklanadi */}
       <Box sx={{ display: tab === 'leaves' ? 'block' : 'none' }}>
         <LeavesTab
           canEdit={canEdit}

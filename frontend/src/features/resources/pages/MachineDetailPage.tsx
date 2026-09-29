@@ -49,8 +49,6 @@ import type { Employee, MachineDetail, MachineStatus, MaintenanceKind } from '..
 import { formatDate, formatDateTime } from '@/shared/utils/dates';
 import { tr } from '@/i18n';
 
-// ---------- holatni o'zgartirish (sabab bilan) ----------
-
 function StatusDialog({ machine, target, onClose, onDone }: { machine: MachineDetail; target: MachineStatus | null; onClose: () => void; onDone: (m: MachineDetail) => void }) {
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
@@ -108,8 +106,6 @@ function StatusDialog({ machine, target, onClose, onDone }: { machine: MachineDe
   );
 }
 
-// ---------- texnik xizmat / ta'mir ----------
-
 function MaintenanceDialog({ machine, open, onClose, onDone }: { machine: MachineDetail; open: boolean; onClose: () => void; onDone: (m: MachineDetail) => void }) {
   const [kind, setKind] = useState<MaintenanceKind>('REPAIR');
   const [description, setDescription] = useState('');
@@ -136,7 +132,6 @@ function MaintenanceDialog({ machine, open, onClose, onDone }: { machine: Machin
     setCost('');
     setTechnician(null);
     setTechnicianName('');
-    // Buzilgan/xizmatdagi mashina odatda tuzatilgach ishga qaytadi
     setSetStatus(broken ? 'WORKING' : '');
     resourcesApi
       .employees({ status: 'ACTIVE', limit: 200 })
@@ -226,8 +221,6 @@ function MaintenanceDialog({ machine, open, onClose, onDone }: { machine: Machin
     </Dialog>
   );
 }
-
-// ---------- sahifa ----------
 
 function Stat({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: string; tone?: string }) {
   return (

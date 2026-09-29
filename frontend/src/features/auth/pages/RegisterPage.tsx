@@ -24,7 +24,6 @@ type Errors = Partial<Record<Field, string>>;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_RE = /^\+?[\d\s()-]{7,20}$/;
 
-// Backenddagi RegisterRequest cheklovlari bilan bir xil
 function validate(form: typeof EMPTY): Errors {
   const errors: Errors = {};
   const factoryName = form.factory_name.trim();
@@ -62,7 +61,6 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
 
   const errors = validate(form);
-  // Xato maydonga tegib chiqilgandan (blur) yoki yuborishga uringandan keyin ko'rsatiladi
   const fieldError = (field: Field) => ((touched[field] || submitted) && errors[field]) || '';
 
   const fieldProps = (field: Field) => ({
@@ -96,7 +94,6 @@ function RegisterForm() {
     }
   };
 
-  // Google orqali: yangi foydalanuvchi uchun fabrika avtomatik yaratiladi (nomini keyin o'zgartirish mumkin)
   const handleGoogle = async (credential: string) => {
     setError('');
     setLoading(true);
@@ -147,7 +144,6 @@ function RegisterForm() {
   );
 }
 
-/** Ochiq ro'yxatdan o'tish sozlama bilan yoqiladi; yopiq bo'lsa zavod egalarini administrator qo'shadi */
 export default function RegisterPage() {
   const [enabled, setEnabled] = useState<boolean | null>(null);
   useEffect(() => {

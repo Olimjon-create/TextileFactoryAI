@@ -43,11 +43,8 @@ export interface NavItem {
   label: string;
   path: string;
   icon: ReactNode;
-  /** Ko'rsatilmasa — barcha rollarga ochiq */
   roles?: Role[];
-  /** Menyu yonidagi son belgisi (masalan, yangi buyurtmalar) */
   badge?: 'newOrders';
-  /** Yangi oynada ochiladigan tashqi sahifa (masalan, mijozlar katalogi) */
   external?: boolean;
 }
 
@@ -56,16 +53,11 @@ export interface NavSection {
   items: NavItem[];
 }
 
-/**
- * Sidebar menyusi. Yangi modul (ERP, MES, ombor, ishlab chiqarish, sifat nazorati,
- * AI / computer vision) qo'shilganda shu yerga yangi bo'lim yoki element qo'shiladi.
- */
 export const NAVIGATION: NavSection[] = [
   {
     title: tr("Asosiy"),
     items: [
       { label: tr("Dashboard"), path: '/', icon: <DashboardOutlinedIcon /> },
-      // Har bir hisobot o'z modulining ruxsati bilan (backend report_service.REPORTS)
       { label: tr("Hisobotlar"), path: '/reports', icon: <AssessmentOutlinedIcon />, roles: REPORT_VIEW_ROLES },
     ],
   },
@@ -90,7 +82,6 @@ export const NAVIGATION: NavSection[] = [
   {
     title: tr("Ishlab chiqarish"),
     items: [
-      // Barcha rollar ko'radi; o'zgartirish huquqi features/products/permissions.ts da
       { label: tr("Mahsulotlar va BOM"), path: '/products', icon: <CheckroomOutlinedIcon /> },
       { label: tr("Ish buyurtmalari"), path: '/production', icon: <AssignmentOutlinedIcon />, roles: PRODUCTION_VIEW_ROLES },
       { label: tr("Skaner (QR)"), path: '/production/scan', icon: <QrCodeScannerIcon />, roles: PRODUCTION_VIEW_ROLES },
@@ -110,7 +101,6 @@ export const NAVIGATION: NavSection[] = [
   {
     title: tr("Ombor"),
     items: [
-      // Ko'rish — rahbarlar; kiritish huquqi features/inventory/permissions.ts da
       { label: tr("Umumiy ko'rinish"), path: '/warehouse', icon: <SpaceDashboardOutlinedIcon />, roles: INVENTORY_VIEW_ROLES },
       { label: tr("Materiallar"), path: '/inventory/materials', icon: <Inventory2OutlinedIcon />, roles: INVENTORY_VIEW_ROLES },
       { label: tr("Kirim-chiqim jurnali"), path: '/inventory/movements', icon: <SwapVertIcon />, roles: INVENTORY_VIEW_ROLES },
@@ -128,17 +118,14 @@ export const NAVIGATION: NavSection[] = [
   {
     title: tr("Savdo"),
     items: [
-      // Katalog orqali kelgan to'langan buyurtmalar
       { label: tr("Buyurtmalar"), path: '/orders', icon: <ReceiptLongOutlinedIcon />, roles: ORDER_VIEW_ROLES, badge: 'newOrders' },
       { label: tr("Jo'natmalar"), path: '/shipments', icon: <LocalShippingOutlinedIcon />, roles: LOGISTICS_VIEW_ROLES },
-      // WORKER ko'rmaydi; boshqarish huquqi features/customers/permissions.ts da
       { label: tr("Mijozlar"), path: '/customers', icon: <HandshakeOutlinedIcon />, roles: CUSTOMER_VIEW_ROLES },
       { label: tr("Mijozlar katalogi"), path: '/store', icon: <StorefrontOutlinedIcon />, external: true },
     ],
   },
 ];
 
-/** Menyuning eng pastida (fabrika nomi ustida) turadigan bandlar */
 export const BOTTOM_NAVIGATION: NavItem[] = [
   { label: tr("Sozlamalar"), path: '/settings', icon: <SettingsOutlinedIcon /> },
 ];

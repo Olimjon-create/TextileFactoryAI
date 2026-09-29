@@ -1,9 +1,3 @@
-/**
- * Telegram Mini App: bot "Do'konni ochish" tugmasi saytni Telegram ichida ochadi va URL'ning #hash qismida
- * tgWebAppData (imzolangan foydalanuvchi ma'lumoti) yuboradi. Router hash'ni yo'qotadi, shuning uchun
- * birinchi yuklanishda sessionStorage'ga olib qo'yamiz. Imzo serverda tekshiriladi — bu yerda faqat tashiladi.
- */
-
 const KEY = 'tfai_tg_init';
 
 function capture(): string | null {
@@ -21,13 +15,10 @@ function capture(): string | null {
 
 const initData = capture();
 
-/** Mini App ichida ochilganmi */
 export const inTelegram = (): boolean => !!initData;
 
-/** Buyurtma bilan serverga yuboriladi (mijozga holat xabarlari shu Telegram hisobiga boradi) */
 export const telegramInitData = (): string | null => initData;
 
-/** Telegram foydalanuvchisining ilova tili (sayt tili hali tanlanmagan bo'lsa ishlatiladi) */
 export function telegramLanguage(): string | null {
   if (!initData) return null;
   try {
@@ -38,7 +29,6 @@ export function telegramLanguage(): string | null {
   }
 }
 
-/** Telegram'ning rasmiy skripti: to'liq ekran, "tayyor" signali. Faqat Mini App ichida yuklanadi. */
 export function startTelegramApp(): void {
   if (!initData) return;
   const script = document.createElement('script');

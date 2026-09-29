@@ -124,7 +124,6 @@ export default function CustomersPage() {
     if (isSuperAdmin) factoriesApi.list().then(setFactories).catch(() => undefined);
   }, [loadMeta, isSuperAdmin]);
 
-  // Filtr o'zgarsa birinchi sahifaga qaytamiz
   useEffect(() => setPage(0), [search, status, type, country, factoryId, rowsPerPage]);
 
   const hasFilters = !!(search || status || type || country || factoryId);
@@ -157,7 +156,6 @@ export default function CustomersPage() {
 
   const colSpan = 8 + (isSuperAdmin ? 1 : 0);
 
-  // Tahrirlash/o'chirish — jadvalda ham, telefon kartalarida ham bir xil
   const rowActions = (c: Customer) => (
     <>
       <Tooltip title={tr("Tahrirlash")}>
@@ -216,7 +214,6 @@ export default function CustomersPage() {
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      {/* Status bo'yicha statistika — bosilganda filtr qo'llanadi */}
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, mb: 2 }}>
         {STAT_CARDS.map((card) => {
           const value = card.key ? stats?.by_status[card.key] : stats?.total;
@@ -334,7 +331,6 @@ export default function CustomersPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Birinchi yuklanishda — jadval qatorlari shaklidagi skeleton */}
               {loading && customers.length === 0 && <TableRowsSkeleton cols={colSpan} />}
               {customers.map((c) => (
                 <TableRow key={c.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/customers/${c.id}`)}>

@@ -10,7 +10,6 @@ import { tr } from '@/i18n';
 
 const MIN_LENGTH = 8;
 
-/** Foydalanuvchi o'z parolini almashtiradi (joriy parol + yangi parol ikki marta) */
 export default function ChangePasswordDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');

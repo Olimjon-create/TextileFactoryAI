@@ -30,7 +30,6 @@ payment_status = sa.Enum("PENDING", "PAID", "FAILED", "REFUNDED", name="payment_
 
 
 def upgrade() -> None:
-    # --- Zavodning katalog profili ---
     with op.batch_alter_table("factories") as batch:
         batch.add_column(sa.Column("city", sa.String(100), nullable=True))
         batch.add_column(sa.Column("short_description", sa.String(200), nullable=True))
@@ -41,12 +40,10 @@ def upgrade() -> None:
             sa.Column("is_public", sa.Boolean(), server_default=sa.true(), nullable=False)
         )
 
-    # --- Mahsulot narxi va rasmi ---
     with op.batch_alter_table("products") as batch:
         batch.add_column(sa.Column("price", sa.Numeric(14, 2), nullable=True))
         batch.add_column(sa.Column("image_url", sa.String(500), nullable=True))
 
-    # --- Buyurtmalar ---
     op.create_table(
         "orders",
         sa.Column("id", sa.Integer(), primary_key=True),

@@ -19,9 +19,6 @@ class Ref(BaseModel):
     name: str
 
 
-# ---------- tayyor mahsulot ombori ----------
-
-
 class LocationQty(BaseModel):
     location: Ref
     quantity: int
@@ -33,7 +30,7 @@ class StockRow(BaseModel):
     color: str | None
     quantity: int
     locations: list[LocationQty]
-    unit_price: float | None  # mahsulotning sotuv narxi
+    unit_price: float | None
     value: float | None
 
 
@@ -73,7 +70,7 @@ class FgMovementInput(str, enum.Enum):
     RETURN = "RETURN"
     WRITE_OFF = "WRITE_OFF"
     ADJUSTMENT = "ADJUSTMENT"
-    TRANSFER = "TRANSFER"  # ikki yozuvga aylanadi: TRANSFER_OUT (location_id) + TRANSFER_IN (to_location_id)
+    TRANSFER = "TRANSFER"
 
 
 class FgMovementCreate(BaseModel):
@@ -82,11 +79,9 @@ class FgMovementCreate(BaseModel):
     size: str | None = Field(default=None, max_length=30)
     color: str | None = Field(default=None, max_length=30)
     location_id: int
-    # Faqat TRANSFER: qaysi joyga ko'chiriladi
     to_location_id: int | None = None
-    # ADJUSTMENT — sanoq natijasi (joydagi haqiqiy qoldiq); boshqalar — miqdor (> 0)
     quantity: int = Field(ge=0, le=MAX_UNITS)
-    order_id: int | None = None  # qaytarishda — qaysi buyurtmadan
+    order_id: int | None = None
     note: str | None = Field(default=None, max_length=500)
 
     @field_validator("size", "color", "note")
@@ -111,23 +106,20 @@ class ProductionReceiptCreate(BaseModel):
 
 class WorkOrderStock(BaseModel):
     work_order_id: int
-    packed: int  # qadoqlash bosqichidan chiqqan
-    received: int  # omborga qabul qilingan
-    remaining: int  # hali omborga topshirilmagan
+    packed: int
+    received: int
+    remaining: int
 
 
 class FgSummary(BaseModel):
-    skus: int  # qoldig'i bor variantlar soni
+    skus: int
     units: int
-    value: float  # sotuv narxida
+    value: float
     received_30d: int
     shipped_30d: int
     shipments_preparing: int
     shipments_in_transit: int
     shipments_late: int
-
-
-# ---------- jo'natmalar ----------
 
 
 class _ShipmentFields(BaseModel):
@@ -151,7 +143,7 @@ class ShipmentCreate(_ShipmentFields):
     order_id: int
     items: list[ShipmentLineIn] = Field(min_length=1, max_length=200)
     planned_date: date | None = None
-    delivery_address: str | None = Field(default=None, max_length=300)  # bo'sh — buyurtmadagi manzil
+    delivery_address: str | None = Field(default=None, max_length=300)
     carrier: str | None = Field(default=None, max_length=100)
     vehicle_no: str | None = Field(default=None, max_length=30)
     driver_name: str | None = Field(default=None, max_length=100)
@@ -175,7 +167,6 @@ class ShipmentUpdate(_ShipmentFields):
 
 
 class ShipRequest(BaseModel):
-    # Berilmasa — qoldig'i bor joylardan avtomatik (ko'pidan boshlab)
     location_id: int | None = None
 
 
@@ -193,7 +184,7 @@ class ShipmentLineOut(BaseModel):
     size: str | None
     color: str | None
     quantity: int
-    in_stock: int  # shu variantning tayyor mahsulot omboridagi joriy qoldig'i
+    in_stock: int
 
 
 class ShipmentOut(BaseModel):
@@ -220,7 +211,7 @@ class ShipmentOut(BaseModel):
     created_by_name: str | None
     items_count: int
     total_quantity: int
-    is_late: bool  # rejadagi sana o'tdi, hali yo'lga chiqmagan
+    is_late: bool
 
 
 class ShipmentPage(BaseModel):
@@ -240,9 +231,9 @@ class OrderShippingLine(BaseModel):
     size: str | None
     color: str | None
     ordered: int
-    shipped: int  # yo'lga chiqqan va yetkazilgan
-    preparing: int  # tayyorlanayotgan jo'natmalarda
-    remaining: int  # hali jo'natmaga kiritilmagan
+    shipped: int
+    preparing: int
+    remaining: int
     in_stock: int
 
 

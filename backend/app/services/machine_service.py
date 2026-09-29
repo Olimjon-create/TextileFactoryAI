@@ -38,7 +38,7 @@ MACHINE_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.P
 MACHINE_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
 
 DOWN_STATUSES = (MachineStatus.BROKEN, MachineStatus.MAINTENANCE)
-MAINTENANCE_WARN_DAYS = 7  # texnik xizmatga shuncha kun qolganda "yaqinlashdi"
+MAINTENANCE_WARN_DAYS = 7
 STATS_PERIOD_DAYS = 30
 
 
@@ -55,9 +55,6 @@ def _aware(dt: datetime | None) -> datetime | None:
 
 def _minutes(a: datetime, b: datetime) -> int:
     return max(0, int((b - a).total_seconds() // 60))
-
-
-# ---------- texnik xizmat muddati ----------
 
 
 def next_maintenance(m: Machine) -> date | None:
@@ -81,9 +78,6 @@ def _machine_out(m: Machine, today: date | None = None) -> MachineOut:
         maintenance_due_soon=nxt is not None and today <= nxt <= today + timedelta(days=MAINTENANCE_WARN_DAYS),
         notes=m.notes, is_active=m.is_active, created_at=m.created_at,
     )
-
-
-# ---------- holat tarixi ----------
 
 
 def _open_period(db: Session, m: Machine, new_status: MachineStatus, at: datetime, actor: User | None, reason: str | None) -> None:
@@ -130,9 +124,6 @@ def _stats(db: Session, machine_ids: list[int], days: int = STATS_PERIOD_DAYS) -
     return out
 
 
-# ---------- CRUD ----------
-
-
 def _load(db: Session, actor: User, machine_id: int) -> Machine:
     m = db.scalar(select(Machine).options(selectinload(Machine.line)).where(Machine.id == machine_id))
     if m is None or not can_access(actor, m.factory_id):
@@ -164,7 +155,7 @@ def list_machines(
     status_: MachineStatus | None = None,
     machine_type: str | None = None,
     line_id: int | None = None,
-    maintenance: str | None = None,  # overdue | due_soon
+    maintenance: str | None = None,
     is_active: bool | None = True,
     factory_id: int | None = None,
     offset: int = 0,
@@ -184,7 +175,6 @@ def list_machines(
         query = query.where(Machine.is_active.is_(is_active))
     query = query.options(selectinload(Machine.line)).order_by(Machine.code)
     if maintenance in ("overdue", "due_soon"):
-        # Texnik xizmat sanasi hisoblanadigan qiymat — Python'da filtrlaymiz (mashinalar soni cheklangan)
         items = [_machine_out(m) for m in db.scalars(query)]
         items = [i for i in items if (i.maintenance_overdue if maintenance == "overdue" else i.maintenance_due_soon)]
         return MachinePage(items=items[offset : offset + limit], total=len(items))
@@ -255,7 +245,7 @@ def update_machine(db: Session, actor: User, machine_id: int, data: MachineUpdat
         audit_service.record(db, actor, entity="machine", entity_id=m.id, action=AuditAction.UPDATE,
                              summary=f"Mashina o'zgartirildi: {m.code}", factory_id=m.factory_id, changes=changes)
     db.commit()
-    db.expire(m)  # liniya bog'lanishi yangidan yuklansin
+    db.expire(m)
     return get_machine(db, actor, m.id)
 
 
@@ -270,9 +260,6 @@ def delete_machine(db: Session, actor: User, machine_id: int) -> None:
                          summary=f"Mashina o'chirildi: {m.code} — {m.name}", factory_id=m.factory_id)
     db.delete(m)
     db.commit()
-
-
-# ---------- holat va texnik xizmat ----------
 
 
 def _apply_status(db: Session, actor: User, m: Machine, new_status: MachineStatus, reason: str | None, at: datetime) -> None:
@@ -320,7 +307,6 @@ def add_maintenance(db: Session, actor: User, machine_id: int, data: Maintenance
         **data.model_dump(exclude={"set_status", "performed_at"}),
     )
     db.add(record)
-    # Rejali xizmat keyingi xizmat sanasini suradi
     if data.kind == MaintenanceKind.PREVENTIVE and (m.last_maintenance_date is None or performed_at.date() >= m.last_maintenance_date):
         m.last_maintenance_date = performed_at.date()
     db.flush()
@@ -331,9 +317,6 @@ def add_maintenance(db: Session, actor: User, machine_id: int, data: Maintenance
         _apply_status(db, actor, m, data.set_status, f"{kind} yakunlandi", _now())
     db.commit()
     return get_machine(db, actor, m.id)
-
-
-# ---------- umumiy ko'rsatkichlar ----------
 
 
 def summary(db: Session, actor: User, factory_id: int | None = None) -> ResourcesSummary:

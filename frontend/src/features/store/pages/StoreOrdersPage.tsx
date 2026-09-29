@@ -37,7 +37,6 @@ import type { PublicOrder } from '../types';
 import { formatDateTime } from '@/shared/utils/dates';
 import { tr } from '@/i18n';
 
-// Mijoz uchun tushunarli bosqichlar
 const STEPS: { status: PublicOrder['status']; label: string }[] = [
   { status: 'NEW', label: tr("Qabul qilindi") },
   { status: 'CONFIRMED', label: tr("Tasdiqlandi") },
@@ -130,7 +129,6 @@ function OrderCard({ order }: { order: PublicOrder }) {
   );
 }
 
-/** Buyurtma kartasi shaklidagi skeleton: raqam, bosqichlar, mahsulotlar, summa */
 function OrderCardSkeleton() {
   return (
     <Card>
@@ -233,13 +231,11 @@ export default function StoreOrdersPage() {
     }
   }, [tokens]);
 
-  // "Yangilash" tugmasi: jarayon ko'rinib tursin va natija aytilsin
   const refresh = useCallback(async () => {
     setRefreshing(true);
     setNotice('');
     const started = Date.now();
     await load();
-    // Juda tez javobda ham foydalanuvchi yangilanganini sezsin
     await new Promise((r) => setTimeout(r, Math.max(0, 400 - (Date.now() - started))));
     setRefreshing(false);
     setNotice(tr("Yangilandi"));
@@ -247,7 +243,6 @@ export default function StoreOrdersPage() {
 
   useEffect(() => {
     load();
-    // Zavod statusni o'zgartirsa — sahifa o'zi yangilanadi
     const id = setInterval(() => document.visibilityState === 'visible' && load(), REFRESH_MS);
     return () => clearInterval(id);
   }, [load]);

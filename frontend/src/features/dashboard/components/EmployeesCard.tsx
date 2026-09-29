@@ -17,7 +17,6 @@ import { useToast } from '@/shared/components/Toast';
 import { tr } from '@/i18n';
 
 const LIMIT = 7;
-// Ro'yxatda avval e'tibor talab qiladiganlar
 const STATE_ORDER: Record<DayState, number> = { ABSENT: 0, LATE: 1, NOT_MARKED: 2, SICK: 3, LEAVE: 4, VACATION: 5, PRESENT: 6 };
 
 function initials(name: string) {
@@ -29,7 +28,6 @@ function initials(name: string) {
     .join('');
 }
 
-/** Dashboard: faol xodimlar ro'yxati, bugungi davomat holati bilan; yangi xodim qo'shish */
 export default function EmployeesCard() {
   const navigate = useNavigate();
   const toast = useToast();
@@ -81,7 +79,6 @@ export default function EmployeesCard() {
           )}
         </Box>
 
-        {/* Bugungi davomat: qisqa xulosa */}
         {s && s.total > 0 && (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, mb: 1.5 }}>
             <MiniTile label={tr("Keldi")} value={`${s.present}/${s.total}`} color="success.main" />

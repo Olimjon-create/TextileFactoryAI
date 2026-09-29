@@ -27,7 +27,6 @@ class DemoProvider:
     name = "demo"
 
     def start(self, order: Order) -> PaymentStart:
-        # Frontend o'zining test to'lov oynasini ko'rsatadi, keyin /pay/demo ni chaqiradi
         return PaymentStart(provider=self.name, test_mode=True)
 
 

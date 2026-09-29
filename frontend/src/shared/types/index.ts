@@ -20,7 +20,6 @@ export interface Factory {
   is_active: boolean;
   users_count: number;
   created_at: string;
-  // Mijozlar katalogidagi profil
   is_public: boolean;
   city: string | null;
   short_description: string | null;

@@ -19,7 +19,7 @@ from pathlib import Path
 
 from sqlalchemy import create_engine, func, select, text
 
-import app.models  # noqa: F401  (barcha modellar metadata'ga ro'yxatdan o'tishi uchun)
+import app.models
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.migrations import run_migrations
@@ -99,7 +99,6 @@ def main() -> None:
             print(f"  {table.name}: {len(rows)}")
 
         if target.dialect.name == "postgresql":
-            # id'lar qo'lda berildi — keyingi yozuvlar to'qnashmasligi uchun sequence'larni suramiz
             for table in tables:
                 if "id" in table.columns:
                     target.execute(

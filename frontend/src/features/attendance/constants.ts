@@ -53,10 +53,8 @@ export const LEAVE_STATUS_COLORS: Record<LeaveStatus, ChipColor> = {
 
 export const keys = <T extends string>(o: Record<T, unknown>) => Object.keys(o) as T[];
 
-/** "08:03:00" -> "08:03" */
 export const hhmm = (t: string | null | undefined) => (t ? t.slice(0, 5) : '—');
 
-/** 482 -> "8 s 02 d" */
 export function duration(minutes: number | null | undefined): string {
   if (minutes === null || minutes === undefined) return '—';
   const h = Math.floor(minutes / 60);
@@ -64,7 +62,6 @@ export function duration(minutes: number | null | undefined): string {
   return h ? tr("{0} s {1} d", h, String(m).padStart(2, '0')) : tr("{0} daq", m);
 }
 
-/** Brauzerning mahalliy sanasi YYYY-MM-DD ko'rinishida */
 export function isoDate(d = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
@@ -78,14 +75,12 @@ export function shiftDate(iso: string, days: number): string {
 const WEEKDAYS = [tr("Yakshanba"), tr("Dushanba"), tr("Seshanba"), tr("Chorshanba"), tr("Payshanba"), tr("Juma"), tr("Shanba")];
 const MONTHS = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
 
-/** "2026-09-26" -> "Shanba, 26-sentabr" */
 export function longDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   const dt = new Date(y, m - 1, d);
   return `${WEEKDAYS[dt.getDay()]}, ${d}-${MONTHS[m - 1]}`;
 }
 
-/** "2026-09-26" -> "26.09" */
 export const shortDate = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}`;
 
 export function monthLabel(month: string): string {

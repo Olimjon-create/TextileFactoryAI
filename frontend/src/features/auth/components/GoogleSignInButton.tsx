@@ -3,7 +3,6 @@ import { Box, Divider, Typography } from '@mui/material';
 import { authApi } from '../api';
 import { tr } from '@/i18n';
 
-// Google Identity Services (https://developers.google.com/identity/gsi/web) — minimal tiplar
 interface GoogleCredentialResponse {
   credential: string;
 }
@@ -48,14 +47,12 @@ function loadGsiScript(): Promise<void> {
   return scriptPromise;
 }
 
-/** Chiqishda chaqiriladi: aks holda One Tap foydalanuvchini darhol qayta kiritib yuboradi */
 export function disableGoogleAutoSelect() {
   window.google?.accounts?.id?.disableAutoSelect();
 }
 
 interface Props {
   onCredential: (credential: string) => void;
-  /** Avval kirgan foydalanuvchini One Tap orqali avtomatik kiritish */
   autoPrompt?: boolean;
 }
 

@@ -14,7 +14,6 @@ export interface UserPayload {
   password?: string;
   role: Role;
   factory_id?: number | null;
-  /** Faqat super admin, zavod egasi bilan: yangi fabrika nomi */
   factory_name?: string;
   is_active: boolean;
 }

@@ -51,7 +51,7 @@ def _token(user: User) -> str:
 
 def seed_workflow_demo() -> bool:
     """Demo zavodga ish oqimi ma'lumotlarini qo'shadi (bor bo'lsa — hech narsa qilmaydi)."""
-    from app.main import app  # prepare() ichidan chaqiriladi — aylanma importdan qochish
+    from app.main import app
 
     with SessionLocal() as db:
         if db.scalar(select(User.id).where(User.email == OWNER_EMAIL)):
@@ -67,7 +67,6 @@ def seed_workflow_demo() -> bool:
             db.refresh(admin)
         factory_id = factory.id
 
-    # Lifespan ishga tushmaydi (context manager'siz) — prepare() qayta chaqirilmaydi
     client = TestClient(app, raise_server_exceptions=True)
     sa = _Api(client, _token(admin))
     owner_user = sa.post("/users", {"full_name": "Sardor Rahimov", "email": OWNER_EMAIL, "password": DEMO_PASSWORD, "phone": "+998901234567",
@@ -81,10 +80,9 @@ def seed_workflow_demo() -> bool:
         api.post("/users", {"full_name": name, "email": email, "password": DEMO_PASSWORD, "role": role})
 
     today = date.today()
-    ago = lambda n: (today - timedelta(days=n)).isoformat()  # noqa: E731
+    ago = lambda n: (today - timedelta(days=n)).isoformat()
     api("PUT", "/settings/factory", {"overhead_percent": 12, "defect_alert_percent": 3})
 
-    # ---------- ombor va xarid ----------
     mats = {}
     for code, name, mtype, unit, cost, minimum in (
         ("PIKE-220", "Pike mato 220 g/m²", "FABRIC", "METER", 32000, 150),
@@ -113,9 +111,8 @@ def seed_workflow_demo() -> bool:
 
     purchase(mato, [("PIKE-220", 600, 32000), ("KUL-180", 420, 26000)])
     purchase(furn, [("IP-40", 60, 18000), ("TUGMA-11", 3000, 250), ("YORLIQ", 2000, 180), ("PAKET", 2000, 350)])
-    purchase(mato, [("KUL-180", 300, 26500)], receive=False, order_date=ago(9), expected_date=ago(2))  # kechikkan xarid
+    purchase(mato, [("KUL-180", 300, 26500)], receive=False, order_date=ago(9), expected_date=ago(2))
 
-    # ---------- mahsulotlar va BOM ----------
     products = [p for p in api("GET", "/products") if p["sizes"]]
     polo, tee = products[0], products[1] if len(products) > 1 else products[0]
     for product, fabric, meters, buttons in ((polo, "PIKE-220", 1.4, 3), (tee, "KUL-180", 1.2, 0)):
@@ -126,7 +123,6 @@ def seed_workflow_demo() -> bool:
             api.post(f"/products/{product['id']}/bom", {"material_id": mats[code]["id"], "material_type": mtype, "material_name": "katalogdan",
                                                          "quantity": qty, "unit": unit, "waste_percent": waste})
 
-    # ---------- resurslar ----------
     lines = {}
     for code, name, stage, cap in (("KS-1", "Kesish sexi", "CUTTING", 1500), ("TK-1", "Tikuv liniyasi 1", "SEWING", 800),
                                    ("TK-2", "Tikuv liniyasi 2", "SEWING", 800), ("PZ-1", "Pardoz va dazmol", "FINISHING", 1200),
@@ -152,13 +148,12 @@ def seed_workflow_demo() -> bool:
         ("KS-01", "Eastman kesish mashinasi", "CUTTING", "KS-1", "WORKING", 90, ago(20)),
         ("JK-01", "Juki DDL-8700", "LOCKSTITCH", "TK-1", "WORKING", 60, ago(15)),
         ("JK-02", "Juki DDL-8700", "LOCKSTITCH", "TK-1", "WORKING", 60, ago(15)),
-        ("OV-01", "Juki MO-6814 overlok", "OVERLOCK", "TK-2", "WORKING", 30, ago(40)),  # texnik xizmat muddati o'tgan
+        ("OV-01", "Juki MO-6814 overlok", "OVERLOCK", "TK-2", "WORKING", 30, ago(40)),
         ("PR-01", "Dazmol presi", "PRESS", "PZ-1", "IDLE", None, None),
     ):
         mach[code] = api.post("/machines", {"code": code, "name": name, "machine_type": mtype, "line_id": lines[line]["id"], "status": status,
                                             "maintenance_interval_days": interval, "last_maintenance_date": last})
 
-    # ---------- mijozlar va buyurtmalar ----------
     cust = [api.post("/customers", {"name": n, "customer_type": "COMPANY", "status": "ACTIVE", "phone": ph, "country": "UZ", "contact_person": cp})
             for n, ph, cp in (("Baraka Savdo MChJ", "+998901000001", "Anvar Qosimov"), ("Orient Textile Group", "+998901000002", "Laylo Hamidova"),
                               ("Samarqand Kiyim Uyi", "+998901000003", "Shoxrux Olimov"))]
@@ -177,13 +172,12 @@ def seed_workflow_demo() -> bool:
             "employee_id": emp[who]["id"] if who else None, "machine_id": mach[machine]["id"] if machine else None,
             "duration_minutes": minutes, "fabric_used": fabric})
 
-    # 1) Baraka: to'liq sikl — ishlab chiqarildi, jo'natildi, yetkazildi, to'landi
     o1 = api.post("/orders", {"customer_id": cust[0]["id"], "due_date": (today + timedelta(days=3)).isoformat(), "comment": "Korporativ polo, logotip bilan",
                               "items": [{"product_id": polo["id"], "quantity": 120, **variant(polo, 1)}, {"product_id": polo["id"], "quantity": 80, **variant(polo, 2)}]})
     issue(o1)
     for i, wo in enumerate(api.post(f"/orders/{o1['id']}/work-orders", {"line_id": lines["TK-1"]["id"], "overcut_pct": 3})):
         q = wo["quantity"]
-        cut = int(q * 1.03)  # ortiqcha kesish chegarasi (pastga yaxlitlanadi)
+        cut = int(q * 1.03)
         log(wo, "CUTTING", cut, 12 - i, who="cut", machine="KS-01", minutes=240, fabric=round(cut * 1.42, 1))
         log(wo, "SEWING", cut - 2, 10 - i, defect=2, reason="Chok qiyshiq", who="s1" if i == 0 else "s2", machine="JK-01" if i == 0 else "JK-02", minutes=480)
         log(wo, "FINISHING", cut - 2, 8 - i, who="fin", minutes=300)
@@ -199,7 +193,6 @@ def seed_workflow_demo() -> bool:
     api.post(f"/shipments/{sh['id']}/deliver", {"received_by": "Anvar Qosimov"})
     api.post(f"/orders/{o1['id']}/payment")
 
-    # 2) Orient: ishlab chiqarishda — kesilgan, tikuv davom etmoqda, partiyalar QR bilan
     o2 = api.post("/orders", {"customer_id": cust[1]["id"], "due_date": (today + timedelta(days=9)).isoformat(),
                               "items": [{"product_id": tee["id"], "quantity": 150, **variant(tee, 0)}, {"product_id": tee["id"], "quantity": 150, **variant(tee, 1)}]})
     issue(o2)
@@ -213,11 +206,9 @@ def seed_workflow_demo() -> bool:
     log(wos2[0], "FINISHING", 60, 1, who="fin", minutes=240)
     log(wos2[1], "SEWING", 48, 1, who="s2", machine="JK-02", minutes=420)
 
-    # 3) Samarqand: yangi, material yetishmaydi (xarid qilish tugmasini ko'rsatish uchun)
     api.post("/orders", {"customer_id": cust[2]["id"], "due_date": (today + timedelta(days=21)).isoformat(),
                          "items": [{"product_id": polo["id"], "quantity": 500, **variant(polo, 0)}]})
 
-    # ---------- kamera / AI ----------
     cam = api.post("/vision/devices", {"code": "CAM-01", "name": "Tikuv liniyasi 2 kamerasi", "kind": "CAMERA", "stage": "SEWING",
                                        "line_id": lines["TK-2"]["id"], "machine_id": mach["OV-01"]["id"]})
     api("PATCH", f"/vision/devices/{cam['id']}", {"work_order_id": wos2[1]["id"]})

@@ -90,9 +90,6 @@ def employee_month(
     return svc.employee_month(db, actor, employee_id, month)
 
 
-# ---------- javob so'rovlari ----------
-
-
 @router.get("/leave-requests", response_model=LeavePage)
 def list_leaves(
     status_: LeaveStatus | None = Query(default=None, alias="status"),

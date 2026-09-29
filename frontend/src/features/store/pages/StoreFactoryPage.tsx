@@ -27,7 +27,6 @@ import StoreImage from '../components/StoreImage';
 import type { StoreFactoryDetail, StoreProduct } from '../types';
 import { tr } from '@/i18n';
 
-/** Telefonda uzun tavsif 4 qatorgacha qisqartiriladi, "Batafsil" bilan ochiladi */
 function ExpandableText({ text }: { text: string }) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
@@ -58,7 +57,6 @@ export default function StoreFactoryPage() {
   const [factory, setFactory] = useState<StoreFactoryDetail | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [category, setCategory] = useState<string | null>(null);
-  // Savatda boshqa zavod mahsulotlari bo'lsa — tasdiqlash uchun
   const [pending, setPending] = useState<{ product: StoreProduct; variant: Variant; quantity: number } | null>(null);
 
   const load = useCallback(() => {
@@ -68,7 +66,6 @@ export default function StoreFactoryPage() {
 
   useEffect(load, [load]);
 
-  // Bosh sahifa kollajidan kelinganda (?product=ID) — shu mahsulotga aylantirib, qisqa yoritamiz
   const [searchParams] = useSearchParams();
   const focusId = Number(searchParams.get('product')) || null;
   const [highlighted, setHighlighted] = useState<number | null>(null);
@@ -97,7 +94,6 @@ export default function StoreFactoryPage() {
     return (
       <>
         <Skeleton width={140} sx={{ mb: 1.5 }} />
-        {/* Zavod kartasi: muqova + logo + nom + tavsif */}
         <Card sx={{ mb: 4 }}>
           <Skeleton variant="rectangular" sx={{ height: { xs: 140, md: 220 } }} />
           <Box sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>
@@ -128,7 +124,6 @@ export default function StoreFactoryPage() {
         {tr("Barcha zavodlar")}
       </Button>
 
-      {/* ---------- Zavod haqida ---------- */}
       <Card sx={{ mb: 4, overflow: 'hidden' }}>
         <StoreImage
           src={factory.cover_url}
@@ -138,7 +133,6 @@ export default function StoreFactoryPage() {
           iconSize={80}
         />
         <Box sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>
-          {/* Logo muqovaga yarim chiqib turadi, nom esa muqovadan pastda */}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mt: { xs: -5, md: -6 }, mb: 2, flexWrap: 'wrap' }}>
             <Avatar
               src={factory.logo_url ?? undefined}
@@ -173,7 +167,6 @@ export default function StoreFactoryPage() {
         </Box>
       </Card>
 
-      {/* ---------- Mahsulotlar ---------- */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 2 }}>
         <Typography variant="h5" sx={{ mr: 2 }}>
           {tr("Mahsulotlar")}
@@ -230,4 +223,3 @@ export default function StoreFactoryPage() {
     </>
   );
 }
-

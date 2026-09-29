@@ -35,8 +35,8 @@ class DemoProduct:
     name: str
     code: str
     category: str
-    price: int  # so'm
-    shape: str  # rasm uchun siluet: tshirt, polo, shirt, sweater, hoodie, pants, coat, dress
+    price: int
+    shape: str
     colors: list[str]
     sizes: list[str]
     description: str
@@ -49,8 +49,8 @@ class DemoFactory:
     city: str
     short: str
     description: str
-    colors: tuple[str, str]  # muqova gradienti
-    font: str  # serif | sans
+    colors: tuple[str, str]
+    font: str
     tagline: str
     products: list[DemoProduct] = field(default_factory=list)
 
@@ -195,7 +195,6 @@ FACTORIES: list[DemoFactory] = [
     ),
 ]
 
-# --------------------------- SVG rasmlar ---------------------------
 
 COLOR_HEX = {
     "Oq": "#f7f7f5", "Qora": "#1f1f22", "Ko'k": "#1f3a93", "Havorang": "#8fb8de", "Qizil": "#c62828",
@@ -258,13 +257,12 @@ def product_svg(shape: str, color_name: str, seed_hex: str) -> str:
 </svg>"""
 
 
-# Kiyim siluetini manekendagi joyiga moslash: (vertikal masshtab, vertikal siljish)
 _ON_BODY = {
-    "pants": (0.79, 351),  # beldan oyoqqacha
-    "coat": (1.05, 73),  # yelkadan tizzagacha
+    "pants": (0.79, 351),
+    "coat": (1.05, 73),
     "dress": (1.04, 70),
 }
-_TOP = (0.75, 96)  # futbolka, polo, ko'ylak, sviter, hudi — yelkadan songacha
+_TOP = (0.75, 96)
 MANNEQUIN = "#dcd8d2"
 MANNEQUIN_SHADE = "#c9c4bc"
 
@@ -284,10 +282,8 @@ def model_svg(shape: str, color_name: str, seed_hex: str) -> str:
     dark = fill in ("#1f1f22", "#1f3a93", "#6d4c41")
     stroke = "rgba(255,255,255,0.35)" if dark else "rgba(0,0,0,0.22)"
     is_bottom = shape == "pants"
-    # Juftlik uchun neytral kiyim: ustki kiyimga — to'q shim, shimga — oq futbolka
     companion = _garment("tshirt", "#f2f1ee", "rgba(0,0,0,0.18)") if is_bottom else _garment("pants", "#3d3f46", "rgba(255,255,255,0.18)")
     body = (
-        # oyoqlar, qo'llar, bo'yin, bosh
         f'<path d="M262,430 L250,748 M338,430 L350,748" stroke="{MANNEQUIN}" stroke-width="46" stroke-linecap="round"/>'
         f'<ellipse cx="246" cy="760" rx="34" ry="12" fill="{MANNEQUIN_SHADE}"/><ellipse cx="354" cy="760" rx="34" ry="12" fill="{MANNEQUIN_SHADE}"/>'
         f'<path d="M205,190 L160,330 L150,462 M395,190 L440,330 L450,462" stroke="{MANNEQUIN}" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
@@ -296,7 +292,6 @@ def model_svg(shape: str, color_name: str, seed_hex: str) -> str:
         f'<rect x="282" y="120" width="36" height="62" rx="14" fill="{MANNEQUIN_SHADE}"/>'
         f'<ellipse cx="300" cy="86" rx="40" ry="50" fill="{MANNEQUIN}"/>'
     )
-    # Shim bo'lsa futbolka uning belini yopadi; qolgan hollarda asosiy kiyim ustki qatlam
     garment = _garment(shape, fill, stroke)
     layers = garment + companion if is_bottom else companion + garment
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
@@ -313,11 +308,8 @@ def cover_svg(f: DemoFactory) -> str:
     family = "Georgia, 'Times New Roman', serif" if f.font == "serif" else "'Helvetica Neue', Arial, sans-serif"
     weight = "400" if f.font == "serif" else "800"
     title = f.name.upper() if f.font == "serif" else f.name
-    # Katalog kartasi (4:3) rasmning faqat o'rtadagi ~930px qismini ko'rsatadi — nom ~760px ga sig'sin
     char_width = 0.78 if f.font == "serif" else 0.62
     size = int(min(150, 760 / (len(title) * char_width)))
-    # Nom + shior bloki rasmning vertikal o'rtasida (y=350) turadi: zavod sahifasidagi keng bannerda
-    # ham, katalog kartasida ham ko'rinadigan qism aynan o'rtadir.
     cap_height = int(size * 0.72)
     block = cap_height + 58
     title_y = 350 - block // 2 + cap_height
@@ -342,9 +334,6 @@ def logo_svg(f: DemoFactory) -> str:
 <rect width="400" height="400" fill="{a}"/>
 <text x="200" y="258" text-anchor="middle" fill="#fff" font-family="{family}" font-weight="700" font-size="{170 if len(initials) == 1 else 140}">{escape(initials)}</text>
 </svg>"""
-
-
-# --------------------------- asosiy ---------------------------
 
 
 def _write(rel_path: str, content: str) -> str:
@@ -393,7 +382,6 @@ def seed() -> None:
         for f in FACTORIES:
             logo, cover, images = _write_images(f)
             if f.name in demo:
-                # Avval qo'shilgan demo zavod — tavsif va rasmlarni yangilaymiz
                 demo[f.name].description = _description(f)
                 for product in db.scalars(select(Product).where(Product.factory_id == demo[f.name].id)):
                     if product.code in images:
@@ -437,7 +425,7 @@ def remove() -> None:
     with SessionLocal() as db:
         factories = _demo_factories(db)
         for factory in factories:
-            db.delete(factory)  # mahsulotlar, buyurtmalar va mijozlar FK CASCADE orqali o'chadi
+            db.delete(factory)
         db.commit()
     shutil.rmtree(media_dir() / DEMO_DIR, ignore_errors=True)
     print(f"Demo zavodlar o'chirildi: {len(factories)}")

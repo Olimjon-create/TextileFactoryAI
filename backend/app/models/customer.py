@@ -16,7 +16,7 @@ class CustomerType(str, enum.Enum):
 
 
 class CustomerStatus(str, enum.Enum):
-    LEAD = "LEAD"  # potensial mijoz
+    LEAD = "LEAD"
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
 
@@ -44,7 +44,7 @@ class Customer(Base, TimestampMixin):
     contact_person: Mapped[str | None] = mapped_column(String(200))
     phone: Mapped[str | None] = mapped_column(String(50))
     email: Mapped[str | None] = mapped_column(String(255))
-    country: Mapped[str | None] = mapped_column(String(2), index=True)  # ISO 3166-1 alpha-2
+    country: Mapped[str | None] = mapped_column(String(2), index=True)
     address: Mapped[str | None] = mapped_column(String(300))
     notes: Mapped[str | None] = mapped_column(Text)
 

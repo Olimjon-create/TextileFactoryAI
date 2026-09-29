@@ -73,7 +73,6 @@ export default function ProductDetailPage() {
     else setNotFound(true);
   }, [load, productId]);
 
-  // Material turlari bo'yicha qisqacha xulosa
   const summary = useMemo(() => {
     const map = new Map<string, number>();
     product?.bom_items.forEach((i) => map.set(i.material_type, (map.get(i.material_type) ?? 0) + 1));
@@ -99,7 +98,6 @@ export default function ProductDetailPage() {
     }
   };
 
-  // BOM qatori tugmalari — jadvalda ham, telefon kartalarida ham bir xil
   const bomActions = (item: BOMItem) => (
     <>
       <Tooltip title={tr("Tahrirlash")}>
@@ -133,7 +131,6 @@ export default function ProductDetailPage() {
         <Skeleton width={120} sx={{ mb: 1 }} />
         <Skeleton width={280} height={40} />
         <Skeleton width={120} sx={{ mb: 3 }} />
-        {/* Ma'lumotlar kartasi + BOM jadvali kartasi */}
         <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: '1fr 2fr' }, alignItems: 'start' }}>
           <CardSkeleton lines={6} />
           <Card>
@@ -206,7 +203,6 @@ export default function ProductDetailPage() {
         <Card>
           <CardContent sx={{ pb: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 1 }}>
-              {/* Tor ekranda tugma sarlavhani siqmasdan keyingi qatorga o'tadi */}
               <Box sx={{ flex: '1 1 240px', minWidth: 0 }}>
                 <Typography variant="h6">{tr("BOM — material tarkibi")}</Typography>
                 <Typography variant="body2" color="text.secondary">

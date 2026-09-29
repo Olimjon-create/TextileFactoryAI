@@ -9,11 +9,11 @@ RevenuePeriod = Literal["day", "week", "month", "year"]
 class RevenueBucket(BaseModel):
     start: date
     end: date
-    label: str  # o'q uchun qisqa: "26.09", "Sen", "2026"
-    full_label: str  # maslahat uchun: "26-sentabr 2026"
+    label: str
+    full_label: str
     revenue: float
     orders: int
-    current: bool = False  # joriy (tugamagan) davr
+    current: bool = False
 
 
 class RevenueQuick(BaseModel):
@@ -40,9 +40,9 @@ class RevenueOut(BaseModel):
     total: float
     orders: int
     average_order: float
-    prev_total: float  # oldingi xuddi shunday uzunlikdagi davr
+    prev_total: float
     prev_orders: int
-    change_pct: float | None  # oldingi davrga nisbatan, %
+    change_pct: float | None
     best: RevenueBucket | None
     quick: RevenueQuick
-    by_factory: list[FactoryRevenue] = []  # faqat SUPER_ADMIN (barcha fabrikalar)
+    by_factory: list[FactoryRevenue] = []

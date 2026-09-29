@@ -37,7 +37,6 @@ from scripts.seed_demo import (
 
 FRONTEND_PUBLIC = Path(__file__).resolve().parents[2] / "frontend" / "public"
 
-# seed_demo slug → to'qima brend: (slug, nom, shahar, qisqa, tavsif, muqova ranglari, shrift, shior, kod prefiksi)
 _BRANDS: dict[str, tuple] = {
     "zara": (
         "atlas-moda", "Atlas Moda", "Toshkent",
@@ -97,7 +96,6 @@ _BRANDS: dict[str, tuple] = {
     ),
 }
 
-# Savdo belgisi bo'lgan mahsulot nomlari → umumiy nomlar
 _PRODUCT_NAMES = {
     "AIRism paxta futbolka": "Salqin paxta futbolka",
     "HEATTECH uzun yengli": "Termo uzun yengli",
@@ -141,7 +139,7 @@ def _photo_url(path: str) -> str:
 def _urls(f: DemoFactory, codes: dict[str, str]) -> tuple[str, str, dict[str, tuple[str, str]]]:
     base = f"/media/demo/{f.slug}"
     images = {}
-    for p in f.products:  # p.code — asl kod (surat kaliti), fayl nomlarida esa yangi kod
+    for p in f.products:
         if p.code in PHOTOS:
             product_photo, model_photo = PHOTOS[p.code]
             images[p.code] = (_photo_url(product_photo), _photo_url(model_photo))
@@ -183,7 +181,6 @@ def seed_public() -> int:
     brands = public_factories()
     with SessionLocal() as db:
         if db.bind.dialect.name == "postgresql":
-            # Bir nechta serverless nusxa bir vaqtda qo'shmasin
             db.execute(text("SELECT pg_advisory_xact_lock(724002)"))
         existing = set(
             db.scalars(

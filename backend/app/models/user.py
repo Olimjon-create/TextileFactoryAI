@@ -21,7 +21,6 @@ class User(Base, TimestampMixin):
     role: Mapped[Role] = mapped_column(Enum(Role, name="user_role"), default=Role.WORKER)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    # SUPER_ADMIN hech qaysi fabrikaga bog'lanmaydi (factory_id = NULL)
     factory_id: Mapped[int | None] = mapped_column(
         ForeignKey("factories.id", ondelete="SET NULL"), index=True
     )

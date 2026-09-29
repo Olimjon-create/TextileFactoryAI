@@ -44,8 +44,6 @@ import { useResourcePermissions } from '../permissions';
 import type { ProductionLine, ProductionStage, Shift } from '../types';
 import { tr } from '@/i18n';
 
-// ---------- liniya dialogi ----------
-
 function LineDialog({ open, line, onClose, onSaved }: { open: boolean; line: ProductionLine | null; onClose: () => void; onSaved: () => void }) {
   const needsFactory = useNeedsFactory(!line);
   const [code, setCode] = useState('');
@@ -128,8 +126,6 @@ function LineDialog({ open, line, onClose, onSaved }: { open: boolean; line: Pro
   );
 }
 
-// ---------- smena dialogi ----------
-
 function ShiftDialog({ open, shift, onClose, onSaved }: { open: boolean; shift: Shift | null; onClose: () => void; onSaved: () => void }) {
   const needsFactory = useNeedsFactory(!shift);
   const [name, setName] = useState('');
@@ -154,7 +150,6 @@ function ShiftDialog({ open, shift, onClose, onSaved }: { open: boolean; shift: 
     setFactoryId('');
   }, [open, shift, save.reset]);
 
-  // Sof ish vaqti — tungi smena (tugash < boshlanish) ham hisobga olinadi
   const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
   const span = start && end ? ((toMin(end) - toMin(start) + 1440) % 1440 || 0) : 0;
   const br = Number(breakMin || 0);
@@ -210,8 +205,6 @@ function ShiftDialog({ open, shift, onClose, onSaved }: { open: boolean; shift: 
     </Dialog>
   );
 }
-
-// ---------- sahifa ----------
 
 type Deleting = { kind: 'line'; item: ProductionLine } | { kind: 'shift'; item: Shift } | null;
 

@@ -1,5 +1,3 @@
-// Mahsulot rang nomlari -> namuna rangi (katalogdagi rang tanlash doirachalari uchun).
-// Ro'yxatda yo'q nomlar uchun namuna ko'rsatilmaydi.
 const SWATCHES: Record<string, string> = {
   oq: '#f7f7f5',
   qora: '#1f1f22',

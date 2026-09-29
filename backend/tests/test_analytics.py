@@ -10,7 +10,7 @@ from tests.conftest import API, add_user, register_owner
 @pytest.fixture()
 def f(client):
     owner, factory_id = register_owner(client, "owner@an.uz", "Tahlil Tekstil")
-    post = lambda url, body=None: client.post(f"{API}{url}", headers=owner, json=body or {})  # noqa: E731
+    post = lambda url, body=None: client.post(f"{API}{url}", headers=owner, json=body or {})
     fab = post("/inventory/materials", {"code": "FAB", "name": "Pike", "material_type": "FABRIC", "unit": "METER", "min_stock": 50}).json()
     loc = post("/inventory/locations", {"code": "A", "name": "Ombor"}).json()
     post("/inventory/movements", {"movement_type": "RECEIPT", "material_id": fab["id"], "location_id": loc["id"], "quantity": 100, "unit_cost": 20000})
@@ -28,32 +28,29 @@ def f(client):
 
 def test_order_costing(client, f):
     o, post, order = f["owner"], f["post"], f["order"]
-    # Material: 15 m × 20 000 = 300 000; keyin narx oshsa ham chiqim o'sha paytdagi narxda qoladi
     assert client.post(f"{API}/orders/{order['id']}/materials/issue", headers=o, json={"lines": [{"material_id": f["fab"]["id"], "quantity": 15}]}).status_code == 200
     post("/inventory/movements", {"movement_type": "RECEIPT", "material_id": f["fab"]["id"], "location_id": f["loc"]["id"], "quantity": 10, "unit_cost": 99000})
     wo = client.post(f"{API}/orders/{order['id']}/work-orders", headers=o, json={}).json()[0]
-    log = lambda **b: post(f"/production/work-orders/{wo['id']}/logs", b)  # noqa: E731
-    log(stage="CUTTING", quantity_good=10, employee_id=f["hourly"]["id"], duration_minutes=90)  # 1.5 soat × 12 000 = 18 000
-    log(stage="SEWING", quantity_good=10, employee_id=f["piece"]["id"])  # 10 × 3 000 = 30 000
-    log(stage="FINISHING", quantity_good=10)  # xodimsiz — ogohlantirish
-    log(stage="QUALITY_CONTROL", quantity_good=10, employee_id=f["monthly"]["id"], duration_minutes=60)  # 4 160 000 / 208 = 20 000
+    log = lambda **b: post(f"/production/work-orders/{wo['id']}/logs", b)
+    log(stage="CUTTING", quantity_good=10, employee_id=f["hourly"]["id"], duration_minutes=90)
+    log(stage="SEWING", quantity_good=10, employee_id=f["piece"]["id"])
+    log(stage="FINISHING", quantity_good=10)
+    log(stage="QUALITY_CONTROL", quantity_good=10, employee_id=f["monthly"]["id"], duration_minutes=60)
     log(stage="PACKING", quantity_good=10)
 
     c = client.get(f"{API}/orders/{order['id']}/costing", headers=o).json()
-    assert c["material_actual"] == 300000 and c["material_planned"] == 15 * 99000  # reja — joriy narx bilan
+    assert c["material_actual"] == 300000 and c["material_planned"] == 15 * 99000
     assert c["labor"] == 68000 and c["overhead"] == 0 and c["total_cost"] == 368000
     assert c["revenue"] == 1_000_000 and c["margin"] == 632000 and c["margin_pct"] == 63.2
     assert c["produced_qty"] == 10 and c["cost_per_unit"] == 36800
     assert any("xodim" in w for w in c["warnings"])
 
-    # Ustama foizi — fabrika sozlamasidan
     assert client.get(f"{API}/settings/factory", headers=o).json()["overhead_percent"] == 0
     s = client.put(f"{API}/settings/factory", headers=o, json={"overhead_percent": 10, "low_margin_percent": 70}).json()
     assert s["overhead_percent"] == 10 and s["monthly_work_hours"] == 208
     c = client.get(f"{API}/orders/{order['id']}/costing", headers=o).json()
     assert c["overhead"] == 36800 and c["total_cost"] == 404800 and c["low_margin"] is True
 
-    # Ish haqi maxfiy — tannarxni ishlab chiqarish rahbari ko'rmaydi
     pm = add_user(client, o, "pm@an.uz", "PRODUCTION_MANAGER")
     assert client.get(f"{API}/orders/{order['id']}/costing", headers=pm).status_code == 403
     assert client.put(f"{API}/settings/factory", headers=pm, json={"overhead_percent": 1}).status_code == 403
@@ -98,7 +95,6 @@ def test_reports(client, f):
 
 def test_notifications(client, f):
     o, post = f["owner"], f["post"]
-    # Material kam (100 − 0 > 50 — hali yetarli); 60 chiqarilsa → 40 ≤ 50
     client.post(f"{API}/orders/{f['order']['id']}/materials/issue", headers=o, json={"lines": [{"material_id": f["fab"]["id"], "quantity": 60}]})
     m = post("/machines", {"code": "JK1", "name": "Juki", "machine_type": "LOCKSTITCH"}).json()
     post(f"/machines/{m['id']}/status", {"status": "BROKEN", "reason": "motor"})
@@ -110,6 +106,5 @@ def test_notifications(client, f):
     assert n["unread"] == len(n["items"]) - 1
     assert next(x for x in n["items"] if x["key"] == f"machine-broken:{m['id']}")["read"] is True
     assert client.post(f"{API}/notifications/read-all", headers=o).json()["unread"] == 0
-    # Boshqa foydalanuvchining o'qilgan holati alohida; ishchi ogohlantirish olmaydi
     w = add_user(client, o, "w3@an.uz", "WORKER")
     assert client.get(f"{API}/notifications", headers=w).json() == {"items": [], "unread": 0}

@@ -1,4 +1,3 @@
-# TextileCore - to'xtatish: qo'riqchi, backend (8001) va frontend (5180)
 $root = Split-Path -Parent $PSScriptRoot
 $pidFile = Join-Path $root 'logs\supervisor.pid'
 if (Test-Path $pidFile) {

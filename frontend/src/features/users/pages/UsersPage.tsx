@@ -94,7 +94,6 @@ export default function UsersPage() {
   if (!actor) return null;
   const editable = (u: User) => u.id !== actor.id && canManage(actor.role, u.role);
 
-  // Tahrirlash/o'chirish — jadvalda ham, telefon kartalarida ham bir xil
   const rowActions = (u: User) => (
     <>
       <Tooltip title={tr("Tahrirlash")}>
@@ -192,7 +191,6 @@ export default function UsersPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Birinchi yuklanishda — jadval qatorlari shaklidagi skeleton */}
               {loading && users.length === 0 && <TableRowsSkeleton cols={isSuperAdmin ? 6 : 5} />}
               {users.map((u) => (
                 <TableRow key={u.id} hover>

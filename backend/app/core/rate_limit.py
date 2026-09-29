@@ -36,7 +36,7 @@ def _too_many(retry: int) -> HTTPException:
 
 def _hit_db(key: str, limit: int, window_seconds: int) -> None:
     """Bazadagi hisoblagich (qat'iy oyna): serverless'ning barcha nusxalari bitta hisobni ko'radi."""
-    from app.core.database import engine  # aylanma importsiz
+    from app.core.database import engine
 
     now = int(time.time())
     window = now - now % window_seconds
@@ -51,7 +51,6 @@ def _hit_db(key: str, limit: int, window_seconds: int) -> None:
             ),
             {"k": key[:200], "w": window},
         ).scalar_one()
-        # Eski yozuvlar jadvalni to'ldirmasin (taxminan har 100 so'rovda bir marta)
         if random.random() < 0.01:
             conn.execute(text("DELETE FROM rate_limit_hits WHERE window_start < :old"), {"old": now - 86_400})
     if hits > limit:
@@ -73,7 +72,6 @@ def hit(key: str, limit: int, window_seconds: int) -> None:
         if len(bucket) >= limit:
             raise _too_many(int(bucket[0] + window_seconds - now) + 1)
         bucket.append(now)
-        # Xotira o'sib ketmasin: bo'shagan kalitlarni vaqti-vaqti bilan tozalash
         if len(_hits) > 50_000:
             for k in [k for k, v in _hits.items() if not v or v[-1] <= now - 3600]:
                 del _hits[k]

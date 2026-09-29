@@ -4,7 +4,6 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { useColorMode } from '@/app/ColorModeContext';
 import { tr } from '@/i18n';
 
-/** 🌙/☀️ — Light va Dark rejimlar orasida almashtirish */
 export default function ThemeToggle({ sx }: { sx?: SxProps<Theme> }) {
   const { mode, toggle } = useColorMode();
   const label = mode === 'dark' ? tr("Yorug' rejim") : tr("Qorong'i rejim");

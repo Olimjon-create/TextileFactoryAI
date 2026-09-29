@@ -53,7 +53,6 @@ from app.schemas.procurement import (
 from app.services import audit_service, inventory_service
 from app.core.i18n import t
 
-# Ta'minot ma'lumotlarini ko'rish va tahrirlash — ombor huquqlari bilan bir xil
 PROCUREMENT_VIEW_ROLES = inventory_service.INVENTORY_VIEW_ROLES
 PROCUREMENT_EDITOR_ROLES = inventory_service.INVENTORY_EDITOR_ROLES
 
@@ -75,9 +74,6 @@ def _q(v) -> Decimal:
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
-
-
-# ---------- yetkazib beruvchilar ----------
 
 
 def _get_supplier(db: Session, actor: User, supplier_id: int) -> Supplier:
@@ -180,7 +176,7 @@ def get_supplier(db: Session, actor: User, supplier_id: int) -> SupplierDetail:
             if o.expected_date is not None:
                 graded += 1
                 on_time += last.date() <= o.expected_date
-            if o.ordered_at is not None:  # ikkalasi ham UTC
+            if o.ordered_at is not None:
                 lead_days.append(max((last.replace(tzinfo=None) - o.ordered_at.replace(tzinfo=None)).total_seconds() / 86400, 0))
     stats = SupplierStats(
         orders_total=sum(1 for o in orders if o.status != PurchaseStatus.CANCELLED),
@@ -234,9 +230,6 @@ def delete_supplier(db: Session, actor: User, supplier_id: int) -> None:
                          summary=f"Yetkazib beruvchi o'chirildi: {supplier.code} — {supplier.name}", factory_id=supplier.factory_id)
     db.delete(supplier)
     db.commit()
-
-
-# ---------- xarid buyurtmalari ----------
 
 
 def _is_overdue(po: PurchaseOrder, today: date | None = None) -> bool:
@@ -372,7 +365,6 @@ def _build_items(db: Session, factory_id: int, lines: list[PurchaseLineIn]) -> l
 
 
 def create_purchase_order(db: Session, actor: User, data: PurchaseOrderCreate) -> PurchaseOrderDetail:
-    # Fabrika yetkazib beruvchidan olinadi (SUPER_ADMIN uchun ham alohida tanlash shart emas)
     supplier = _get_supplier(db, actor, data.supplier_id)
     factory_id = supplier.factory_id
     _active_supplier(db, actor, supplier.id, factory_id)
@@ -452,7 +444,7 @@ def submit(db: Session, actor: User, po_id: int) -> PurchaseOrderDetail:
 def receive(db: Session, actor: User, po_id: int, data: ReceiveRequest) -> PurchaseOrderDetail:
     """Kelgan tovarni omborga kirim qilish — barcha qatorlar bitta tranzaksiyada."""
     po = _load(db, actor, po_id)
-    if db.bind.dialect.name == "postgresql":  # parallel ikki qabul buyurtmadan ortiq kirim qilmasin
+    if db.bind.dialect.name == "postgresql":
         db.execute(select(PurchaseOrder.id).where(PurchaseOrder.id == po.id).with_for_update())
     if po.status not in OPEN:
         raise HTTPException(status.HTTP_409_CONFLICT, "Qabul qilish uchun buyurtma yuborilgan bo'lishi kerak")

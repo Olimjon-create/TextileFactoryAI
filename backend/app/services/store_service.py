@@ -65,7 +65,7 @@ def list_factories(db: Session, search: str | None = None) -> list[StoreFactoryC
     )
     query = (
         _public_factories()
-        .join(stats, stats.c.factory_id == Factory.id)  # mahsuloti yo'q zavodlar ko'rsatilmaydi
+        .join(stats, stats.c.factory_id == Factory.id)
         .add_columns(stats.c.product_count, stats.c.min_price)
         .order_by(stats.c.product_count.desc(), Factory.name)
     )
@@ -209,7 +209,6 @@ def _check_variant(product: Product, size: str | None, color: str | None) -> Non
 def create_order(db: Session, data: CheckoutRequest) -> CheckoutResponse:
     factory = _get_public_factory(db, data.factory_id)
 
-    # Bir xil variant (mahsulot + o'lcham + rang) bir necha qatorda kelsa — birlashtiramiz
     quantities: dict[tuple[int, str | None, str | None], int] = {}
     for line in data.items:
         key = (line.product_id, line.size, line.color)
@@ -231,7 +230,7 @@ def create_order(db: Session, data: CheckoutRequest) -> CheckoutResponse:
         _check_variant(products[product_id], size, color)
 
     provider = payments.get_provider()
-    tg_user = telegram_service.verify_init_data(data.telegram_init_data)  # soxta/eskirgan bo'lsa — oddiy buyurtma
+    tg_user = telegram_service.verify_init_data(data.telegram_init_data)
     order = Order(
         factory_id=factory.id,
         public_token=secrets.token_urlsafe(32),
@@ -249,7 +248,7 @@ def create_order(db: Session, data: CheckoutRequest) -> CheckoutResponse:
     total = Decimal("0")
     for (product_id, size, color), qty in quantities.items():
         product = products[product_id]
-        price = Decimal(product.price)  # type: ignore[arg-type]
+        price = Decimal(product.price)
         line_total = price * qty
         total += line_total
         order.items.append(
@@ -307,7 +306,6 @@ def find_order(db: Session, order_number: str, phone: str) -> PublicOrder:
         .options(selectinload(Order.items), selectinload(Order.factory))
         .where(Order.order_number == order_number, Order.payment_status == PaymentStatus.PAID)
     )
-    # "+998 90 123 45 67" va "901234567" bir xil hisoblanadi: oxirgi 9 raqam solishtiriladi
     phone_digits = _digits(phone)
     if order is None or len(phone_digits) < 7 or not _digits(order.customer_phone).endswith(phone_digits[-9:]):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Buyurtma topilmadi. Raqam va telefonni tekshiring.")
@@ -318,7 +316,7 @@ def pay_demo(db: Session, token: str, card_last4: str) -> PublicOrder:
     order = _get_order_by_token(db, token)
     if order.payment_provider != payments.DemoProvider.name:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Test to'lov bu buyurtma uchun mavjud emas")
-    if not payments.demo_allowed():  # provayder almashgan yoki productionda demo o'chirilgan
+    if not payments.demo_allowed():
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Test to'lov o'chirilgan")
     order_service.mark_paid(
         db, order, reference=f"DEMO-{secrets.token_hex(6).upper()}", card_last4=card_last4

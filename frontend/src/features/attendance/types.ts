@@ -14,7 +14,7 @@ export interface EmployeeBrief {
   position: string | null;
   department: Department;
   shift_name: string | null;
-  shift_start: string | null; // "08:00:00"
+  shift_start: string | null;
   shift_end: string | null;
 }
 

@@ -63,7 +63,6 @@ from app.core.i18n import t
 
 LOGISTICS_VIEW_ROLES = inventory_service.INVENTORY_VIEW_ROLES
 LOGISTICS_EDITOR_ROLES = inventory_service.INVENTORY_EDITOR_ROLES
-# Qadoqlangan mahsulotni omborga topshirish — ombor xodimlari va ishlab chiqarish rahbari
 FG_RECEIVE_ROLES = LOGISTICS_EDITOR_ROLES + (Role.PRODUCTION_MANAGER,)
 
 MOVEMENT_LABELS = {
@@ -82,9 +81,7 @@ STATUS_LABELS = {
     ShipmentStatus.DELIVERED: "Yetkazildi",
     ShipmentStatus.CANCELLED: "Bekor qilindi",
 }
-# Bu holatdagi buyurtma bo'yicha jo'natma tayyorlanmaydi / jo'natilmaydi
 NO_SHIP_ORDER = (OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELLED, OrderStatus.COMPLETED)
-# Jo'natma bilan "Jo'natildi" holatiga o'tadigan buyurtma holatlari
 PRE_SHIP_ORDER = (OrderStatus.NEW, OrderStatus.CONFIRMED, OrderStatus.IN_PRODUCTION, OrderStatus.READY)
 
 PSM = ProductStockMovement
@@ -181,9 +178,6 @@ def _post(
     db.add(movement)
     db.flush()
     return movement
-
-
-# ---------- qoldiq ----------
 
 
 def list_stock(
@@ -348,9 +342,6 @@ def _transfer(db: Session, actor: User, product: Product, source: WarehouseLocat
     return _one_movement(db, out.id)
 
 
-# ---------- ishlab chiqarishdan qabul ----------
-
-
 def _received_from_wo(db: Session, wo_id: int) -> int:
     return int(db.scalar(
         select(func.coalesce(func.sum(PSM.quantity), 0)).where(PSM.work_order_id == wo_id, PSM.movement_type == ProductMovementType.PRODUCTION)
@@ -390,9 +381,6 @@ def receive_from_work_order(db: Session, actor: User, data: ProductionReceiptCre
     )
     db.commit()
     return _wo_stock(db, wo)
-
-
-# ---------- jo'natmalar ----------
 
 
 _SH_OPTS = (selectinload(Shipment.order), selectinload(Shipment.items).selectinload(ShipmentItem.order_item))

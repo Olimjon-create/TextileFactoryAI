@@ -494,7 +494,6 @@ function RulesTab({ devices, canEdit }: { devices: Device[]; canEdit: boolean })
   );
 }
 
-/** Kameralar va AI: qurilmalar, hodisalar (tasdiqlash navbati) va qayta ishlash qoidalari */
 export default function VisionPage() {
   const location = useLocation();
   const navigate = useNavigate();

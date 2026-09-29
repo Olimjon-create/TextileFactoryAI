@@ -20,7 +20,6 @@ NEW_VALUES = ("RECEIPT", "TRANSFER_OUT", "TRANSFER_IN")
 
 
 def _sqlite_column(values: tuple[str, ...]) -> None:
-    # SQLite'da enum — VARCHAR(eng uzun qiymat); yangi qiymatlar uzunroq ("TRANSFER_OUT"), ustun qayta quriladi
     with op.batch_alter_table("product_stock_movements") as batch:
         batch.alter_column("movement_type", type_=sa.Enum(*values, name="product_movement_type"), existing_nullable=False)
 
@@ -34,6 +33,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # PostgreSQL enum'dan qiymatni o'chirib bo'lmaydi; bu harakatlar bo'lsa ular qoladi
     if op.get_bind().dialect.name != "postgresql":
         _sqlite_column(OLD_VALUES)

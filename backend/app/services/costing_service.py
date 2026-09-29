@@ -25,7 +25,6 @@ from app.schemas.analytics import CostLine, LaborLine, OrderCosting, SettingsOut
 from app.services import audit_service, material_plan_service, order_service, workforce_service
 from app.core.i18n import t
 
-# Tannarx ish haqi stavkalarini ochib beradi — maosh ko'ra oladigan rollar bilan bir xil
 FINANCE_ROLES = workforce_service.PAY_VIEW_ROLES
 SETTINGS_EDITOR_ROLES = FINANCE_ROLES
 
@@ -34,9 +33,6 @@ MONEY = Decimal("0.01")
 
 def _m(v: Decimal) -> float:
     return float(v.quantize(MONEY))
-
-
-# ---------- sozlamalar ----------
 
 
 def settings_for(db: Session, factory_id: int) -> FactorySettings:
@@ -65,9 +61,6 @@ def update_settings(db: Session, actor: User, data: SettingsUpdate, factory_id: 
                              summary="Tannarx va ogohlantirish sozlamalari o'zgartirildi", factory_id=fid, changes=changes)
     db.commit()
     return SettingsOut.model_validate(row)
-
-
-# ---------- tannarx ----------
 
 
 def _material_costs(db: Session, order_ids: list[int]) -> dict[int, list[tuple[Material, Decimal, Decimal, bool]]]:
@@ -157,14 +150,12 @@ def _costing(order: Order, settings: FactorySettings, materials: list, labor: di
         warnings.append("Ishlab chiqarish yozuvlari yo'q — ish haqi 0")
     ordered = sum(i.quantity for i in order.items)
     if packed < ordered:
-        # Summa butun buyurtma uchun, xarajat esa hozirgacha qilingani — foyda yakuniy emas
         warnings.insert(0, t("Buyurtma hali tugallanmagan ({packed}/{ordered} dona qadoqlangan) — foyda yakuniy emas, xarajatlar hali qo'shiladi", packed=packed, ordered=ordered))
     return OrderCosting(
         order_id=order.id, order_number=order.order_number, currency=order.currency, revenue=_m(revenue),
         ordered_qty=ordered, produced_qty=packed, material_planned=_m(planned), material_actual=_m(material_cost),
         labor=_m(labor_cost), overhead_percent=float(overhead_pct), overhead=_m(overhead), total_cost=_m(total),
         cost_per_unit=_m(total / packed) if packed else None, margin=_m(margin), margin_pct=margin_pct,
-        # Past foyda faqat ishlab chiqarish tugaganda baholanadi (oraliq holatda xarajat to'liq emas)
         low_margin=margin_pct is not None and bool(materials) and packed >= ordered and margin_pct < float(settings.low_margin_percent),
         materials=[
             CostLine(material_id=m.id, code=m.code, name=m.name, unit=m.unit.value, quantity=float(q), cost=_m(v), unpriced=u)

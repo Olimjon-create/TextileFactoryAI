@@ -21,7 +21,6 @@ interface Props {
   open: boolean;
   device?: Device | null;
   onClose: () => void;
-  /** Yangi qurilma — kalit bilan (bir marta ko'rsatiladi) */
   onSaved: (d: Device | DeviceWithKey) => void;
 }
 

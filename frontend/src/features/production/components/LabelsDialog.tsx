@@ -14,7 +14,6 @@ interface Props {
 
 const esc = escapeHtml;
 
-/** Partiya/quti yorliqlari: QR kod (kod matni) + ma'lumot. Chop etish — alohida oynada */
 export default function LabelsDialog({ open, units, onClose }: Props) {
   const [images, setImages] = useState<Record<string, string>>({});
 

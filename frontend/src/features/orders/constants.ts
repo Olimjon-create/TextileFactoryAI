@@ -23,7 +23,6 @@ export const ORDER_STATUS_COLORS: Record<OrderStatus, 'error' | 'info' | 'warnin
   CANCELLED: 'default',
 };
 
-/** Odatiy ish oqimidagi keyingi qadam (asosiy tugma uchun) */
 export const NEXT_STATUS: Partial<Record<OrderStatus, { status: OrderStatus; action: string }>> = {
   NEW: { status: 'CONFIRMED', action: tr("Buyurtmani tasdiqlash") },
   CONFIRMED: { status: 'IN_PRODUCTION', action: tr("Ishlab chiqarishga berish") },

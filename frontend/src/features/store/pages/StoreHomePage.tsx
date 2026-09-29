@@ -24,12 +24,10 @@ const STEPS = [
   { icon: <LockOutlinedIcon />, title: tr("Karta orqali to'lang"), text: tr("To'lovdan so'ng buyurtma zavodga darhol yetib boradi.") },
 ];
 
-/** Katalog bo'sh bo'lsa ishlatiladigan bezak suratlar (Pexels, bepul litsenziya — public/brand/CREDITS.txt) */
 const FALLBACK_PHOTOS = ['/brand/hero-coat.jpg', '/brand/hero-knit.jpg', '/brand/hero-dress.jpg'];
 
 type HeroSlot = { src: string; item?: StoreFeaturedProduct };
 
-/** Kollaj uchun 3 ta joy: avval katalogdagi mahsulotlar, yetmasa — bezak suratlar */
 function heroSlots(featured: StoreFeaturedProduct[] | null): HeroSlot[] {
   return FALLBACK_PHOTOS.map((src, i) => {
     const item = featured?.[i];
@@ -37,10 +35,6 @@ function heroSlots(featured: StoreFeaturedProduct[] | null): HeroSlot[] {
   });
 }
 
-/**
- * Bitta surat. Mahsulotga bog'langan bo'lsa — havola: bosilganda ishlab chiqaruvchi
- * zavod sahifasi ochiladi va shu mahsulotga aylantiriladi.
- */
 function HeroPhoto({ slot, radius, sx, compact = false }: { slot: HeroSlot; radius: string; sx: object; compact?: boolean }) {
   const { item } = slot;
   const link = item
@@ -95,7 +89,6 @@ function HeroPhoto({ slot, radius, sx, compact = false }: { slot: HeroSlot; radi
             alignItems: 'center',
             gap: 1,
             color: 'text.primary',
-            // Kompyuterda yorliq sichqoncha borganda chiqadi, telefonda doim ko'rinadi
             opacity: compact ? 1 : 0,
             transform: compact ? 'none' : 'translateY(8px)',
             transition: 'opacity 0.3s ease, transform 0.3s ease',
@@ -118,7 +111,6 @@ function HeroPhoto({ slot, radius, sx, compact = false }: { slot: HeroSlot; radi
   );
 }
 
-/** Hero'dagi fotosuratlar kollaji */
 function HeroCollage({ featured }: { featured: StoreFeaturedProduct[] | null }) {
   const [a, b, c] = heroSlots(featured);
   const frame = { position: 'absolute', border: '6px solid', borderColor: 'background.paper' };
@@ -127,7 +119,6 @@ function HeroCollage({ featured }: { featured: StoreFeaturedProduct[] | null }) 
       <HeroPhoto slot={a} radius="28px" sx={{ ...frame, width: '52%', height: '78%', left: '4%', top: '6%', transform: 'rotate(-3deg)' }} />
       <HeroPhoto slot={b} radius="28px" sx={{ ...frame, width: '44%', height: '46%', right: '2%', top: 0, transform: 'rotate(3deg)' }} />
       <HeroPhoto slot={c} radius="28px" sx={{ ...frame, width: '40%', height: '50%', right: '8%', bottom: 0, transform: 'rotate(-1.5deg)' }} />
-      {/* Suzuvchi "yorliq" — bosilganda zavodlar ro'yxatiga tushadi */}
       <Box
         component="button"
         type="button"
@@ -161,7 +152,6 @@ function HeroCollage({ featured }: { featured: StoreFeaturedProduct[] | null }) 
   );
 }
 
-/** Telefon uchun ixcham variant: bir qatorda 3 ta surat */
 function MobileHeroStrip({ featured }: { featured: StoreFeaturedProduct[] | null }) {
   return (
     <Box sx={{ display: { xs: 'grid', md: 'none' }, gridTemplateColumns: '1.2fr 1fr 1fr', gap: 1, mb: 2.5, height: 150 }}>
@@ -183,7 +173,6 @@ export default function StoreHomePage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
-  // Kollaj suratlari — katalogdagi haqiqiy mahsulotlar (xato bo'lsa bezak suratlar qoladi)
   const [featured, setFeatured] = useState<StoreFeaturedProduct[] | null>(null);
 
   useEffect(() => {
@@ -205,7 +194,6 @@ export default function StoreHomePage() {
     return () => clearTimeout(t);
   }, [load]);
 
-  // Eng ko'p uchraydigan mahsulot turlari — tezkor filtr uchun
   const categories = useMemo(() => {
     const count = new Map<string, number>();
     factories?.forEach((f) => f.categories.forEach((c) => count.set(c, (count.get(c) ?? 0) + 1)));
@@ -217,7 +205,6 @@ export default function StoreHomePage() {
 
   return (
     <>
-      {/* ---------- Hero ---------- */}
       <Box
         component="section"
         sx={{
@@ -247,7 +234,6 @@ export default function StoreHomePage() {
             }}
           >
             {tr("Sifatli kiyim —")}{' '}
-            {/* Light rejimda to'qroq mokko — blur fon ustida ham yaxshi o'qilsin */}
             <Box component="span" sx={(t) => ({ color: t.palette.mode === 'dark' ? t.palette.primary.main : t.palette.primary.dark, fontStyle: 'italic' })}>
               {tr("ishlab chiqaruvchidan")}
             </Box>
@@ -274,7 +260,6 @@ export default function StoreHomePage() {
               },
             }}
           />
-          {/* Ishonch belgilari */}
           <Box sx={{ display: 'flex', gap: { xs: 2.5, sm: 4 }, mt: 3.5, flexWrap: 'wrap' }}>
             {[
               { value: factories?.length ?? '—', label: tr('zavod') },
@@ -293,7 +278,6 @@ export default function StoreHomePage() {
         <HeroCollage featured={featured} />
       </Box>
 
-      {/* ---------- Kategoriyalar ---------- */}
       {categories.length > 1 && (
         <Box
           sx={{
@@ -317,7 +301,6 @@ export default function StoreHomePage() {
         </Box>
       )}
 
-      {/* ---------- Zavodlar ---------- */}
       <Box id="factories" sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 2, scrollMarginTop: 96 }}>
         <Typography variant="h4" sx={{ fontSize: { xs: 26, md: 32 } }}>
           {tr("Zavodlar")}
@@ -348,7 +331,6 @@ export default function StoreHomePage() {
         </Box>
       )}
 
-      {/* ---------- Qanday ishlaydi ---------- */}
       <Box component="section" sx={{ mt: { xs: 6, md: 9 } }}>
         <Typography variant="h4" sx={{ fontSize: { xs: 26, md: 32 }, mb: 1 }}>
           {tr("Qanday ishlaydi")}

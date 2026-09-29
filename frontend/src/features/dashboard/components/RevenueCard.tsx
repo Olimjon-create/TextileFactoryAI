@@ -17,7 +17,6 @@ const QUICK:{ key: keyof RevenueStats['quick']; label: string; period: RevenuePe
   { key: 'year', label: tr("Shu yil"), period: 'year' },
 ];
 
-/** Dashboard: oxirgi 30 kunlik tushum diagrammasi. Bosilganda — kunlik/haftalik/oylik/yillik batafsil oyna */
 export default function RevenueCard() {
   const [data, setData] = useState<RevenueStats | null>(null);
   const [failed, setFailed] = useState(false);
@@ -54,7 +53,6 @@ export default function RevenueCard() {
           </Button>
         </Box>
 
-        {/* Asosiy ko'rsatkich (chapda) va joriy davrlar (o'ngda); telefonda ustma-ust */}
         <Box
           sx={{
             display: 'grid',
@@ -88,7 +86,6 @@ export default function RevenueCard() {
             )}
           </Box>
 
-          {/* Joriy davrlar: bosilganda o'sha kesim ochiladi */}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(4, 1fr)', md: '1fr 1fr' }, gap: 1 }}>
             {QUICK.map((q) => (
               <ButtonBase
@@ -119,14 +116,12 @@ export default function RevenueCard() {
           </Box>
         </Box>
 
-        {/* Diagramma kartaning qolgan balandligini to'ldiradi (yonidagi karta baland bo'lsa ham bo'sh joy qolmaydi) */}
         <ButtonBase
           ref={chartBox}
           onClick={() => setDialog('day')}
           sx={{ display: 'block', position: 'relative', width: '100%', borderRadius: '12px', flex: 1, minHeight: CHART_MIN_HEIGHT }}
           aria-label={tr("Tushumni batafsil ko'rish")}
         >
-          {/* Absolyut: diagramma o'z balandligi bilan kartani cho'zib yubormasin (oyna kichrayganda ham) */}
           <Box sx={{ position: 'absolute', inset: 0 }}>
             {data ? (
               <BarChart

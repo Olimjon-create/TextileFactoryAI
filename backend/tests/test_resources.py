@@ -13,7 +13,7 @@ from tests.conftest import ADMIN_EMAIL, API, add_user, auth, register_owner
 @pytest.fixture()
 def fx(client):
     owner, factory_id = register_owner(client, "owner@r.uz", "Resurs Tekstil")
-    post = lambda url, body: client.post(f"{API}{url}", headers=owner, json=body)  # noqa: E731
+    post = lambda url, body: client.post(f"{API}{url}", headers=owner, json=body)
     line = post("/production-lines", {"code": "tk-1", "name": "Tikuv-1", "stage": "SEWING", "capacity_per_shift": 800}).json()
     day = post("/shifts", {"name": "Kunduzgi", "start_time": "08:00", "end_time": "17:00", "break_minutes": 60}).json()
     return {"owner": owner, "factory_id": factory_id, "post": post, "line": line, "day": day}
@@ -42,30 +42,25 @@ def test_employees_codes_links_and_pay_privacy(client, fx):
     assert lines[0]["employees_count"] == 2
     assert client.get(f"{API}/shifts", headers=o).json()[0]["employees_count"] == 2
 
-    # Boshqa zavod liniyasi/smenasiga bog'lab bo'lmaydi
     other, _ = register_owner(client, "o2@r.uz", "Boshqa")
     foreign_line = client.post(f"{API}/production-lines", headers=other, json={"code": "X", "name": "Begona", "stage": "CUTTING"}).json()
     assert post("/employees", {**body, "line_id": foreign_line["id"]}).status_code == 422
 
-    # Ishlab chiqarish boshlig'i xodimni boshqaradi, lekin maoshni ko'rmaydi va o'zgartirmaydi
     planner = add_user(client, o, "p@r.uz", "PRODUCTION_MANAGER")
     seen = client.get(f"{API}/employees/{e1['id']}", headers=planner).json()
     assert seen["pay_rate"] is None and seen["daily_norm"] == 120
     assert client.patch(f"{API}/employees/{e1['id']}", headers=planner, json={"daily_norm": 130}).status_code == 200
     assert client.patch(f"{API}/employees/{e1['id']}", headers=planner, json={"pay_rate": 9999}).status_code == 403
 
-    # Maosh o'zgarishi auditda ochiq ko'rinmaydi
     client.patch(f"{API}/employees/{e1['id']}", headers=o, json={"pay_rate": 1700})
     log = client.get(f"{API}/audit-logs", headers=o, params={"entity": "employee"}).json()["items"][0]
     assert log["changes"]["pay_rate"] == ["***", "***"]
 
-    # Tizim akkauntiga bog'lash: bir akkaunt — bitta xodim
     keeper_headers = add_user(client, o, "k@r.uz", "WAREHOUSE_MANAGER")
     keeper_id = client.get(f"{API}/auth/me", headers=keeper_headers).json()["id"]
     assert client.patch(f"{API}/employees/{e1['id']}", headers=o, json={"user_id": keeper_id}).json()["user_email"] == "k@r.uz"
     assert client.patch(f"{API}/employees/{e2['id']}", headers=o, json={"user_id": keeper_id}).status_code == 409
 
-    # Filtrlar va sahifalash
     client.patch(f"{API}/employees/{e2['id']}", headers=o, json={"status": "ON_LEAVE"})
     assert client.get(f"{API}/employees", headers=o, params={"status": "ACTIVE"}).json()["total"] == 1
     page = client.get(f"{API}/employees", headers=o, params={"search": "malika", "limit": 1}).json()
@@ -88,14 +83,13 @@ def test_machine_status_history_and_downtime(client, fx):
 
     client.post(f"{url}/status", headers=o, json={"status": "WORKING"})
     assert client.post(f"{url}/status", headers=o, json={"status": "WORKING"}).status_code == 409
-    # Buzilish sababsiz qayd etilmaydi
     assert client.post(f"{url}/status", headers=o, json={"status": "BROKEN"}).status_code == 422
     d = client.post(f"{url}/status", headers=o, json={"status": "BROKEN", "reason": "Igna ushlagich sindi"}).json()
     assert d["status"] == "BROKEN" and d["history"][0]["reason"] == "Igna ushlagich sindi"
-    assert d["history"][1]["ended_at"] is not None  # oldingi davr yopildi
+    assert d["history"][1]["ended_at"] is not None
     assert client.get(f"{API}/production-lines", headers=o).json()[0]["machines_down"] == 1
 
-    _backdate(m["id"], 3)  # 3 soat buzuq turdi
+    _backdate(m["id"], 3)
     d = client.post(f"{url}/maintenance", headers=o, json={"kind": "REPAIR", "description": "Igna ushlagich almashtirildi", "cost": 250000, "duration_minutes": 90, "technician_name": "Usta Rustam", "set_status": "WORKING"}).json()
     assert d["status"] == "WORKING"
     assert d["stats"]["broken_minutes"] == pytest.approx(180, abs=1)
@@ -107,7 +101,6 @@ def test_machine_status_history_and_downtime(client, fx):
     assert s["machines_total"] == 1 and s["machines_by_status"]["WORKING"] == 1
     assert s["downtime_hours_30d"] == pytest.approx(3, abs=0.05)
 
-    # Tarixi bor mashina o'chmaydi
     assert client.delete(url, headers=o).status_code == 409
     assert client.patch(url, headers=o, json={"is_active": False}).json()["is_active"] is False
 
@@ -123,7 +116,6 @@ def test_maintenance_schedule(client, fx):
     assert client.get(f"{API}/machines", headers=o, params={"maintenance": "overdue"}).json()["total"] == 1
     assert client.get(f"{API}/machines", headers=o, params={"maintenance": "due_soon"}).json()["items"][0]["code"] == "OV-2"
 
-    # Rejali xizmat keyingi sanani suradi
     d = client.post(f"{API}/machines/{overdue['id']}/maintenance", headers=o, json={"kind": "PREVENTIVE", "description": "Moylash, tozalash"}).json()
     assert d["last_maintenance_date"] == date.today().isoformat()
     assert d["next_maintenance_date"] == (date.today() + timedelta(days=90)).isoformat()
@@ -131,7 +123,6 @@ def test_maintenance_schedule(client, fx):
     s = client.get(f"{API}/resources/summary", headers=o).json()
     assert s["maintenance_overdue"] == 0 and s["maintenance_due_soon"] == 1
 
-    # Tarixsiz mashina o'chiriladi
     fresh = post("/machines", {"code": "TMP", "name": "Vaqtincha", "machine_type": "OTHER"}).json()
     assert client.delete(f"{API}/machines/{fresh['id']}", headers=o).status_code == 204
 

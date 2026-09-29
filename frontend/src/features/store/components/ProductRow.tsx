@@ -12,9 +12,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   product: StoreProduct;
-  /** Miqdor o'zgarganda (savatga qo'shish/o'zgartirish) */
   onChange: (variant: Variant, quantity: number) => void;
-  /** Bosh sahifa kollajidan shu mahsulotga kelinganda — qisqa vaqt kattalashib, ramka bilan ajraladi */
   highlighted?: boolean;
 }
 
@@ -73,7 +71,6 @@ export default function ProductRow({ product, onChange, highlighted = false }: P
   const hasSizes = product.sizes.length > 0;
   const hasColors = product.colors.length > 0;
 
-  // Faqat bitta variant bo'lsa — avtomatik tanlanadi
   const [size, setSize] = useState<string | null>(product.sizes.length === 1 ? product.sizes[0] : null);
   const [color, setColor] = useState<string | null>(product.colors.length === 1 ? product.colors[0] : null);
   const [showError, setShowError] = useState(false);
@@ -102,17 +99,14 @@ export default function ProductRow({ product, onChange, highlighted = false }: P
         overflow: 'hidden',
         position: 'relative',
         transition: 'transform 0.5s cubic-bezier(.2,.7,.2,1), box-shadow 0.5s ease, border-color 0.35s ease',
-        // Sichqoncha borganda suratlar sekin kattalashadi (karta ko'tarilishi — storeTheme'dan)
         '& .pg-photo > *': { transition: 'transform 0.6s ease' },
         '@media (hover: hover) and (pointer: fine)': {
           '&:hover .pg-photo > *': { transform: 'scale(1.06)' },
         },
-        // Ramka kartaning o'zida — burchaklari kartaning radiusiga aynan mos keladi
         ...(highlighted && {
           zIndex: 1,
           transform: { xs: 'scale(1.02)', sm: 'scale(1.035)' },
           boxShadow: `0 0 0 2px ${theme.palette.primary.main}, 0 24px 60px ${alpha(theme.palette.primary.main, 0.35)}`,
-          // Ajratilgan paytda hover kattalashishni bekor qilmasin
           '&&:hover': { transform: 'scale(1.035)' },
         }),
         '@media (prefers-reduced-motion: reduce)': {
@@ -170,7 +164,6 @@ export default function ProductRow({ product, onChange, highlighted = false }: P
               {tr("Avval")}{' '}{missing}{tr("ni tanlang")}
             </Typography>
           )}
-          {/* Savatdagi variantlar: bosilsa shu variant tanlanadi, × — olib tashlash */}
           {inCart.length > 0 && (hasSizes || hasColors) && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', mt: 1.25 }}>
               <Typography variant="body2" color="text.secondary" sx={{ minWidth: 62 }}>

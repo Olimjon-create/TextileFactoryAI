@@ -5,7 +5,6 @@ import { tr } from '@/i18n';
 
 const DAY = 24 * 60 * 60 * 1000;
 
-/** Topshirish muddati: kechikkan bo'lsa qizil, 3 kun qolgan bo'lsa sariq */
 export default function DueDate({ order }: { order: Pick<OrderListItem, 'due_date' | 'is_overdue' | 'status'> }) {
   if (!order.due_date) {
     return (

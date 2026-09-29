@@ -5,32 +5,28 @@ import tempfile
 
 _db_file = os.path.join(tempfile.gettempdir(), "textile_factory_ai_test.db")
 os.environ["DATABASE_URL"] = f"sqlite:///{_db_file}"
-# Testlar sxemani o'zi yaratadi (create_all); migratsiyalar test_migrations.py da alohida tekshiriladi
 os.environ["AUTO_MIGRATE"] = "false"
 os.environ["MEDIA_DIR"] = os.path.join(tempfile.gettempdir(), "tfai_test_media")
-# .env da Supabase kalitlari bo'lsa ham testlar haqiqiy Storage'ga fayl yuklamasin
 os.environ["SUPABASE_URL"] = ""
 os.environ["SUPABASE_SECRET_KEY"] = ""
-os.environ["TELEGRAM_BOT_TOKEN"] = ""  # testlar haqiqiy botdan xabar yubormasin
+os.environ["TELEGRAM_BOT_TOKEN"] = ""
 os.environ["RESEND_API_KEY"] = ""
 os.environ["APP_URL"] = ""
 os.environ["TELEGRAM_ADMIN_CHAT_ID"] = ""
 os.environ["CRON_SECRET"] = ""
 os.environ["PAYMENT_PROVIDER"] = "demo"
-# Chastota cheklovi alohida testda yoqiladi (testlar bitta IP dan juda ko'p login qiladi)
 os.environ["RATE_LIMIT_ENABLED"] = "false"
-# Testlar fabrikalarni /register orqali yaratadi (productionda sukut bo'yicha yopiq)
 os.environ["SELF_REGISTRATION_ENABLED"] = "true"
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
+import pytest
+from fastapi.testclient import TestClient
 
-import app.models  # noqa: E402,F401
-from app.core.database import Base, SessionLocal, engine  # noqa: E402
-from app.core.roles import Role  # noqa: E402
-from app.core.security import hash_password  # noqa: E402
-from app.main import app  # noqa: E402
-from app.models import User  # noqa: E402
+import app.models
+from app.core.database import Base, SessionLocal, engine
+from app.core.roles import Role
+from app.core.security import hash_password
+from app.main import app
+from app.models import User
 
 API = "/api/v1"
 ADMIN_EMAIL = "admin@test.uz"

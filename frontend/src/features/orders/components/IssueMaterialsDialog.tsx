@@ -37,7 +37,6 @@ interface Props {
 const round = (v: number) => Math.round(v * 1000) / 1000;
 const num = (v: string) => (v.trim() === '' ? 0 : Number(v.replace(/\s/g, '').replace(',', '.')));
 
-/** Buyurtmaga material chiqarish (miqdorlar rejadan to'ldiriladi) yoki ortganini omborga qaytarish */
 export default function IssueMaterialsDialog({ open, mode, order, materials, onClose, onDone }: Props) {
   const isIssue = mode === 'ISSUE';
   const candidates: MaterialRequirement[] = materials.lines.filter((l) => l.material_id !== null && (isIssue ? true : l.issued > 0));
@@ -54,7 +53,6 @@ export default function IssueMaterialsDialog({ open, mode, order, materials, onC
     save.reset();
     setError('');
     setNote('');
-    // Chiqarish: qolgan ehtiyoj (omborda borigacha); qaytarish: bo'sh — foydalanuvchi kiritadi
     setQty(
       Object.fromEntries(
         candidates.map((l) => [l.material_id!, isIssue ? String(round(Math.max(0, Math.min(l.remaining, l.available)))) || '' : '']),

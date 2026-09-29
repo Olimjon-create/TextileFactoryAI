@@ -68,7 +68,6 @@ def test_duplicate_code_in_same_factory(client, owner):
     create_product(client, owner)
     r = client.post(f"{API}/products", headers=owner, json={**PRODUCT, "code": "TS-001"})
     assert r.status_code == 409
-    # Boshqa fabrikada xuddi shu kod ruxsat etiladi
     other, _ = register_owner(client, "b@b.uz", "Beta")
     create_product(client, other)
 
@@ -145,10 +144,8 @@ def test_read_only_roles(client, owner, role):
     product = create_product(client, owner)
     headers = add_user(client, owner, "r@a.uz", role)
     pid = product["id"]
-    # Ko'rish mumkin
     assert client.get(f"{API}/products", headers=headers).status_code == 200
     assert client.get(f"{API}/products/{pid}", headers=headers).status_code == 200
-    # O'zgartirish mumkin emas
     assert client.post(f"{API}/products", headers=headers, json={**PRODUCT, "code": "X-1"}).status_code == 403
     assert client.patch(f"{API}/products/{pid}", headers=headers, json={"name": "Yangi"}).status_code == 403
     assert client.delete(f"{API}/products/{pid}", headers=headers).status_code == 403
@@ -171,5 +168,4 @@ def test_super_admin_needs_factory(client, owner):
     factory_id = client.get(f"{API}/factories", headers=admin).json()[0]["id"]
     product = create_product(client, admin, factory_id=factory_id)
     assert product["factory"]["name"] == "Alpha"
-    # Egasi super admin yaratgan mahsulotni ko'radi
     assert len(client.get(f"{API}/products", headers=owner).json()) == 1

@@ -44,7 +44,6 @@ function Stat({ label, value, color }: { label: string; value: string | number; 
   );
 }
 
-/** Xodimning bir oylik davomati: kunma-kun, jami ko'rsatkichlar va javob so'rovlari */
 export default function EmployeeMonthDialog({ employeeId, month: initialMonth, onClose }: { employeeId: number | null; month: string; onClose: () => void }) {
   const [month, setMonth] = useState(initialMonth);
   const [data, setData] = useState<EmployeeMonthDetail | null>(null);

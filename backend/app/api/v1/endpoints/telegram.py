@@ -21,7 +21,7 @@ class TelegramStatus(BaseModel):
     bot_username: str | None
     linked: bool
     link_url: str | None
-    shop_url: str | None = None  # mijozlarga tarqatiladigan do'kon havolasi
+    shop_url: str | None = None
 
 
 def _factory(db: Session, actor: User, factory_id: int | None) -> Factory:
@@ -66,7 +66,7 @@ def telegram_webhook(
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Forbidden")
     try:
         telegram_service.handle_update(db, update, str(request.base_url))
-    except Exception as exc:  # noqa: BLE001 — 200 qaytmasa Telegram shu xabarni qayta-qayta yuboradi
+    except Exception as exc:
         db.rollback()
         print("telegram webhook:", exc)
     return {"ok": True}

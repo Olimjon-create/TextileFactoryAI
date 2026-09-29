@@ -20,23 +20,23 @@ if TYPE_CHECKING:
 
 
 class AttendanceStatus(str, enum.Enum):
-    PRESENT = "PRESENT"  # keldi (kechikkan bo'lsa late_minutes > 0)
-    ABSENT = "ABSENT"  # sababsiz kelmadi
-    LEAVE = "LEAVE"  # javob olgan (ruxsat bilan kelmadi)
-    SICK = "SICK"  # kasal
-    VACATION = "VACATION"  # ta'til
+    PRESENT = "PRESENT"
+    ABSENT = "ABSENT"
+    LEAVE = "LEAVE"
+    SICK = "SICK"
+    VACATION = "VACATION"
 
 
 class LeaveType(str, enum.Enum):
-    PERSONAL = "PERSONAL"  # shaxsiy ish — javob
-    SICK = "SICK"  # kasallik
-    VACATION = "VACATION"  # ta'til
-    FAMILY = "FAMILY"  # oilaviy sabab (to'y, ma'raka)
+    PERSONAL = "PERSONAL"
+    SICK = "SICK"
+    VACATION = "VACATION"
+    FAMILY = "FAMILY"
     OTHER = "OTHER"
 
 
 class LeaveStatus(str, enum.Enum):
-    PENDING = "PENDING"  # ko'rib chiqilmoqda
+    PENDING = "PENDING"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
 
@@ -52,7 +52,6 @@ class LeaveRequest(Base, TimestampMixin):
     leave_type: Mapped[LeaveType] = mapped_column(Enum(LeaveType, name="leave_type"))
     start_date: Mapped[date] = mapped_column(Date, index=True)
     end_date: Mapped[date] = mapped_column(Date)
-    # Soatbay javob (masalan 14:00–16:00) — faqat bir kunlik so'rovda
     start_time: Mapped[time | None] = mapped_column(Time)
     end_time: Mapped[time | None] = mapped_column(Time)
     reason: Mapped[str] = mapped_column(String(500))
@@ -79,11 +78,9 @@ class Attendance(Base, TimestampMixin):
     status: Mapped[AttendanceStatus] = mapped_column(Enum(AttendanceStatus, name="attendance_status"), index=True)
     check_in: Mapped[time | None] = mapped_column(Time)
     check_out: Mapped[time | None] = mapped_column(Time)
-    # Smena boshlanishiga nisbatan kechikish va sof ishlagan vaqt (tanaffussiz), daqiqa
     late_minutes: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     worked_minutes: Mapped[int | None] = mapped_column(Integer)
     note: Mapped[str | None] = mapped_column(String(300))
-    # Javob so'rovi tasdiqlanganda avtomatik qo'yilgan yozuv (so'rov bekor qilinsa o'chiriladi)
     leave_request_id: Mapped[int | None] = mapped_column(ForeignKey("leave_requests.id", ondelete="SET NULL"), index=True)
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
 

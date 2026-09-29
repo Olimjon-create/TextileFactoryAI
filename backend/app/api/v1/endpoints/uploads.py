@@ -8,7 +8,6 @@ from app.services import upload_service
 
 router = APIRouter(prefix="/uploads", tags=["Uploads"])
 
-# Zavod profili yoki mahsulot rasmini o'zgartira oladigan rollar
 can_upload = require_roles(Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
 
 

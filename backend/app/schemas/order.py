@@ -47,7 +47,6 @@ class OrderListItem(BaseModel):
     total_quantity: int = 0
     source: OrderSource
     due_date: date | None
-    # Muddati o'tgan, lekin hali jo'natilmagan/yakunlanmagan
     is_overdue: bool = False
     created_at: datetime
     paid_at: datetime | None
@@ -73,8 +72,6 @@ class OrderStatusUpdate(BaseModel):
     status: OrderStatus
 
 
-# ---------- qo'lda kiritiladigan (B2B) buyurtma ----------
-
 MAX_LINE_QTY = 1_000_000
 
 
@@ -83,7 +80,6 @@ class ManualOrderLine(BaseModel):
     quantity: int = Field(ge=1, le=MAX_LINE_QTY)
     size: str | None = Field(default=None, max_length=30)
     color: str | None = Field(default=None, max_length=30)
-    # Berilmasa — mahsulotning katalog narxi
     unit_price: float | None = Field(default=None, ge=0, le=100_000_000_000)
 
     @field_validator("size", "color")

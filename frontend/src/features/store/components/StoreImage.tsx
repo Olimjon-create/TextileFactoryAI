@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Box, Skeleton, type SxProps, type Theme } from '@mui/material';
 import CheckroomOutlinedIcon from '@mui/icons-material/CheckroomOutlined';
 
-// Rasm yuklanmagan bo'lsa — nomdan barqaror rang tanlanadigan gradient o'rinbosar
 const GRADIENTS = [
   ['#283593', '#5c6bc0'],
   ['#00695c', '#26a69a'],
@@ -20,7 +19,6 @@ function gradientFor(seed: string) {
   return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`;
 }
 
-/** Rasm brauzerga to'liq yuklanganmi (yoki xato bilan tugadimi) */
 function useImageLoaded(src: string | null): boolean {
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   useEffect(() => {
@@ -29,7 +27,7 @@ function useImageLoaded(src: string | null): boolean {
     const img = new Image();
     const done = () => !cancelled && setLoadedSrc(src);
     img.onload = done;
-    img.onerror = done; // xato bo'lsa ham skeletonni to'xtatamiz
+    img.onerror = done;
     img.src = src;
     if (img.complete) done();
     return () => {
@@ -68,7 +66,6 @@ export default function StoreImage({ src, seed, alt, sx, iconSize = 48 }: Props)
       }}
     >
       {!src && <CheckroomOutlinedIcon sx={{ fontSize: iconSize }} />}
-      {/* Rasm yuklanayotganda — to'lqinli skeleton */}
       {!loaded && <Skeleton variant="rectangular" sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'none' }} />}
     </Box>
   );

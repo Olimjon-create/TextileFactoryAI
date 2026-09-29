@@ -35,7 +35,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  product: Product | null; // null — yangi mahsulot
+  product: Product | null;
   onClose: () => void;
   onSaved: (product: Product) => void;
 }
@@ -128,7 +128,6 @@ export default function ProductFormDialog({ open, product, onClose, onSaved }: P
   const code = form.code.trim().toUpperCase();
   const codeError = form.code !== '' && !CODE_RE.test(code);
   const needsFactory = isSuperAdmin && !product;
-  // "85 000" yoki "85000,50" kabi yozilishiga ruxsat
   const priceNumber = form.price.trim() === '' ? null : Number(form.price.replace(/\s/g, '').replace(',', '.'));
   const priceError = priceNumber !== null && (!Number.isFinite(priceNumber) || priceNumber < 0);
   const valid =

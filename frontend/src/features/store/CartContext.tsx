@@ -2,14 +2,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { StoreProduct } from './types';
 import { tr } from '@/i18n';
 
-/** Mijoz tanlagan variant. Mahsulotda o'lcham/rang bo'lmasa — null */
 export interface Variant {
   size: string | null;
   color: string | null;
 }
 
 export interface CartLine extends Variant {
-  /** Qator kaliti: mahsulot + o'lcham + rang — har bir variant alohida qator */
   key: string;
   productId: number;
   name: string;
@@ -32,16 +30,9 @@ interface CartContextValue extends CartState {
   totalQuantity: number;
   totalAmount: number;
   quantityOf: (productId: number, variant: Variant) => number;
-  /** Shu mahsulotning savatdagi barcha variantlari */
   linesOf: (productId: number) => CartLine[];
-  /**
-   * Variant miqdorini o'rnatadi (0 — savatdan olib tashlash).
-   * Savatda boshqa zavod mahsulotlari bo'lsa false qaytaradi (avval tozalash kerak).
-   */
   setQuantity: (factory: FactoryRef, product: StoreProduct, variant: Variant, quantity: number) => boolean;
-  /** Savatni tozalab, boshqa zavodning mahsuloti bilan yangidan boshlaydi */
   startNew: (factory: FactoryRef, product: StoreProduct, variant: Variant, quantity: number) => void;
-  /** Savatdagi qator miqdorini o'zgartirish (0 — olib tashlash) */
   setLineQuantity: (key: string, quantity: number) => void;
   removeLine: (key: string) => void;
   clear: () => void;
@@ -62,7 +53,6 @@ function load(): CartState {
     if (!raw) return EMPTY;
     const parsed = JSON.parse(raw) as CartState;
     if (!Array.isArray(parsed.lines)) return EMPTY;
-    // Eski formatdagi savat (variantsiz) — kalitlarni to'ldiramiz
     const lines = parsed.lines.map((l) => {
       const size = l.size ?? null;
       const color = l.color ?? null;
@@ -100,13 +90,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (state.lines.length === 0) localStorage.removeItem(STORAGE_KEY);
       else localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
-      // Brauzer xotirasi yopiq bo'lsa savat faqat sahifa ochiq turganda saqlanadi
     }
   }, [state]);
 
   const setQuantity = useCallback<CartContextValue['setQuantity']>(
     (factory, product, variant, quantity) => {
-      // Bitta buyurtma — bitta zavod: boshqa zavod mahsuloti bo'lsa, qo'shmaymiz
       if (state.factoryId !== null && state.factoryId !== factory.id && state.lines.length > 0) return false;
       const key = lineKey(product.id, variant);
       setState((prev) => {
@@ -168,5 +156,4 @@ export function useCart(): CartContextValue {
   return ctx;
 }
 
-/** "M · Oq" ko'rinishida variant nomi */
 export const variantLabel = (v: Variant) => [v.size, v.color].filter(Boolean).join(' · ');

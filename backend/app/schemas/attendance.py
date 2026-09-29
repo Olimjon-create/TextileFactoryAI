@@ -7,7 +7,6 @@ from app.models.attendance import AttendanceStatus, LeaveStatus, LeaveType
 from app.models.resources import Department
 from app.schemas.common import clean_str
 
-# Kunlik jadvaldagi hisoblangan holat: yozuv holati + "kechikdi", "hozir ishda", "belgilanmagan"
 DayState = Literal["PRESENT", "LATE", "ABSENT", "LEAVE", "SICK", "VACATION", "NOT_MARKED"]
 
 
@@ -55,9 +54,7 @@ class DailyRow(BaseModel):
     employee: EmployeeBrief
     record: AttendanceRecordOut | None
     state: DayState
-    # Keldi, lekin hali ketmadi (faqat bugungi kun uchun)
     at_work: bool = False
-    # Shu kunga tegishli javob so'rovi (kutilayotgan yoki tasdiqlangan, soatbay ham)
     leave: LeaveBrief | None = None
 
 
@@ -83,8 +80,8 @@ class DailyBoard(BaseModel):
 
 class CheckIn(BaseModel):
     employee_id: int
-    work_date: date | None = None  # bo'sh — bugun
-    at: time | None = None  # bo'sh — hozir (zavod vaqti)
+    work_date: date | None = None
+    at: time | None = None
     note: str | None = Field(default=None, max_length=300)
 
 
@@ -126,7 +123,7 @@ class EmployeeMonthRow(BaseModel):
 
 
 class MonthlyReport(BaseModel):
-    month: str  # YYYY-MM
+    month: str
     rows: list[EmployeeMonthRow]
 
 
@@ -138,18 +135,14 @@ class EmployeeMonthDetail(BaseModel):
     totals: EmployeeMonthRow
 
 
-# ---------- javob so'rovlari ----------
-
-
 class LeaveCreate(_Clean):
     employee_id: int
     leave_type: LeaveType = LeaveType.PERSONAL
     start_date: date
-    end_date: date | None = None  # bo'sh — bir kunlik
+    end_date: date | None = None
     start_time: time | None = None
     end_time: time | None = None
     reason: str = Field(min_length=2, max_length=500)
-    # Rahbar o'zi kiritayotgan bo'lsa darhol tasdiqlash mumkin
     approve: bool = False
 
     @model_validator(mode="after")

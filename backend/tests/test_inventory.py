@@ -41,15 +41,14 @@ def test_receipt_issue_and_negative_stock_guard(client, shop):
     assert r.json()[0]["quantity"] == 120.5
     detail = stock(client, o, fab)
     assert detail["stock"] == 120.5
-    assert detail["unit_cost"] == 26000  # oxirgi xarid narxi
+    assert detail["unit_cost"] == 26000
     assert detail["stock_value"] == 120.5 * 26000
 
-    # Qoldiqdan ko'p chiqim — rad etiladi, qoldiq o'zgarmaydi
     r = move(client, o, movement_type="ISSUE", material_id=fab, location_id=loc, quantity=200)
     assert r.status_code == 422 and "yetarli qoldiq" in r.json()["detail"]
     assert move(client, o, movement_type="ISSUE", material_id=fab, location_id=loc, quantity=100).status_code == 201
     assert stock(client, o, fab)["stock"] == 20.5
-    assert stock(client, o, fab)["is_low"] is True  # min_stock = 50
+    assert stock(client, o, fab)["is_low"] is True
 
 
 def test_transfer_moves_between_locations(client, shop):
@@ -63,7 +62,6 @@ def test_transfer_moves_between_locations(client, shop):
     detail = stock(client, o, fab)
     assert detail["stock"] == 100
     assert {x["location_code"]: x["quantity"] for x in detail["locations"]} == {"A-1": 70, "B-1": 30}
-    # Bir joyning o'ziga ko'chirib bo'lmaydi
     r = move(client, o, movement_type="TRANSFER", material_id=fab, location_id=shop["main"]["id"], to_location_id=shop["main"]["id"], quantity=1)
     assert r.status_code == 422
 
@@ -75,7 +73,6 @@ def test_adjustment_sets_counted_quantity(client, shop):
     assert r.status_code == 201
     assert r.json()[0]["quantity"] == -2.75
     assert stock(client, o, fab)["stock"] == 97.25
-    # Farq yo'q — tuzatish kerak emas
     assert move(client, o, movement_type="ADJUSTMENT", material_id=fab, location_id=loc, quantity=97.25).status_code == 422
 
 
@@ -86,7 +83,7 @@ def test_movements_journal_filters_and_pagination(client, shop):
     move(client, o, movement_type="ISSUE", material_id=fab, location_id=loc, quantity=5)
     page = client.get(f"{INV}/movements", headers=o, params={"limit": 2}).json()
     assert page["total"] == 4 and len(page["items"]) == 2
-    assert page["items"][0]["movement_type"] == "ISSUE"  # yangilari birinchi
+    assert page["items"][0]["movement_type"] == "ISSUE"
     assert page["items"][0]["created_by_name"]
     receipts = client.get(f"{INV}/movements", headers=o, params={"movement_type": "RECEIPT"}).json()
     assert receipts["total"] == 3
@@ -98,7 +95,7 @@ def test_material_list_stock_filters_and_summary(client, shop):
     o = shop["owner"]
     thread = client.post(f"{INV}/materials", headers=o, json={"code": "THR-1", "name": "Ip oq", "material_type": "THREAD", "unit": "SPOOL"}).json()
     move(client, o, movement_type="RECEIPT", material_id=thread["id"], location_id=shop["main"]["id"], quantity=40, unit_cost=5000)
-    assert client.get(f"{INV}/materials", headers=o, params={"stock_state": "out"}).json()["total"] == 1  # mato
+    assert client.get(f"{INV}/materials", headers=o, params={"stock_state": "out"}).json()["total"] == 1
     assert client.get(f"{INV}/materials", headers=o, params={"stock_state": "low"}).json()["total"] == 1
     assert client.get(f"{INV}/materials", headers=o, params={"stock_state": "in"}).json()["items"][0]["code"] == "THR-1"
     assert client.get(f"{INV}/materials", headers=o, params={"material_type": "THREAD"}).json()["total"] == 1
@@ -114,10 +111,8 @@ def test_history_protects_delete_and_unit(client, shop):
     assert client.delete(f"{INV}/materials/{fab}", headers=o).status_code == 409
     assert client.delete(f"{INV}/locations/{loc}", headers=o).status_code == 409
     assert client.patch(f"{INV}/materials/{fab}", headers=o, json={"unit": "KILOGRAM"}).status_code == 409
-    # Nofaol qilish mumkin, nofaol materialga kirim qilib bo'lmaydi
     assert client.patch(f"{INV}/materials/{fab}", headers=o, json={"is_active": False}).status_code == 200
     assert move(client, o, movement_type="RECEIPT", material_id=fab, location_id=loc, quantity=1).status_code == 422
-    # Tarixi yo'q material o'chadi
     tmp = client.post(f"{INV}/materials", headers=o, json={"code": "TMP", "name": "Vaqtincha", "material_type": "OTHER", "unit": "PIECE"}).json()
     assert client.delete(f"{INV}/materials/{tmp['id']}", headers=o).status_code == 204
 
@@ -135,7 +130,7 @@ def test_roles_and_factory_isolation(client, shop):
     quality = add_user(client, o, "q@f.uz", "QUALITY_MANAGER")
     keeper = add_user(client, o, "k@f.uz", "WAREHOUSE_MANAGER")
     assert client.get(f"{INV}/materials", headers=worker).status_code == 403
-    assert client.get(f"{INV}/materials", headers=quality).status_code == 200  # ko'rish mumkin
+    assert client.get(f"{INV}/materials", headers=quality).status_code == 200
     assert move(client, quality, movement_type="RECEIPT", material_id=fab, location_id=shop["main"]["id"], quantity=1).status_code == 403
     assert move(client, keeper, movement_type="RECEIPT", material_id=fab, location_id=shop["main"]["id"], quantity=1).status_code == 201
 
@@ -143,7 +138,6 @@ def test_roles_and_factory_isolation(client, shop):
     assert client.get(f"{INV}/materials", headers=other).json()["total"] == 0
     assert client.get(f"{INV}/materials/{fab}", headers=other).status_code == 404
     assert move(client, other, movement_type="RECEIPT", material_id=fab, location_id=shop["main"]["id"], quantity=1).status_code == 404
-    # Boshqa zavodning joyiga o'z materialini qo'yib bo'lmaydi
     own = client.post(f"{INV}/materials", headers=other, json={"code": "X", "name": "Beta mato", "material_type": "FABRIC", "unit": "METER"}).json()
     assert move(client, other, movement_type="RECEIPT", material_id=own["id"], location_id=shop["main"]["id"], quantity=1).status_code == 404
 
@@ -151,7 +145,7 @@ def test_roles_and_factory_isolation(client, shop):
     assert client.get(f"{INV}/materials", headers=admin).json()["total"] == 2
     assert client.get(f"{INV}/materials", headers=admin, params={"factory_id": shop["factory_id"]}).json()["total"] == 1
     r = client.post(f"{INV}/materials", headers=admin, json={"code": "Z", "name": "Admin", "material_type": "OTHER", "unit": "PIECE"})
-    assert r.status_code == 422  # SUPER_ADMIN fabrikani tanlashi shart
+    assert r.status_code == 422
 
 
 def test_bom_links_catalog_material(client, shop):
@@ -164,16 +158,13 @@ def test_bom_links_catalog_material(client, shop):
     )
     assert r.status_code == 201, r.text
     item = r.json()
-    # Nom, tur va birlik katalogdan olinadi
     assert (item["material_name"], item["material_type"], item["unit"], item["material_code"]) == ("Paxta trikotaj", "FABRIC", "METER", "FAB-01")
     assert stock(client, o, fab["id"])["bom_usage_count"] == 1
 
-    # Katalogda nom o'zgarsa — BOM ham yangilanadi (bir ma'lumot bir joyda)
     client.patch(f"{INV}/materials/{fab['id']}", headers=o, json={"name": "Paxta trikotaj 180 g/m²"})
     bom = client.get(f"{API}/products/{product['id']}", headers=o).json()["bom_items"]
     assert bom[0]["material_name"] == "Paxta trikotaj 180 g/m²"
 
-    # Boshqa zavod materiali BOM'ga qo'shilmaydi
     other, _ = register_owner(client, "o2@f.uz", "Gamma")
     foreign = client.post(f"{INV}/materials", headers=other, json={"code": "F", "name": "Begona", "material_type": "FABRIC", "unit": "METER"}).json()
     r = client.post(f"{API}/products/{product['id']}/bom", headers=o, json={"material_id": foreign["id"], "material_type": "FABRIC", "material_name": "Begona", "quantity": 1, "unit": "METER"})
@@ -186,7 +177,7 @@ def test_audit_log_records_and_permissions(client, shop):
     client.patch(f"{INV}/materials/{fab}", headers=o, json={"min_stock": 5})
     logs = client.get(f"{API}/audit-logs", headers=o).json()
     actions = [x["action"] for x in logs["items"]]
-    assert actions[:2] == ["UPDATE", "STOCK"]  # yangilari birinchi
+    assert actions[:2] == ["UPDATE", "STOCK"]
     assert logs["items"][0]["changes"] == {"min_stock": [50.0, 5.0]}
     assert logs["items"][0]["user_name"]
     only_stock = client.get(f"{API}/audit-logs", headers=o, params={"entity": "stock_movement"}).json()

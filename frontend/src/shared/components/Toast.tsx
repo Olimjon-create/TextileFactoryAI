@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { Alert, Snackbar } from '@mui/material';
 import { tr } from '@/i18n';
 
-/** Butun ilova uchun qisqa xabarlar (pastda, 3 soniya): "Saqlandi", "Holat yangilandi" va h.k. */
 interface ToastValue {
   success: (message: string) => void;
 }
@@ -10,7 +9,6 @@ interface ToastValue {
 const ToastContext = createContext<ToastValue | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  // key — bir xil matnli ketma-ket xabarlar ham qaytadan ko'rinsin
   const [toast, setToast] = useState<{ message: string; key: number } | null>(null);
   const [open, setOpen] = useState(false);
 

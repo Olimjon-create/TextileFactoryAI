@@ -10,11 +10,9 @@ interface Props {
   value: number;
   onChange: (value: number) => void;
   size?: 'small' | 'medium';
-  /** 0 bo'lganda "Savatga" tugmasini ko'rsatish */
   showAddButton?: boolean;
 }
 
-/** Miqdor tanlash: [-] [son] [+]. Sonni qo'lda ham yozish mumkin (katta partiyalar uchun). */
 export default function QuantityStepper({ value, onChange, size = 'medium', showAddButton = true }: Props) {
   const [text, setText] = useState(String(value));
   useEffect(() => setText(String(value)), [value]);

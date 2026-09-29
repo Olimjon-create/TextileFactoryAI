@@ -17,17 +17,12 @@ from app.schemas.product import (
 from app.services import audit_service
 from app.core.i18n import t
 
-# Mahsulot va BOM ma'lumotlarini o'zgartira oladigan rollar.
-# Qolgan fabrika xodimlari (ombor, sifat, ishchi) faqat ko'ra oladi.
 PRODUCT_EDITOR_ROLES = (
     Role.SUPER_ADMIN,
     Role.FACTORY_OWNER,
     Role.MANAGER,
     Role.PRODUCTION_MANAGER,
 )
-
-
-# ---------- yordamchi funksiyalar ----------
 
 
 def _not_found() -> HTTPException:
@@ -72,7 +67,7 @@ def _ensure_code_free(db: Session, factory_id: int, code: str, exclude_id: int |
 
 def _resolve_factory_id(db: Session, actor: User, factory_id: int | None) -> int:
     if actor.role != Role.SUPER_ADMIN:
-        return actor.factory_id  # type: ignore[return-value]
+        return actor.factory_id
     if factory_id is None:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Fabrikani tanlang")
     if db.get(Factory, factory_id) is None:
@@ -84,9 +79,6 @@ def _to_out(product: Product) -> ProductOut:
     out = ProductOut.model_validate(product)
     out.bom_items_count = len(product.bom_items)
     return out
-
-
-# ---------- mahsulotlar ----------
 
 
 def list_products(
@@ -155,7 +147,6 @@ def update_product(db: Session, actor: User, product_id: int, data: ProductUpdat
     if changes.get("code") and changes["code"] != product.code:
         _ensure_code_free(db, product.factory_id, changes["code"], exclude_id=product.id)
 
-    # description/price/rasmlar bo'shatilishi mumkin, qolgan maydonlarda None — "o'zgartirmaslik"
     values = {f: v for f, v in changes.items() if v is not None or f in ("description", "price", "image_url", "model_image_url")}
     diff = audit_service.diff(product, values)
     for field, value in values.items():
@@ -179,9 +170,6 @@ def delete_product(db: Session, actor: User, product_id: int) -> None:
     )
     db.delete(product)
     db.commit()
-
-
-# ---------- BOM ----------
 
 
 def _get_bom_item(product: Product, item_id: int) -> BOMItem:
@@ -217,7 +205,6 @@ def update_bom_item(
     product = _get_product(db, actor, product_id)
     item = _get_bom_item(product, item_id)
     for field, value in _link_material(db, product.factory_id, data.model_dump(exclude_unset=True)).items():
-        # material_id = null — katalog bilan bog'lanishni uzish
         if value is not None or field in ("notes", "material_id"):
             setattr(item, field, value)
     db.commit()

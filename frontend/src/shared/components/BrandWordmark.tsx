@@ -1,7 +1,6 @@
 import { Box } from '@mui/material';
 import { BRAND_PARTS } from '@/shared/constants/brand';
 
-/** Dastur nomi logotip ko'rinishida: "Textile" + urg'u rangidagi "Core" (Typography ichida ishlatiladi) */
 export default function BrandWordmark({ accent = 'secondary.main' }: { accent?: string }) {
   return (
     <>

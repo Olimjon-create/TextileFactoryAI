@@ -26,7 +26,6 @@ export type MaterialUnit =
 export interface BOMItem {
   id: number;
   product_id: number;
-  /** Ombor katalogidagi material (bog'langan bo'lsa) */
   material_id: number | null;
   material_code: string | null;
   material_type: MaterialType;

@@ -15,12 +15,10 @@ def test_login_is_recorded_in_audit_log(client):
     admin = auth(client, ADMIN_EMAIL)
 
     logs = client.get(f"{API}/audit-logs", headers=admin, params={"action": "LOGIN"}).json()["items"]
-    # Faqat muvaffaqiyatli kirish yoziladi (noto'g'ri parol — yo'q)
     assert [l["changes"]["email"] for l in logs].count("owner@a.uz") == 1
     entry = next(l for l in logs if l["changes"]["email"] == "owner@a.uz")
     assert entry["entity"] == "session" and entry["user_name"] == "Owner"
     assert entry["changes"]["ip"] and entry["changes"]["qurilma"]
-    # Zavod egasi faqat o'z zavodidagi kirishlarni ko'radi
     own = client.get(f"{API}/audit-logs", headers=owner, params={"action": "LOGIN"}).json()["items"]
     assert {l["changes"]["email"] for l in own} == {"owner@a.uz"}
 
@@ -46,13 +44,13 @@ def test_backend_messages_follow_accept_language(client):
     owner, _ = register_owner(client, "owner@a.uz", "Alpha")
     body = {"code": "FAB-1", "name": "Pike", "material_type": "FABRIC", "unit": "METER"}
     assert client.post(f"{API}/inventory/materials", headers=owner, json=body).status_code == 201
-    detail = lambda lang: client.post(  # noqa: E731
+    detail = lambda lang: client.post(
         f"{API}/inventory/materials", headers={**owner, "Accept-Language": lang}, json=body
     ).json()["detail"]
     assert detail("uz") == "'FAB-1' kodli material allaqachon mavjud"
     assert detail("ru") == "Материал с кодом 'FAB-1' уже существует"
     assert detail("en-US,en;q=0.9") == "A material with code 'FAB-1' already exists"
-    assert detail("de") == "'FAB-1' kodli material allaqachon mavjud"  # noma'lum til — o'zbekcha
+    assert detail("de") == "'FAB-1' kodli material allaqachon mavjud"
 
 
 def test_wrong_password(client):
@@ -62,7 +60,6 @@ def test_wrong_password(client):
 
 def test_role_hierarchy(client):
     owner, _ = register_owner(client, "owner@a.uz", "Alpha")
-    # Egasi boshqa egani yarata olmaydi
     r = client.post(
         f"{API}/users",
         headers=owner,

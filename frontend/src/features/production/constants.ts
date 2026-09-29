@@ -4,7 +4,6 @@ import { tr } from '@/i18n';
 
 export { STAGE_LABELS } from '@/features/resources/constants';
 
-/** Marshrut tartibi — backenddagi models.production.STAGE_ROUTE bilan bir xil */
 export const STAGE_ROUTE: ProductionStage[] = ['CUTTING', 'SEWING', 'FINISHING', 'QUALITY_CONTROL', 'PACKING'];
 
 export const STAGE_SHORT: Record<ProductionStage, string> = {

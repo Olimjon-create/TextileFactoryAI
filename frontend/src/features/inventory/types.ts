@@ -1,7 +1,6 @@
 import type { MaterialType, MaterialUnit } from '@/features/products/types';
 
 export type MovementType = 'RECEIPT' | 'ISSUE' | 'RETURN' | 'WRITE_OFF' | 'ADJUSTMENT' | 'TRANSFER_OUT' | 'TRANSFER_IN';
-/** Foydalanuvchi kiritadigan amal (TRANSFER — ikki yozuvga aylanadi) */
 export type MovementInput = 'RECEIPT' | 'ISSUE' | 'RETURN' | 'WRITE_OFF' | 'ADJUSTMENT' | 'TRANSFER';
 export type StockState = 'low' | 'out' | 'in';
 

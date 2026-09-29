@@ -137,7 +137,6 @@ def _vision(db: Session, actor: User) -> list[Notification]:
     pending = db.execute(scoped(select(func.count(), func.max(DeviceEvent.id)), actor, DeviceEvent.factory_id)
                          .where(DeviceEvent.status == EventStatus.PENDING)).one()
     if pending[0]:
-        # Kalit eng yangi kutilayotgan hodisaga bog'liq — yangisi kelsa yana ko'rinadi
         out.append(Notification(key=f"vision-pending:{pending[1]}", type="vision", severity="info",
                                 title=t("{count} ta AI hodisasi tasdiqlashni kutmoqda", count=pending[0]), message=t("Kamera/sensor hodisalarini ko'rib chiqing"),
                                 path="/vision/events"))
@@ -206,7 +205,6 @@ def mark_read(db: Session, actor: User, keys: list[str] | None = None) -> Notifi
     for key in sorted(wanted - existing):
         if len(key) <= 120:
             db.add(NotificationRead(user_id=actor.id, key=key))
-    # Eski o'qilgan kalitlar jadvalni to'ldirib yubormasin
     cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=READ_RETENTION_DAYS)
     db.execute(delete(NotificationRead).where(NotificationRead.user_id == actor.id, NotificationRead.read_at < cutoff))
     db.commit()

@@ -11,11 +11,8 @@ def _engine_options() -> dict:
     if settings.DATABASE_URL.startswith("sqlite"):
         return options
     if "pooler.supabase.com" in settings.DATABASE_URL:
-        # Supabase pooler (Supavisor) transaction rejimi prepared statement'larni qo'llamaydi —
-        # psycopg ularni avtomatik yaratmasin (session rejimida ham zarari yo'q)
         options["connect_args"] = {"prepare_threshold": None}
     if settings.DB_NULL_POOL:
-        # Serverless (Vercel): har instansiya o'z pulini ushlab turmasin — PgBouncer/Neon pooler ishlatiladi
         from sqlalchemy.pool import NullPool
 
         options["poolclass"] = NullPool
@@ -27,8 +24,6 @@ def _engine_options() -> dict:
 engine = create_engine(settings.DATABASE_URL, **_engine_options())
 
 if engine.dialect.name == "sqlite":
-    # SQLite (faqat lokal ishlab chiqish/testlar uchun) FK va ON DELETE CASCADE'ni
-    # sukut bo'yicha o'chirib qo'yadi — PostgreSQL bilan bir xil ishlashi uchun yoqamiz.
     @event.listens_for(engine, "connect")
     def _enable_sqlite_fk(dbapi_connection, _):
         dbapi_connection.execute("PRAGMA foreign_keys=ON")

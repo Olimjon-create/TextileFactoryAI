@@ -1,7 +1,3 @@
-/**
- * CSV (Excel uchun): UTF-8 BOM va ";" ajratkich — rus/o'zbek lokalidagi Excel shuni kutadi,
- * kasr vergul bilan. Fayl nomiga bugungi sana qo'shiladi.
- */
 export type CsvValue = string | number | null | undefined;
 
 export function downloadCsv(name: string, headers: string[], rows: CsvValue[][], footer?: CsvValue[]) {
@@ -15,13 +11,11 @@ export function downloadCsv(name: string, headers: string[], rows: CsvValue[][],
   a.href = URL.createObjectURL(blob);
   a.download = `${name}.csv`;
   a.click();
-  // Darhol bekor qilinsa ba'zi brauzerlar (Firefox) yuklashni uzib qo'yadi
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-/** Sahifalangan API'dan filtr bo'yicha hamma yozuvlarni yig'ish (eksport uchun) */
 export async function fetchAll<T>(page: (offset: number, limit: number) => Promise<{ items: T[]; total: number }>, max = 10_000): Promise<T[]> {
-  const limit = 100; // eng qattiq API chegarasi (buyurtmalar, mijozlar: le=100)
+  const limit = 100;
   const items: T[] = [];
   for (let offset = 0; offset < max; offset += limit) {
     const res = await page(offset, limit);

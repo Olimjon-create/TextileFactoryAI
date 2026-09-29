@@ -13,12 +13,12 @@ from pathlib import Path
 
 from sqlalchemy import create_engine, inspect, select, text
 
-import app.models  # noqa: F401  (barcha modellar metadata'ga ro'yxatdan o'tishi uchun)
+import app.models
 from app.core.database import Base, engine
 
 BACKUP_DIR = Path(__file__).resolve().parents[1] / "backups"
 BATCH = 500
-KEEP = 14  # nechta oxirgi nusxa saqlanadi
+KEEP = 14
 
 
 def main() -> None:
@@ -32,7 +32,6 @@ def main() -> None:
     with engine.connect() as src, target.begin() as dst:
         existing = set(inspect(src).get_table_names())
         for table in Base.metadata.sorted_tables:
-            # Chastota hisoblagichi vaqtinchalik — zaxiraga kerak emas
             if table.name not in existing or table.name == "rate_limit_hits":
                 continue
             rows = [dict(r._mapping) for r in src.execute(select(table))]
@@ -41,13 +40,11 @@ def main() -> None:
             total += len(rows)
             if rows:
                 print(f"  {table.name}: {len(rows)}")
-        # Migratsiya versiyasi — fayl lokal baza sifatida ochilsa, qayta migratsiya qilinmasin
         version = src.execute(text("SELECT version_num FROM alembic_version")).scalar()
         dst.execute(text("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL PRIMARY KEY)"))
         dst.execute(text("INSERT INTO alembic_version VALUES (:v)"), {"v": version})
     target.dispose()
     print(f"Tayyor: {total} ta qator → {path} ({path.stat().st_size / 1024:.0f} KB)")
-    # Disk to'lib ketmasin: eng yangi KEEP ta nusxa qoladi
     old = sorted(BACKUP_DIR.glob("textilecore-*.db"))[:-KEEP]
     for f in old:
         f.unlink(missing_ok=True)

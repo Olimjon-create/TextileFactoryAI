@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 
 class OrderStatus(str, enum.Enum):
-    PENDING_PAYMENT = "PENDING_PAYMENT"  # to'lov kutilmoqda — zavodga hali ko'rinmaydi
-    NEW = "NEW"  # to'langan, zavod hali ko'rib chiqmagan
+    PENDING_PAYMENT = "PENDING_PAYMENT"
+    NEW = "NEW"
     CONFIRMED = "CONFIRMED"
     IN_PRODUCTION = "IN_PRODUCTION"
     READY = "READY"
@@ -32,8 +32,8 @@ class PaymentStatus(str, enum.Enum):
 
 
 class OrderSource(str, enum.Enum):
-    STORE = "STORE"  # mijoz katalog orqali bergan va to'lagan
-    MANUAL = "MANUAL"  # menejer CRM'dagi mijoz uchun qo'lda kiritgan (B2B)
+    STORE = "STORE"
+    MANUAL = "MANUAL"
 
 
 class Order(Base, TimestampMixin):
@@ -45,12 +45,10 @@ class Order(Base, TimestampMixin):
     factory_id: Mapped[int] = mapped_column(
         ForeignKey("factories.id", ondelete="CASCADE"), index=True
     )
-    # To'lovdan keyin CRM'dagi mijozga (telefon bo'yicha) bog'lanadi
     customer_id: Mapped[int | None] = mapped_column(
         ForeignKey("customers.id", ondelete="SET NULL"), index=True
     )
     order_number: Mapped[str | None] = mapped_column(String(20), unique=True, index=True)
-    # Mijoz buyurtmasini ko'rishi va to'lashi uchun taxmin qilib bo'lmaydigan kalit
     public_token: Mapped[str] = mapped_column(String(64), unique=True, index=True)
 
     customer_name: Mapped[str] = mapped_column(String(200))
@@ -75,10 +73,8 @@ class Order(Base, TimestampMixin):
     source: Mapped[OrderSource] = mapped_column(
         Enum(OrderSource, name="order_source"), default=OrderSource.STORE, server_default=OrderSource.STORE.value, index=True
     )
-    # Mijozga va'da qilingan topshirish sanasi — kechikayotgan buyurtmalar shu bo'yicha aniqlanadi
     due_date: Mapped[date | None] = mapped_column(Date, index=True)
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
-    # Telegram bot (Mini App) orqali berilgan bo'lsa — mijozga holat xabarlari shu chatga, shu tilda yuboriladi
     customer_telegram_id: Mapped[str | None] = mapped_column(String(32), index=True)
     customer_lang: Mapped[str | None] = mapped_column(String(2))
 
@@ -102,7 +98,6 @@ class OrderItem(Base):
     )
     product_name: Mapped[str] = mapped_column(String(200))
     product_code: Mapped[str] = mapped_column(String(50))
-    # Mijoz tanlagan variant (mahsulotda o'lcham/rang bo'lmasa — NULL)
     size: Mapped[str | None] = mapped_column(String(30))
     color: Mapped[str | None] = mapped_column(String(30))
     unit_price: Mapped[Decimal] = mapped_column(Numeric(14, 2))

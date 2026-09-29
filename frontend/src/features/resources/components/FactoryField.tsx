@@ -5,7 +5,6 @@ import { factoriesApi } from '@/features/factories/api';
 import type { Factory } from '@/shared/types';
 import { tr } from '@/i18n';
 
-/** Faqat SUPER_ADMIN yangi yozuv yaratganda ko'rinadi: qaysi fabrikaga tegishli */
 export function useNeedsFactory(isNew: boolean) {
   const { user } = useAuth();
   return user?.role === 'SUPER_ADMIN' && isNew;

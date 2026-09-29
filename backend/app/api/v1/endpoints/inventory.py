@@ -35,9 +35,6 @@ def summary(factory_id: int | None = None, db: Session = Depends(get_db), actor:
     return svc.summary(db, actor, factory_id)
 
 
-# ---------- materiallar ----------
-
-
 @router.get("/materials", response_model=MaterialPage)
 def list_materials(
     search: str | None = Query(default=None, max_length=100),
@@ -76,9 +73,6 @@ def delete_material(material_id: int, db: Session = Depends(get_db), actor: User
     svc.delete_material(db, actor, material_id)
 
 
-# ---------- joylashuvlar ----------
-
-
 @router.get("/locations", response_model=list[LocationOut])
 def list_locations(
     include_inactive: bool = False,
@@ -102,9 +96,6 @@ def update_location(location_id: int, data: LocationUpdate, db: Session = Depend
 @router.delete("/locations/{location_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_location(location_id: int, db: Session = Depends(get_db), actor: User = Depends(can_edit)):
     svc.delete_location(db, actor, location_id)
-
-
-# ---------- harakatlar ----------
 
 
 @router.get("/movements", response_model=MovementPage)

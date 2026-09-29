@@ -79,7 +79,6 @@ interface Props {
   onClose: () => void;
 }
 
-/** Fabrika tushumi: kunlik / haftalik / oylik / yillik diagramma, jami ko'rsatkichlar va davrlar jadvali */
 export default function RevenueDialog({ open, initialPeriod = 'day', onClose }: Props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -134,7 +133,6 @@ export default function RevenueDialog({ open, initialPeriod = 'day', onClose }: 
       <DialogContent>
         {error && <Alert severity="error">{error}</Alert>}
 
-        {/* Joriy davrlar — tab'dan qat'i nazar doim ko'rinadi */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 1.25, mb: 2.5 }}>
           {([
             [tr("Bugun"), data?.quick.today],

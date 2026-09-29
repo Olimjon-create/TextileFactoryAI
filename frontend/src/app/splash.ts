@@ -1,7 +1,3 @@
-/**
- * index.html dagi splash (sayt ochilayotgandagi loading) ni yashiradi.
- * Juda tez yuklansa ham splash qisqa vaqt ko'rinadi — "miltillash" bo'lmasligi uchun.
- */
 const MIN_VISIBLE_MS = 450;
 
 let hidden = false;

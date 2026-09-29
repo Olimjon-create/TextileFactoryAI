@@ -1,5 +1,4 @@
 export type ProductMovementType = 'PRODUCTION' | 'SHIPMENT' | 'RETURN' | 'WRITE_OFF' | 'ADJUSTMENT' | 'RECEIPT' | 'TRANSFER_OUT' | 'TRANSFER_IN';
-/** Qo'lda kiritiladigan amal (TRANSFER — ikki yozuvga aylanadi) */
 export type FgMovementInput = 'RECEIPT' | 'RETURN' | 'WRITE_OFF' | 'ADJUSTMENT' | 'TRANSFER';
 export type ShipmentStatus = 'PREPARING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
@@ -54,7 +53,6 @@ export interface FgMovementPayload {
   size: string | null;
   color: string | null;
   location_id: number;
-  /** Faqat TRANSFER: qaysi joyga */
   to_location_id?: number | null;
   quantity: number;
   order_id?: number | null;

@@ -46,7 +46,6 @@ def test_new_google_user_gets_own_factory(client, google):
     assert user["email"] == "aziz@gmail.com"
     assert user["role"] == "FACTORY_OWNER"
     assert user["factory"]["name"] == "Aziz Karimov fabrikasi"
-    # Ikkinchi marta kirganda yangi fabrika yaratilmaydi
     again = google_login(client).json()["user"]
     assert again["id"] == user["id"]
     assert again["factory_id"] == user["factory_id"]

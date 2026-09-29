@@ -20,7 +20,6 @@ from app.models.production import WorkOrderStatus
 from app.models.resources import MachineStatus
 from app.services import telegram_service
 
-# O'zbekiston vaqti (UTC+5, yozgi vaqt yo'q) — "bugun" shu bo'yicha
 TASHKENT = timezone(timedelta(hours=5))
 OPEN_ORDER = (OrderStatus.NEW, OrderStatus.CONFIRMED, OrderStatus.IN_PRODUCTION, OrderStatus.READY)
 
@@ -115,6 +114,6 @@ def cleanup(db: Session) -> dict:
 
 
 def run(db: Session) -> dict:
-    result = {"cleanup": cleanup(db)}  # bazaga yozish — Supabase loyihasi faol hisoblanadi
+    result = {"cleanup": cleanup(db)}
     result["reports_sent"] = send_reports(db)
     return result

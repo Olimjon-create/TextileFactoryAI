@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 PEXELS = "https://images.pexels.com/photos/{path}?auto=compress&cs=tinysrgb&w=900"
-LOCAL_DIR = ("demo", "photos")  # MEDIA_DIR ichida
+LOCAL_DIR = ("demo", "photos")
 
 
 def _remote(path: str) -> str:
@@ -49,7 +49,6 @@ def download_all(media_root: Path) -> tuple[int, int]:
             if target.exists():
                 existed += 1
                 continue
-            # requests yangilangan certifi sertifikatlaridan foydalanadi (tizim Python'iniki eskirgan bo'lishi mumkin)
             response = requests.get(_remote(path), headers={"User-Agent": "TextileFactoryAI-demo/1.0"}, timeout=30)
             response.raise_for_status()
             data = response.content
@@ -62,7 +61,6 @@ def download_all(media_root: Path) -> tuple[int, int]:
 
 
 PHOTOS: dict[str, tuple[str, str]] = {
-    # --- Zara ---
     "ZR-TS-01": ("12025472/pexels-photo-12025472.jpeg", "9775441/pexels-photo-9775441.jpeg"),
     "ZR-SH-02": (
         "28576630/pexels-photo-28576630/free-photo-of-minimalist-white-shirt-on-hanger-close-up.jpeg",
@@ -80,7 +78,6 @@ PHOTOS: dict[str, tuple[str, str]] = {
         "31733950/pexels-photo-31733950/free-photo-of-elegant-coat-closet-with-stylish-outerwear.jpeg",
         "4872101/pexels-photo-4872101.jpeg",
     ),
-    # --- Polo Ralph Lauren ---
     "PRL-PL-01": (
         "20763273/pexels-photo-20763273/free-photo-of-folded-polo-shirt.jpeg",
         "38010898/pexels-photo-38010898/free-photo-of-man-in-blue-polo-shirt-standing-by-ornate-door.jpeg",
@@ -97,7 +94,6 @@ PHOTOS: dict[str, tuple[str, str]] = {
         "33633245/pexels-photo-33633245/free-photo-of-flat-lay-of-men-s-casual-outfits-on-blue-background.jpeg",
         "16721806/pexels-photo-16721806/free-photo-of-man-with-a-beard-standing-on-the-pavement-in-a-town.jpeg",
     ),
-    # --- Loro Piana ---
     "LP-SW-01": (
         "14642651/pexels-photo-14642651.jpeg",
         "15235481/pexels-photo-15235481/free-photo-of-close-up-shot-of-a-blonde-man-in-white-knitted-sweater.jpeg",
@@ -110,7 +106,6 @@ PHOTOS: dict[str, tuple[str, str]] = {
         "10772702/pexels-photo-10772702.jpeg",
         "19169192/pexels-photo-19169192/free-photo-of-woman-wearing-an-autumn-coat.jpeg",
     ),
-    # --- Uniqlo ---
     "UQ-TS-01": (
         "37704849/pexels-photo-37704849/free-photo-of-white-t-shirt-on-wooden-floor-in-sunlight.jpeg",
         "10788951/pexels-photo-10788951.jpeg",
@@ -124,7 +119,6 @@ PHOTOS: dict[str, tuple[str, str]] = {
         "4109759/pexels-photo-4109759.jpeg",
         "30133696/pexels-photo-30133696/free-photo-of-casual-portrait-of-man-in-denim-outfit.jpeg",
     ),
-    # --- Levi's ---
     "LV-JN-501": (
         "6924338/pexels-photo-6924338.jpeg",
         "26125921/pexels-photo-26125921/free-photo-of-smiling-man-in-black-t-shirt.jpeg",
@@ -137,7 +131,6 @@ PHOTOS: dict[str, tuple[str, str]] = {
         "37704843/pexels-photo-37704843/free-photo-of-minimalist-white-t-shirt-on-wooden-floor.jpeg",
         "8217461/pexels-photo-8217461.jpeg",
     ),
-    # --- Lacoste ---
     "LC-PL-1212": (
         "36074834/pexels-photo-36074834/free-photo-of-colorful-assortment-of-t-shirts-on-hangers.jpeg",
         "11751211/pexels-photo-11751211.jpeg",
@@ -147,14 +140,12 @@ PHOTOS: dict[str, tuple[str, str]] = {
         "18984601/pexels-photo-18984601/free-photo-of-dress-in-wardrobe.jpeg",
         "27064329/pexels-photo-27064329/free-photo-of-woman-in-white-dress-at-tennis-court.jpeg",
     ),
-    # --- United Colors of Benetton ---
     "UCB-SW-01": (
         "34854182/pexels-photo-34854182/free-photo-of-stack-of-colorful-knit-sweaters-on-shelf.jpeg",
         "5709914/pexels-photo-5709914.jpeg",
     ),
     "UCB-TS-02": ("9558246/pexels-photo-9558246.jpeg", "9558895/pexels-photo-9558895.jpeg"),
     "UCB-HD-03": ("12555806/pexels-photo-12555806.png", "14370986/pexels-photo-14370986.png"),
-    # --- H&M ---
     "HM-TS-01": ("5746084/pexels-photo-5746084.jpeg", "8217504/pexels-photo-8217504.jpeg"),
     "HM-HD-02": ("9594422/pexels-photo-9594422.jpeg", "5825332/pexels-photo-5825332.jpeg"),
     "HM-PT-03": (

@@ -14,13 +14,11 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  /** Tahrirlash: mahsulot va variant o'zgarmaydi */
   wo?: WorkOrderDetail | null;
   onClose: () => void;
   onSaved: (wo: WorkOrderDetail) => void;
 }
 
-/** Ombor uchun (buyurtmasiz) ish buyurtmasi yoki mavjudini tahrirlash (miqdor, liniya, muddat) */
 export default function WorkOrderFormDialog({ open, wo, onClose, onSaved }: Props) {
   const [product, setProduct] = useState<ProductListItem | null>(null);
   const [products, setProducts] = useState<ProductListItem[]>([]);

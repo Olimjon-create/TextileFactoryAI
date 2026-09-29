@@ -23,7 +23,6 @@ from app.services import order_service
 MONTHS = ["Yan", "Fev", "Mar", "Apr", "May", "Iyun", "Iyul", "Avg", "Sen", "Okt", "Noy", "Dek"]
 MONTHS_FULL = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"]
 
-# Nechta ustun ko'rsatiladi
 BUCKETS: dict[str, int] = {"day": 30, "week": 12, "month": 12, "year": 5}
 
 
@@ -36,7 +35,6 @@ def _today() -> date:
 
 
 def _local_date(stamp: datetime) -> date:
-    # SQLite vaqtni tz'siz qaytaradi — bazada UTC saqlanadi
     if stamp.tzinfo is None:
         stamp = stamp.replace(tzinfo=timezone.utc)
     return stamp.astimezone(_tz()).date()
@@ -51,7 +49,7 @@ def _bucket_start(d: date, period: str) -> date:
     if period == "day":
         return d
     if period == "week":
-        return d - timedelta(days=d.weekday())  # dushanba
+        return d - timedelta(days=d.weekday())
     if period == "month":
         return d.replace(day=1)
     return date(d.year, 1, 1)
@@ -104,7 +102,6 @@ def revenue(db: Session, actor: User, period: RevenuePeriod = "day", factory_id:
     last = _bucket_start(today, period)
     first = _next(last, period, -(count - 1))
     prev_first = _next(first, period, -count)
-    # Tezkor ko'rsatkichlar uchun eng uzoq sana — joriy yil boshi
     since = min(prev_first, date(today.year, 1, 1), _bucket_start(today, "week"))
     since_utc = datetime.combine(since, datetime.min.time(), tzinfo=_tz()).astimezone(timezone.utc).replace(tzinfo=None)
 

@@ -21,13 +21,11 @@ import { tr } from '@/i18n';
 interface Props {
   row: DailyRow | null;
   date: string;
-  /** Dialog ochilganda tanlangan holat (masalan menyudan "Kelmadi") */
   initialStatus?: AttendanceStatus;
   onClose: () => void;
   onSaved: (message: string) => void;
 }
 
-/** Kunlik yozuvni qo'lda kiritish/tuzatish: keldi (vaqtlar bilan), kelmadi, kasal, javob, ta'til */
 export default function MarkDialog({ row, date, initialStatus, onClose, onSaved }: Props) {
   const [status, setStatus] = useState<AttendanceStatus>('PRESENT');
   const [checkIn, setCheckIn] = useState('');

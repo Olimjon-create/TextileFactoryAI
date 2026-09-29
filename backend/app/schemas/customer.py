@@ -77,7 +77,6 @@ class _CustomerFields(BaseModel):
 
 class CustomerCreate(_CustomerFields):
     name: str = Field(min_length=2, max_length=200)
-    # Bo'sh qoldirilsa avtomatik yaratiladi: CUS-00001, CUS-00002, ...
     customer_code: str | None = Field(default=None, max_length=30)
     customer_type: CustomerType = CustomerType.COMPANY
     status: CustomerStatus = CustomerStatus.ACTIVE
@@ -87,7 +86,6 @@ class CustomerCreate(_CustomerFields):
     country: str | None = Field(default=None, max_length=2)
     address: str | None = Field(default=None, max_length=300)
     notes: str | None = Field(default=None, max_length=5000)
-    # Faqat SUPER_ADMIN uchun majburiy; boshqalarda o'z fabrikasi olinadi
     factory_id: int | None = None
 
 

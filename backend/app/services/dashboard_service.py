@@ -54,8 +54,6 @@ def get_stats(db: Session, actor: User) -> DashboardStats:
     )
 
 
-# ---------- rahbar dashboardi: mavjud modullar ko'rsatkichlari (rolga qarab) ----------
-
 TREND_DAYS = 14
 
 

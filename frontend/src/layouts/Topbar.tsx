@@ -37,7 +37,6 @@ function initials(name: string) {
     .join('');
 }
 
-
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { user, logout } = useAuth();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
@@ -67,7 +66,6 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         <IconButton edge="start" onClick={onMenuClick} aria-label={tr("Menyu")} sx={{ mr: 1, display: { lg: 'none' } }}>
           <MenuIcon />
         </IconButton>
-        {/* Telefon/planshetda sidebar yopiq — brend header'da ko'rinadi */}
         <Box
           component={RouterLink}
           to="/"
@@ -79,13 +77,11 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           </Typography>
         </Box>
 
-        {/* Sana va jonli soat — panel o'rtasida (telefonda joy yo'q — yashirin) */}
         <Box
           sx={{
             display: { xs: 'none', sm: 'flex' },
             alignItems: 'center',
             gap: 1.25,
-            // Tor planshetda (<900px) o'ng tugmalar bilan to'qnashmasin — oddiy oqimda, logo yonida
             ml: { sm: 1.5, md: 0 },
             position: { sm: 'static', md: 'absolute' },
             left: '50%',

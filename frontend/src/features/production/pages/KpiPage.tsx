@@ -54,7 +54,6 @@ function Efficiency({ k }: { k: EmployeeKpi }) {
   );
 }
 
-/** Xodimlar KPI: ishlab chiqarish yozuvlaridan — yaroqli dona, me'yor bajarilishi, brak ulushi, soatbay unumdorlik */
 export default function KpiPage() {
   const isMobile = useIsMobile();
   const [from, setFrom] = useState(iso(new Date(Date.now() - 6 * 86400000)));

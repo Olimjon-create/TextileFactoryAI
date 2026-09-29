@@ -1,13 +1,8 @@
 import { alpha, createTheme, type PaletteMode, type Theme } from '@mui/material/styles';
 
 export const SIDEBAR_WIDTH = 272;
-/** Sidebar va header ekranning chetidan shu masofada "suzib" turadi */
 export const SHELL_GAP = 16;
 
-/**
- * "Linen & Emerald" dizayni: iliq zig'ir fon, to'q zumrad asosiy rang, terrakota urg'u.
- * Sidebar ham kontent kabi ochiq (light) / to'q (dark) — alohida to'q panel yo'q.
- */
 export const SIDEBAR_BG: Record<PaletteMode, string> = {
   light: '#ffffff',
   dark: '#171a18',
@@ -42,7 +37,6 @@ const TABLE_HEAD_BG: Record<PaletteMode, string> = { light: '#faf8f4', dark: '#1
 
 const FONT = '"Manrope", "Inter", "Segoe UI", "Roboto", sans-serif';
 
-/** Kartalar uchun yumshoq, qatlamli soya (dark rejimda — ingichka chegara) */
 export const softShadow = (theme: Theme) =>
   theme.palette.mode === 'light'
     ? '0 1px 2px rgba(40, 32, 18, 0.04), 0 8px 24px -12px rgba(40, 32, 18, 0.12)'
@@ -67,7 +61,6 @@ export function createAppTheme(mode: PaletteMode): Theme {
         styleOverrides: (theme) => ({
           body: {
             transition: 'background-color .2s ease',
-            // Fonda juda yengil "to'qima" naqshi
             backgroundImage:
               theme.palette.mode === 'light'
                 ? 'radial-gradient(rgba(15, 92, 77, 0.035) 1px, transparent 1px)'
@@ -208,10 +201,8 @@ export function createAppTheme(mode: PaletteMode): Theme {
   });
 }
 
-/** Header/app bar uchun yarim shaffof fon (orqasidagi kontent xiralashadi) */
 export const translucentPaper = (theme: Theme) => alpha(theme.palette.background.paper, 0.8);
 
-/** 'primary.main' kabi mavzu yo'lini yoki oddiy CSS rangni haqiqiy rangga aylantiradi */
 export function resolveColor(theme: Theme, color: string): string {
   const [key, shade = 'main'] = color.split('.');
   const entry = (theme.palette as unknown as Record<string, unknown>)[key];

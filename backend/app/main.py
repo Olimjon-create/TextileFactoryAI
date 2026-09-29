@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 
-import app.models  # noqa: F401  (modellarni metadata'ga ro'yxatdan o'tkazish)
+import app.models
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.i18n import set_lang
@@ -27,7 +27,6 @@ def prepare() -> None:
     if _prepared:
         return
     settings.validate_for_production()
-    # Baza sxemasi Alembic migratsiyalari orqali yangilanadi (migrations/versions).
     if settings.AUTO_MIGRATE:
         run_migrations()
     if settings.BOOTSTRAP_SUPERADMIN and ensure_superadmin():
@@ -37,7 +36,6 @@ def prepare() -> None:
         from scripts.public_demo import seed_public
 
         seed_public()
-        # Taqdimot uchun: "Atlas Moda" ichida to'liq ish oqimi va demo hisoblar
         seed_workflow_demo()
     _prepared = True
 
@@ -52,7 +50,6 @@ app = FastAPI(
     title=settings.APP_NAME,
     version="0.1.0",
     lifespan=lifespan,
-    # Productionda API sxemasi ochiq e'lon qilinmaydi
     docs_url=None if settings.is_production else "/docs",
     redoc_url=None if settings.is_production else "/redoc",
     openapi_url=None if settings.is_production else "/openapi.json",
@@ -68,19 +65,16 @@ app.add_middleware(
 
 @app.middleware("http")
 async def request_language(request: Request, call_next):
-    # Frontend tanlangan tilni yuboradi: xabarlar shu tilda (app.core.i18n.t)
     set_lang(request.headers.get("accept-language"))
     try:
         return await call_next(request)
     except Exception as exc:
-        # Kutilmagan xato: administratorga Telegram xabari, so'ng odatiy 500 javobi
         await run_in_threadpool(telegram_service.alert_admin, request.method, request.url.path, exc)
         raise
 
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
-# Yuklangan rasmlar (zavod logolari, mahsulot rasmlari)
 app.mount("/media", StaticFiles(directory=media_dir()), name="media")
 
 

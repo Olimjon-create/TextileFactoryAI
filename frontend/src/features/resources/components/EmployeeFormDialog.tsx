@@ -99,7 +99,6 @@ export default function EmployeeFormDialog({ open, employee, onClose, onSaved }:
       daily_norm: norm,
       status: form.status,
       notes: form.notes.trim() || null,
-      // Maosh maydonlari faqat ruxsati borlardan yuboriladi
       ...(canSeePay ? { pay_type: form.pay_type, pay_rate: rate } : {}),
       ...(needsFactory ? { factory_id: Number(form.factory_id) } : {}),
     };

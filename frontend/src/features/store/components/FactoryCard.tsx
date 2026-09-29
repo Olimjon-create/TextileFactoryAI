@@ -8,13 +8,11 @@ import type { StoreFactoryCard } from '../types';
 import StoreImage from './StoreImage';
 import { tr } from '@/i18n';
 
-/** Katalogdagi zavod kartasi: rasm ustida qisqa ma'lumot, hover'da rasm sekin kattalashadi */
 export default function FactoryCard({ factory }: { factory: StoreFactoryCard }) {
   return (
     <Card
       sx={{
         overflow: 'hidden',
-        // Ko'tarilish va soya — umumiy katalog mavzusidan (storeTheme MuiCard)
         '&:hover .cover': { transform: 'scale(1.05)' },
         '&:hover .go': { opacity: 1, transform: 'translateX(0)' },
       }}
@@ -30,7 +28,6 @@ export default function FactoryCard({ factory }: { factory: StoreFactoryCard }) 
               iconSize={72}
             />
           </Box>
-          {/* Rasm ustidagi qisqa ma'lumot — iliq "espresso" soya */}
           <Box
             sx={{
               position: 'absolute',
@@ -66,7 +63,6 @@ export default function FactoryCard({ factory }: { factory: StoreFactoryCard }) 
               </Box>
             )}
           </Box>
-          {/* Hover'da chiqadigan "Ko'rish" belgisi */}
           <Box
             className="go"
             sx={{

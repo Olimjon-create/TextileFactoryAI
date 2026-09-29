@@ -1,5 +1,4 @@
 import { getLang, tr } from '@/i18n';
-// ISO 3166-1 alpha-2 kodlari. Nomlar brauzerning Intl.DisplayNames orqali o'zbekcha olinadi.
 const ALL_CODES = (
   'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ ' +
   'CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO ' +
@@ -10,10 +9,8 @@ const ALL_CODES = (
   'TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'
 ).split(' ');
 
-// Ro'yxat boshida ko'rsatiladigan (mintaqa uchun eng ko'p ishlatiladigan) davlatlar
 const PRIORITY = ['UZ', 'KZ', 'KG', 'TJ', 'TM', 'RU', 'TR', 'CN', 'AE', 'AZ', 'BY', 'DE', 'PL', 'US', 'GB'];
 
-// Ko'p ishlatiladigan davlatlarning o'zbekcha nomlari (brauzerda o'zbek tili ma'lumotlari bo'lmasa ham)
 const UZ_NAMES: Record<string, string> = {
   UZ: "O'zbekiston",
   KZ: "Qozog'iston",
@@ -48,18 +45,14 @@ const UZ_NAMES: Record<string, string> = {
 };
 
 function makeNamer(): (code: string) => string {
-  // Rus/ingliz tilida — brauzer nomlari to'liq (Intl)
   const lang = getLang();
   if (lang !== 'uz') {
     try {
       const names = new Intl.DisplayNames([lang], { type: 'region' });
       return (code) => names.of(code) ?? code;
     } catch {
-      // eski brauzer — pastdagi o'zbekcha ro'yxatga
     }
   }
-  // Intl locale'ni qo'llamasa jimgina boshqasiga (odatda inglizcha) o'tadi —
-  // shuning uchun faqat haqiqatan 'uz' ishlaganda foydalanamiz, aks holda inglizcha.
   for (const locale of ['uz', 'en']) {
     try {
       const names = new Intl.DisplayNames([locale], { type: 'region', fallback: 'none' });
@@ -67,7 +60,6 @@ function makeNamer(): (code: string) => string {
         return (code) => UZ_NAMES[code] ?? names.of(code) ?? code;
       }
     } catch {
-      // bu locale qo'llab-quvvatlanmaydi — keyingisini sinaymiz
     }
   }
   return (code) => UZ_NAMES[code] ?? code;

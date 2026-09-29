@@ -6,7 +6,6 @@ export interface FactoryPayload {
   address: string | null;
   phone: string | null;
   is_active?: boolean;
-  // Katalog profili
   is_public?: boolean;
   city?: string | null;
   short_description?: string | null;

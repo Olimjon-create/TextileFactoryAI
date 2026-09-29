@@ -51,7 +51,7 @@ export interface Shift {
   id: number;
   factory_id: number;
   name: string;
-  start_time: string; // "08:00:00"
+  start_time: string;
   end_time: string;
   break_minutes: number;
   is_active: boolean;
@@ -83,7 +83,6 @@ export interface Employee {
   user_email: string | null;
   hire_date: string | null;
   pay_type: PayType;
-  /** Faqat egasi/menejer ko'radi, boshqalarga null */
   pay_rate: number | null;
   daily_norm: number | null;
   status: EmployeeStatus;

@@ -16,7 +16,6 @@ const ICON = {
   info: <InfoOutlinedIcon color="info" fontSize="small" />,
 };
 
-/** Yuqori paneldagi qo'ng'iroqcha: kechikishlar, kam qolgan material, buzilgan mashina, yangi buyurtmalar */
 export default function NotificationBell() {
   const navigate = useNavigate();
   const [data, setData] = useState<NotificationList | null>(null);

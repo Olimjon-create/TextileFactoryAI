@@ -39,9 +39,6 @@ class Brief(BaseModel):
     name: str
 
 
-# ---------- liniyalar ----------
-
-
 class LineCreate(_Clean):
     code: str
     name: str = Field(min_length=2, max_length=100)
@@ -80,10 +77,7 @@ class LineOut(BaseModel):
     is_active: bool
     employees_count: int = 0
     machines_count: int = 0
-    machines_down: int = 0  # buzilgan yoki texnik xizmatda
-
-
-# ---------- smenalar ----------
+    machines_down: int = 0
 
 
 class ShiftCreate(_Clean):
@@ -118,17 +112,13 @@ class ShiftOut(BaseModel):
     end_time: time
     break_minutes: int
     is_active: bool
-    # Sof ish vaqti (tanaffussiz), daqiqa — tungi smena ham to'g'ri hisoblanadi
     work_minutes: int = 0
     is_night: bool = False
     employees_count: int = 0
 
 
-# ---------- xodimlar ----------
-
-
 class EmployeeCreate(_Clean):
-    employee_code: str | None = None  # bo'sh bo'lsa avtomatik (EMP-00001)
+    employee_code: str | None = None
     full_name: str = Field(min_length=2, max_length=200)
     phone: str | None = Field(default=None, max_length=50)
     position: str | None = Field(default=None, max_length=100)
@@ -186,7 +176,6 @@ class EmployeeOut(BaseModel):
     user_email: str | None
     hire_date: date | None
     pay_type: PayType
-    # Faqat PAY_VIEW_ROLES ko'radi — boshqalarga None
     pay_rate: float | None
     daily_norm: int | None
     status: EmployeeStatus
@@ -197,9 +186,6 @@ class EmployeeOut(BaseModel):
 class EmployeePage(BaseModel):
     items: list[EmployeeOut]
     total: int
-
-
-# ---------- mashinalar ----------
 
 
 class MachineCreate(_Clean):
@@ -253,13 +239,12 @@ class MachineStatusChange(_Clean):
 class MaintenanceCreate(_Clean):
     kind: MaintenanceKind
     description: str = Field(min_length=3, max_length=5000)
-    performed_at: datetime | None = None  # bo'sh — hozir
+    performed_at: datetime | None = None
     parts_used: str | None = Field(default=None, max_length=500)
     duration_minutes: int | None = Field(default=None, ge=0, le=100_000)
     cost: float | None = Field(default=None, ge=0, le=10_000_000_000)
     technician_id: int | None = None
     technician_name: str | None = Field(default=None, max_length=200)
-    # Ta'mirdan keyin mashina qaysi holatga o'tsin (masalan, WORKING). Bo'sh — holat o'zgarmaydi
     set_status: MachineStatus | None = None
 
 
@@ -316,12 +301,12 @@ class MaintenanceOut(BaseModel):
 
 class MachineStats(BaseModel):
     period_days: int
-    downtime_minutes: int  # BROKEN + MAINTENANCE
+    downtime_minutes: int
     broken_minutes: int
     maintenance_minutes: int
     working_minutes: int
-    availability_pct: float  # (davr − downtime) / davr
-    breakdowns: int  # davr ichida BROKEN holatiga necha marta o'tgan
+    availability_pct: float
+    breakdowns: int
     repair_cost: float
 
 

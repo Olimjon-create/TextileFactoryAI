@@ -1,11 +1,6 @@
-/**
- * Yuklanish paytidagi skeletonlar — haqiqiy kartalar va jadvallar shaklida,
- * shunda ma'lumot kelganda sahifa "sakramaydi".
- */
 import { Box, Card, CardContent, Skeleton, TableCell, TableRow } from '@mui/material';
 import { tr } from '@/i18n';
 
-/** Dashboard/statistika kartasi: ikonka + sarlavha + son */
 export function StatCardSkeleton() {
   return (
     <Card>
@@ -20,7 +15,6 @@ export function StatCardSkeleton() {
   );
 }
 
-/** Kichik raqamli karta (masalan, mijozlar statistikasi) */
 export function MiniStatSkeleton() {
   return (
     <Card>
@@ -32,7 +26,6 @@ export function MiniStatSkeleton() {
   );
 }
 
-/** Umumiy karta: sarlavha + bir necha qator matn */
 export function CardSkeleton({ lines = 4, title = true, height }: { lines?: number; title?: boolean; height?: number }) {
   return (
     <Card>
@@ -53,7 +46,6 @@ export function CardSkeleton({ lines = 4, title = true, height }: { lines?: numb
   );
 }
 
-/** Jadval qatorlari (birinchi yuklanishda bo'sh jadval o'rniga) */
 export function TableRowsSkeleton({ cols, rows = 6 }: { cols: number; rows?: number }) {
   return (
     <>
@@ -71,7 +63,6 @@ export function TableRowsSkeleton({ cols, rows = 6 }: { cols: number; rows?: num
   );
 }
 
-/** Butun sahifa: sarlavha + statistika kartalari + jadval kartasi (sahifa kodi yuklanayotganda) */
 export function PageSkeleton() {
   return (
     <Box aria-busy="true" aria-label={tr("Yuklanmoqda")}>
@@ -87,7 +78,6 @@ export function PageSkeleton() {
   );
 }
 
-/** Katalog sahifasi: sarlavha + kartalar to'ri */
 export function CatalogSkeleton() {
   return (
     <Box aria-busy="true" aria-label={tr("Yuklanmoqda")}>
@@ -105,7 +95,6 @@ export function CatalogSkeleton() {
   );
 }
 
-/** Katalogdagi zavod kartasi shaklida */
 export function FactoryCardSkeleton() {
   return (
     <Card>
@@ -120,7 +109,6 @@ export function FactoryCardSkeleton() {
   );
 }
 
-/** Katalogdagi mahsulot qatori shaklida (rasmlar + matn + narx) */
 export function ProductRowSkeleton() {
   return (
     <Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' } }}>

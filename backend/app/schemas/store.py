@@ -72,7 +72,6 @@ class StoreFactoryDetail(BaseModel):
 class CartLine(BaseModel):
     product_id: int
     quantity: int = Field(ge=1, le=MAX_ITEM_QUANTITY)
-    # Mahsulotda o'lcham/rang bo'lsa — ulardan biri majburiy (serverda tekshiriladi)
     size: str | None = Field(default=None, max_length=30)
     color: str | None = Field(default=None, max_length=30)
 
@@ -89,7 +88,6 @@ class CheckoutRequest(BaseModel):
     customer_phone: str = Field(max_length=50)
     delivery_address: str | None = Field(default=None, max_length=300)
     comment: str | None = Field(default=None, max_length=2000)
-    # Telegram Mini App ichida ochilgan bo'lsa — Telegram.WebApp.initData (serverda imzosi tekshiriladi)
     telegram_init_data: str | None = Field(default=None, max_length=4096)
 
     @field_validator("customer_name", mode="before")
@@ -130,7 +128,6 @@ class FindOrderRequest(BaseModel):
 
 
 class DemoPaymentRequest(BaseModel):
-    # Karta raqami serverga YUBORILMAYDI — faqat oxirgi 4 raqam (chek uchun)
     card_last4: str = Field(pattern=r"^\d{4}$")
 
 
@@ -149,7 +146,6 @@ class PublicOrderItem(BaseModel):
 class PaymentInfo(BaseModel):
     provider: str
     test_mode: bool
-    # Haqiqiy provayderlarda (Payme/Click) — to'lov sahifasi manzili
     checkout_url: str | None = None
 
 

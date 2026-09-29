@@ -184,7 +184,6 @@ export default function MaterialsPage() {
         <StatCard label={tr("Ombor qiymati")} value={summary ? formatMoney(summary.stock_value) : '—'} icon={<PaymentsOutlinedIcon />} color="success.main" />
       </Box>
 
-      {/* Qoldiq holati bo'yicha tezkor filtr */}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <Chip label={tr("Barchasi")} color={stockState === '' ? 'primary' : 'default'} onClick={() => setStockState('')} />
         {keysOf(STOCK_STATE_LABELS).map((s) => (

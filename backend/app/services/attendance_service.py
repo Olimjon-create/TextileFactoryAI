@@ -41,12 +41,9 @@ from app.core.i18n import t
 from app.services import telegram_service
 
 ATTENDANCE_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER, Role.QUALITY_MANAGER, Role.WAREHOUSE_MANAGER)
-# Kelish/ketishni belgilash, yozuvni tuzatish, javob so'rovini kiritish
 ATTENDANCE_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
-# Javob so'rovini tasdiqlash / rad etish
 LEAVE_APPROVER_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
 
-# Shu vaqtdan ko'p ishlagan bo'lsa smenadagi tanaffus ishlagan vaqtdan chegiriladi
 BREAK_AFTER_MINUTES = 4 * 60
 
 _LEAVE_TO_STATUS = {
@@ -55,9 +52,6 @@ _LEAVE_TO_STATUS = {
 }
 
 ACTIVE_STATES = (EmployeeStatus.ACTIVE, EmployeeStatus.ON_LEAVE)
-
-
-# ---------- vaqt yordamchilari ----------
 
 
 def local_now() -> datetime:
@@ -78,8 +72,6 @@ def _late_minutes(check_in: time, shift: Shift | None) -> int:
     if shift is None:
         return 0
     diff = _to_min(check_in) - _to_min(shift.start_time)
-    # Faqat tungi smenada (yarim tundan o'tadigan) sutka chegarasi hisobga olinadi:
-    # 22:00 smenaga 00:30 da kelgan — 150 daqiqa kechikkan, 21:50 da kelgan — kechikmagan
     if shift.end_time <= shift.start_time:
         if diff < -12 * 60:
             diff += 24 * 60
@@ -107,9 +99,6 @@ def _parse_month(month: str | None) -> tuple[str, date, date]:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Oy formati: YYYY-MM") from exc
     end = (start.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
     return month, start, end
-
-
-# ---------- chiqish (out) yig'uvchilar ----------
 
 
 def _brief(e: Employee) -> EmployeeBrief:
@@ -159,9 +148,6 @@ def _employees_query(actor: User, factory_id: int | None, *, search: str | None,
     return q.options(selectinload(Employee.shift))
 
 
-# ---------- kunlik jadval ----------
-
-
 def _state(record: Attendance | None) -> str:
     if record is None:
         return "NOT_MARKED"
@@ -192,7 +178,6 @@ def daily_board(
             select(Attendance).where(Attendance.work_date == day, Attendance.employee_id.in_(select(base.subquery().c.id)))
         )
     }
-    # Faol xodimlar (shu kungacha ishga olingan) + shu kuni yozuvi bor boshqalar (masalan keyin bo'shaganlar)
     employees = db.scalars(
         base.where(
             or_(
@@ -211,7 +196,7 @@ def daily_board(
             LeaveRequest.start_date <= day,
             LeaveRequest.end_date >= day,
         )
-        .order_by(LeaveRequest.status)  # APPROVED avval (alifbo bo'yicha)
+        .order_by(LeaveRequest.status)
     ):
         leaves.setdefault(lr.employee_id, lr)
 
@@ -254,9 +239,6 @@ def daily_board(
     return DailyBoard(date=day, is_today=is_today, now=now.time().replace(second=0, microsecond=0) if is_today else None, rows=rows, summary=summary)
 
 
-# ---------- kelish / ketish ----------
-
-
 def check_in(db: Session, actor: User, data: CheckIn) -> AttendanceRecordOut:
     e = _load_employee(db, actor, data.employee_id)
     now = local_now()
@@ -284,7 +266,6 @@ def check_out(db: Session, actor: User, data: CheckOut) -> AttendanceRecordOut:
     day = data.work_date or now.date()
     r = _record(db, e.id, day)
     if r is None and data.work_date is None:
-        # Tungi smena: kecha kelgan va hali ketmagan bo'lsa — o'sha yozuv yopiladi
         prev = _record(db, e.id, day - timedelta(days=1))
         if prev is not None and prev.check_in is not None and prev.check_out is None:
             r = prev
@@ -330,9 +311,6 @@ def delete_record(db: Session, actor: User, record_id: int) -> None:
                          summary=f"Davomat yozuvi o'chirildi: {r.employee.full_name}, {r.work_date.isoformat()}", factory_id=r.factory_id)
     db.delete(r)
     db.commit()
-
-
-# ---------- oylik hisobot ----------
 
 
 def _accumulate(row: EmployeeMonthRow, r: Attendance) -> None:
@@ -395,9 +373,6 @@ def employee_month(db: Session, actor: User, employee_id: int, month: str | None
     )
 
 
-# ---------- javob so'rovlari ----------
-
-
 def _leaves_query():
     return (
         select(LeaveRequest)
@@ -437,7 +412,6 @@ def list_leaves(
     if status_ is not None:
         q = q.where(LeaveRequest.status == status_)
     total = db.scalar(select(func.count()).select_from(q.order_by(None).subquery())) or 0
-    # Kutilayotganlar har doim yuqorida
     rows = db.scalars(q.order_by(None).order_by((LeaveRequest.status != LeaveStatus.PENDING), LeaveRequest.start_date.desc(), LeaveRequest.id.desc()).offset(offset).limit(limit))
     return LeavePage(items=[_leave_out(lr) for lr in rows], total=total, pending=pending)
 
@@ -445,7 +419,7 @@ def list_leaves(
 def _apply_leave(db: Session, lr: LeaveRequest, actor: User) -> None:
     """Tasdiqlangan to'liq kunlik javobni davomatga yozadi (o'sha kuni kelgan bo'lsa tegilmaydi)."""
     if lr.start_time is not None:
-        return  # soatbay javob — xodim o'sha kuni ishda, faqat so'rovda qayd etiladi
+        return
     att_status = _LEAVE_TO_STATUS.get(lr.leave_type, AttendanceStatus.LEAVE)
     day = lr.start_date
     while day <= lr.end_date:

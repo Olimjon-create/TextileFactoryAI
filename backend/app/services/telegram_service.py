@@ -33,7 +33,6 @@ from app.models.order import OrderStatus, PaymentStatus
 API = "https://api.telegram.org/bot{token}/{method}"
 INIT_DATA_MAX_AGE = 24 * 3600
 
-# Buyurtma holatining mijozga ko'rinadigan nomi (tarjimasi i18n.MESSAGES'da)
 STATUS_LABELS = {
     OrderStatus.PENDING_PAYMENT: "To'lov kutilmoqda",
     OrderStatus.NEW: "Qabul qilindi",
@@ -64,13 +63,12 @@ def bot_username() -> str | None:
         return None
     try:
         return _bot_username(settings.TELEGRAM_BOT_TOKEN.strip())
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         print(exc)
         return None
 
 
 def _sign(purpose: str) -> str:
-    # Kalit — bot tokeni: lokal server ham, Vercel ham bir xil kod/imzo hosil qiladi (JWT kaliti ularda har xil)
     return hmac.new(settings.TELEGRAM_BOT_TOKEN.strip().encode(), purpose.encode(), hashlib.sha256).hexdigest()
 
 
@@ -117,16 +115,15 @@ def check_link(db: Session, factory: Factory) -> dict:
     try:
         updates = _call("getUpdates", timeout=10, allowed_updates=["message"])
     except RuntimeError as exc:
-        if "webhook" not in str(exc).lower():  # webhook yoqilgan bo'lsa getUpdates ishlamaydi — demak Start bosilmagan
+        if "webhook" not in str(exc).lower():
             print(exc)
             raise HTTPException(status.HTTP_502_BAD_GATEWAY, t("Telegram bilan bog'lanib bo'lmadi, keyinroq urinib ko'ring"))
         updates = []
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         print(exc)
         raise HTTPException(status.HTTP_502_BAD_GATEWAY, t("Telegram bilan bog'lanib bo'lmadi, keyinroq urinib ko'ring"))
     for upd in reversed(updates):
         msg = upd.get("message") or {}
-        # Shaxsiy chat: "/start KOD"; guruhda: "/start@BotNomi KOD"
         parts = (msg.get("text") or "").split()
         if len(parts) == 2 and parts[0].split("@")[0] == "/start" and parts[1] == code:
             _link(db, factory, str(msg["chat"]["id"]), get_lang())
@@ -148,7 +145,7 @@ def _send_chat(chat_id: str | int, lang: str, template: str, /, reply_markup: di
     try:
         _call("sendMessage", timeout=5, **params)
         return True
-    except Exception as exc:  # noqa: BLE001 — xabar ketmasa ham asosiy amal davom etadi
+    except Exception as exc:
         print(exc)
         return False
 
@@ -165,9 +162,6 @@ def notify(db: Session, factory_id: int | None, template: str, /, **kwargs) -> N
     if factory_id is None or not settings.telegram_enabled:
         return
     send(db.get(Factory, factory_id), template, **kwargs)
-
-
-# ---------- mijozlar (Mini App do'kon) ----------
 
 
 def verify_init_data(init_data: str | None) -> dict | None:
@@ -228,7 +222,7 @@ def _drop_customer_messages(session: Session) -> None:
 
 def _site(base_url: str) -> str:
     url = (settings.APP_URL or base_url).rstrip("/")
-    return "https://" + url.split("://", 1)[-1]  # Mini App faqat https'da ochiladi
+    return "https://" + url.split("://", 1)[-1]
 
 
 def _shop_keyboard(lang: str, site: str, factory: Factory | None = None) -> dict:
@@ -263,7 +257,7 @@ def _send_raw(chat_id: int | str, text: str, reply_markup: dict | None = None) -
         params["reply_markup"] = reply_markup
     try:
         _call("sendMessage", timeout=5, **params)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         print(exc)
 
 
@@ -275,7 +269,6 @@ def _public_factory(db: Session, factory_id: int) -> Factory | None:
 def _handle_start(db: Session, chat: dict, user: dict, arg: str, lang: str, site: str) -> None:
     chat_id = chat["id"]
     name = user.get("first_name") or ""
-    # Zavod egasi bildirishnomalarni ulayapti: /start f<ID>-<imzo>
     if arg.startswith("f") and "-" in arg:
         try:
             factory_id = int(arg[1:].split("-", 1)[0])
@@ -288,7 +281,7 @@ def _handle_start(db: Session, chat: dict, user: dict, arg: str, lang: str, site
             _send_chat(chat_id, lang, "Havola noto'g'ri yoki eskirgan. Saytda Sozlamalar → Telegram bo'limidan qayta oching.")
         return
     if chat.get("type") != "private":
-        return  # guruhlarda do'kon ko'rsatilmaydi (Mini App tugmalari faqat shaxsiy chatda ishlaydi)
+        return
     factory = None
     if arg.startswith("shop"):
         try:
@@ -313,7 +306,7 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         lang = _lang(user.get("language_code"))
         try:
             _call("answerCallbackQuery", timeout=5, callback_query_id=cq["id"])
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             print(exc)
         chat_id = (cq.get("message") or {}).get("chat", {}).get("id") or user.get("id")
         if cq.get("data") == "orders" and chat_id:
@@ -354,9 +347,7 @@ def setup_bot(base_url: str) -> dict:
     return {"webhook": webhook, "shop": f"{site}/store"}
 
 
-# ---------- administrator uchun: server xatolari ----------
-
-_ALERT_COOLDOWN = 600  # bir xil xato har 10 daqiqada ko'pi bilan bir marta
+_ALERT_COOLDOWN = 600
 _last_alert: dict[str, float] = {}
 
 

@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { CssBaseline, ThemeProvider, type PaletteMode } from '@mui/material';
 import { createAppTheme } from './theme';
 
-/** index.html dagi splash skripti ham shu kalitni o'qiydi — nomini o'zgartirmang */
 export const COLOR_MODE_KEY = 'tfai_color_mode';
 
 function initialMode(): PaletteMode {
@@ -22,7 +21,6 @@ interface ColorModeValue {
 
 const ColorModeContext = createContext<ColorModeValue>({ mode: 'light', toggle: () => undefined });
 
-/** Light/Dark mavzuni boshqaradi va tanlovni localStorage'da saqlaydi */
 export function ColorModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<PaletteMode>(initialMode);
 
@@ -30,9 +28,7 @@ export function ColorModeProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(COLOR_MODE_KEY, mode);
     } catch {
-      // saqlab bo'lmasa ham rejim sahifa ochiq turganda ishlaydi
     }
-    // Brauzerning o'z elementlari (scrollbar, autofill) ham mos rangda bo'lsin
     document.documentElement.style.colorScheme = mode;
   }, [mode]);
 

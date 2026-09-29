@@ -76,7 +76,6 @@ PRODUCTION_VIEW_ROLES = (
     Role.WAREHOUSE_MANAGER,
 )
 PRODUCTION_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
-# Amal yozish: rahbarlar — istalgan bosqich; sifat menejeri — faqat sifat nazorati bosqichi
 LOG_ROLES = PRODUCTION_EDITOR_ROLES + (Role.QUALITY_MANAGER,)
 KPI_VIEW_ROLES = PRODUCTION_EDITOR_ROLES
 
@@ -92,9 +91,6 @@ def _ref(obj, code_attr: str = "code", name_attr: str = "name") -> Ref | None:
     if obj is None:
         return None
     return Ref(id=obj.id, code=getattr(obj, code_attr, None), name=getattr(obj, name_attr))
-
-
-# ---------- progress ----------
 
 
 def _totals(db: Session, wo_ids: list[int]) -> dict[int, dict[ProductionStage, tuple[int, int]]]:
@@ -124,7 +120,6 @@ def _progress(wo: WorkOrder, totals: dict[ProductionStage, tuple[int, int]]) -> 
         good, defect = totals.get(stage, (0, 0))
         done = good + defect
         remaining = max(available - done, 0)
-        # Bosqich tugadi: oldingisi tugagan va reja bajarilgan yoki ishlanadigan narsa qolmagan (brak tufayli)
         stage_done = prev_done and (good >= wo.quantity or remaining == 0)
         if current is None and not stage_done:
             current = stage
@@ -155,9 +150,6 @@ def _wo_out(wo: WorkOrder, totals: dict[ProductionStage, tuple[int, int]], today
         percent=round(min(finished / wo.quantity * 100, 100), 1) if wo.quantity else 0,
         is_late=wo.status in OPEN and wo.planned_end is not None and wo.planned_end < today,
     )
-
-
-# ---------- ish buyurtmalari ----------
 
 
 def _load(db: Session, actor: User, wo_id: int) -> WorkOrder:
@@ -358,8 +350,6 @@ _LOG_OPTS = (
 )
 
 
-# Birlik qaysi bosqich chiqishidan tuziladi: partiya — kesilgan donadan, quti — sifatdan o'tgan donadan.
-# Shu bosqichgacha bo'lgan yo'l birlik uchun o'tilgan hisoblanadi (u bosqichlar birlik kodisiz qayd etiladi).
 _UNIT_ORIGIN = {UnitKind.BUNDLE: ProductionStage.CUTTING, UnitKind.BOX: ProductionStage.QUALITY_CONTROL}
 
 
@@ -435,9 +425,6 @@ def set_work_order_status(db: Session, actor: User, wo_id: int, new_status: Work
     return get_work_order(db, actor, wo.id)
 
 
-# ---------- buyurtma holati bilan bog'lanish ----------
-
-
 _set_order_status = order_service.change_status
 
 
@@ -453,9 +440,6 @@ def _close(db: Session, actor: User, wo: WorkOrder, new_status: WorkOrderStatus)
     siblings = list(db.scalars(select(WorkOrder.status).where(WorkOrder.order_id == order.id)))
     if order.status == OrderStatus.IN_PRODUCTION and all(s not in OPEN for s in siblings) and WorkOrderStatus.COMPLETED in siblings:
         _set_order_status(db, actor, order, OrderStatus.READY, "barcha ish buyurtmalari tugadi")
-
-
-# ---------- amal yozuvlari ----------
 
 
 def _same_factory(db: Session, model, obj_id: int | None, factory_id: int, label: str):
@@ -478,7 +462,7 @@ STAGE_NAMES = {
 
 def add_log(db: Session, actor: User, wo_id: int, data: LogCreate) -> WorkOrderDetail:
     wo = _load(db, actor, wo_id)
-    _lock_row(db, wo)  # bir vaqtdagi ikki yozuv bosqich chegarasidan oshib ketmasin
+    _lock_row(db, wo)
     if actor.role == Role.QUALITY_MANAGER and data.stage != ProductionStage.QUALITY_CONTROL:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Sifat menejeri faqat sifat nazorati natijasini kiritadi")
     if wo.status not in OPEN:
@@ -493,7 +477,6 @@ def add_log(db: Session, actor: User, wo_id: int, data: LogCreate) -> WorkOrderD
     if work_date > date.today():
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Kelajakdagi sana bo'lmasin")
 
-    # Bosqich nazorati: oldingi bosqichdan kelgandan ko'p ishlab bo'lmaydi
     totals = _totals(db, [wo.id])[wo.id]
     progress, _, _ = _progress(wo, totals)
     p = next(x for x in progress if x.stage == data.stage)
@@ -556,7 +539,6 @@ def delete_log(db: Session, actor: User, log_id: int) -> WorkOrderDetail:
         raise HTTPException(status.HTTP_409_CONFLICT, "Yopilgan ish buyurtmasining yozuvi o'chirilmaydi")
     totals = _totals(db, [wo.id])[wo.id]
     if log.stage == ProductionStage.PACKING:
-        # Tayyor mahsulot omboriga qabul qilingan miqdor qadoqlangandan oshib ketmasin
         received = int(db.scalar(select(func.coalesce(func.sum(ProductStockMovement.quantity), 0)).where(
             ProductStockMovement.work_order_id == wo.id, ProductStockMovement.movement_type == ProductMovementType.PRODUCTION)) or 0)
         if totals.get(ProductionStage.PACKING, (0, 0))[0] - log.quantity_good < received:
@@ -575,9 +557,6 @@ def delete_log(db: Session, actor: User, log_id: int) -> WorkOrderDetail:
     return get_work_order(db, actor, wo.id)
 
 
-# ---------- partiya / qutilar ----------
-
-
 def _unit_stages(db: Session, unit_ids: list[int]) -> dict[int, list[ProductionStage]]:
     out: dict[int, list[ProductionStage]] = defaultdict(list)
     if unit_ids:
@@ -591,7 +570,6 @@ def create_unit(db: Session, actor: User, wo_id: int, data: UnitCreate) -> WorkO
     if wo.status == WorkOrderStatus.CANCELLED:
         raise HTTPException(status.HTTP_409_CONFLICT, "Bekor qilingan ish buyurtmasi")
     totals = _totals(db, [wo.id])[wo.id]
-    # Partiya — kesilgan yaroqli miqdor ichida; quti — sifatdan o'tgan miqdor ichida
     source_stage = ProductionStage.CUTTING if data.kind == UnitKind.BUNDLE else ProductionStage.QUALITY_CONTROL
     limit = totals.get(source_stage, (0, 0))[0]
     used = db.scalar(select(func.coalesce(func.sum(TrackingUnit.quantity), 0)).where(TrackingUnit.work_order_id == wo.id, TrackingUnit.kind == data.kind)) or 0
@@ -604,9 +582,6 @@ def create_unit(db: Session, actor: User, wo_id: int, data: UnitCreate) -> WorkO
                         size=wo.size, color=wo.color, note=data.note, created_by_id=actor.id))
     db.commit()
     return get_work_order(db, actor, wo.id)
-
-
-# ---------- kuzatuv (QR / shtrix-kod) ----------
 
 
 def trace(db: Session, actor: User, code: str) -> TraceResult:
@@ -652,9 +627,6 @@ def trace(db: Session, actor: User, code: str) -> TraceResult:
         return TraceResult(kind="PURCHASE_ORDER", code=code, title=f"Xarid buyurtmasi {code}", subtitle=db.get(Supplier, po.supplier_id).name,
                            path=f"/purchases/{po.id}")
     raise HTTPException(status.HTTP_404_NOT_FOUND, t("«{code}» kodi topilmadi", code=code))
-
-
-# ---------- KPI va umumiy ko'rsatkichlar ----------
 
 
 def employee_kpi(db: Session, actor: User, *, date_from: date, date_to: date, line_id: int | None = None, factory_id: int | None = None) -> list[EmployeeKpi]:

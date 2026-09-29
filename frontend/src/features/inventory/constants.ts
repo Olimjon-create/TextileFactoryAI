@@ -23,7 +23,6 @@ export const MOVEMENT_TYPE_COLORS: Record<MovementType, 'success' | 'warning' | 
 
 export const MOVEMENT_TYPES = Object.keys(MOVEMENT_TYPE_LABELS) as MovementType[];
 
-/** Harakat kiritish formasi: har bir amal uchun tushuntirish */
 export const MOVEMENT_INPUTS: { value: MovementInput; label: string; hint: string }[] = [
   { value: 'RECEIPT', label: tr("Kirim"), hint: tr("Yetkazib beruvchidan yoki xariddan kelgan material") },
   { value: 'ISSUE', label: tr("Ishlab chiqarishga berish"), hint: tr("Kesish/tikuv sexiga chiqarilgan material") },

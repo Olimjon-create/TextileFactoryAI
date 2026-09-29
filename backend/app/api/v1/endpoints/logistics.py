@@ -32,9 +32,6 @@ can_edit = require_roles(*svc.LOGISTICS_EDITOR_ROLES)
 can_receive = require_roles(*svc.FG_RECEIVE_ROLES)
 
 
-# ---------- tayyor mahsulot ombori ----------
-
-
 @router.get("/finished-goods/summary", response_model=FgSummary)
 def summary(factory_id: int | None = None, db: Session = Depends(get_db), actor: User = Depends(can_view)):
     return svc.summary(db, actor, factory_id)
@@ -91,9 +88,6 @@ def work_order_stock(wo_id: int, db: Session = Depends(get_db), actor: User = De
 @router.post("/finished-goods/receive", response_model=WorkOrderStock)
 def receive(data: ProductionReceiptCreate, db: Session = Depends(get_db), actor: User = Depends(can_receive)):
     return svc.receive_from_work_order(db, actor, data)
-
-
-# ---------- jo'natmalar ----------
 
 
 @router.get("/shipments", response_model=ShipmentPage)

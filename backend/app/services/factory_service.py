@@ -6,7 +6,6 @@ from app.core.roles import Role
 from app.models import Factory, Order, ProductStockMovement, PurchaseOrder, StockMovement, User, WorkOrder
 from app.schemas.factory import FactoryCreate, FactoryOut, FactoryUpdate
 
-# None yuborilsa bo'shatiladigan ixtiyoriy maydonlar (qolganlarida None — "o'zgartirmaslik")
 _CLEARABLE_FIELDS = {
     "address",
     "phone",
@@ -58,7 +57,6 @@ def update_factory(db: Session, actor: User, factory_id: int, data: FactoryUpdat
     if actor.role not in (Role.SUPER_ADMIN, Role.FACTORY_OWNER):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Ruxsat yo'q")
     changes = data.model_dump(exclude_unset=True)
-    # Fabrika egasi o'z fabrikasini o'chira (nofaol qila) olmaydi
     if actor.role != Role.SUPER_ADMIN:
         changes.pop("is_active", None)
     for field, value in changes.items():
@@ -73,15 +71,12 @@ def delete_factory(db: Session, factory_id: int) -> None:
     factory = db.get(Factory, factory_id)
     if factory is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Fabrika topilmadi")
-    # Operatsion tarixi bor fabrikani o'chirish butun hisob-kitob va audit izini yo'q qiladi
-    # (yoki RESTRICT FK sabab yarim yo'lda xato beradi) — bunday fabrika nofaol qilinadi
     history = (Order, StockMovement, ProductStockMovement, WorkOrder, PurchaseOrder)
     if any(db.scalar(select(m.id).where(m.factory_id == factory_id).limit(1)) is not None for m in history):
         raise HTTPException(
             status.HTTP_409_CONFLICT,
             "Fabrikada buyurtma, ombor, ishlab chiqarish yoki xarid tarixi bor — o'chirish o'rniga nofaol qiling",
         )
-    # Fabrika o'chirilganda uning barcha foydalanuvchilari ham o'chiriladi
     db.execute(delete(User).where(User.factory_id == factory_id))
     db.delete(factory)
     db.commit()

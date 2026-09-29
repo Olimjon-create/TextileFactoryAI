@@ -13,7 +13,6 @@ import { useCanEditInventory } from '../permissions';
 import type { Movement, MovementType, WarehouseLocation } from '../types';
 import { tr } from '@/i18n';
 
-/** Ombor harakatlari jurnali: barcha kirim, chiqim, ko'chirish va inventarizatsiyalar */
 export default function MovementsPage() {
   const canEdit = useCanEditInventory();
   const [items, setItems] = useState<Movement[]>([]);

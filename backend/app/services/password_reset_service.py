@@ -41,7 +41,6 @@ def request_reset(db: Session, email: str, base_url: str) -> None:
     user = db.scalar(select(User).where(User.email == email.strip().lower()))
     if user is None or not user.is_active:
         return
-    # Eski, ishlatilmagan havolalar bekor
     db.execute(update(PasswordResetToken).where(PasswordResetToken.user_id == user.id, PasswordResetToken.used_at.is_(None))
                .values(used_at=_now()))
     token = secrets.token_urlsafe(32)
@@ -55,7 +54,7 @@ def request_reset(db: Session, email: str, base_url: str) -> None:
     body = f'<p>{greeting}</p><p>{intro}</p><p><a href="{link}">{button}</a></p><p style="color:#888">{ignore}</p>'
     try:
         mail_service.send(user.email, t("TextileCore: parolni tiklash"), body)
-    except Exception as exc:  # noqa: BLE001 — pochta xatosi foydalanuvchiga umumiy xabar bilan
+    except Exception as exc:
         print(exc)
         raise HTTPException(status.HTTP_502_BAD_GATEWAY, t("Xatni yuborib bo'lmadi, keyinroq urinib ko'ring"))
 

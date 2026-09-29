@@ -1,4 +1,3 @@
-' TextileCore - qo'riqchini oynasiz ishga tushiradi. "open" argumenti bilan - tayyor bo'lgach brauzerni ham ochadi.
 Set sh = CreateObject("WScript.Shell")
 dir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
 extra = ""

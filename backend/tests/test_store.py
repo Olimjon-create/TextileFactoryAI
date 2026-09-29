@@ -51,11 +51,8 @@ def pay(client, token, last4="4242"):
     return client.post(f"{API}/store/orders/{token}/pay/demo", json={"card_last4": last4})
 
 
-# ---------- katalog ----------
-
-
 def test_catalog_lists_only_public_factories_with_products(client, shop):
-    register_owner(client, "empty@b.uz", "Bo'sh zavod")  # mahsuloti yo'q — ko'rinmaydi
+    register_owner(client, "empty@b.uz", "Bo'sh zavod")
     factories = client.get(f"{API}/store/factories").json()
     assert [f["name"] for f in factories] == ["Alpha Textile"]
     card = factories[0]
@@ -69,7 +66,6 @@ def test_factory_page_shows_only_sellable_products(client, shop):
     detail = client.get(f"{API}/store/factories/{shop['factory_id']}").json()
     assert {p["code"] for p in detail["products"]} == {"PL-1", "TS-1"}
     assert detail["description"] == "20 yillik tajriba"
-    # Ichki ma'lumotlar (BOM, status) chiqmaydi
     assert "bom_items" not in detail["products"][0]
     assert "status" not in detail["products"][0]
 
@@ -82,12 +78,8 @@ def test_hidden_or_inactive_factory_not_in_catalog(client, shop):
 
 
 def test_catalog_needs_no_login(client, shop):
-    # Hech qanday Authorization header'siz
     assert client.get(f"{API}/store/factories").status_code == 200
     assert checkout(client, shop).status_code == 201
-
-
-# ---------- buyurtma va to'lov ----------
 
 
 def test_checkout_computes_total_on_server(client, shop):
@@ -156,7 +148,6 @@ def test_demo_payment_makes_order_visible_and_links_crm(client, shop):
     assert customers["total"] == 1
     assert customers["items"][0]["name"] == "Aziz Karimov"
 
-    # Xuddi shu telefon (boshqa formatda) — yangi mijoz yaratilmaydi
     token2 = checkout(client, shop, customer_phone="998901234567").json()["order"]["public_token"]
     pay(client, token2)
     assert client.get(f"{API}/customers", headers=shop["owner"]).json()["total"] == 1
@@ -191,23 +182,18 @@ def test_order_snapshot_survives_product_change(client, shop):
     assert polo_line["unit_price"] == 85000 and polo_line["product_name"] == "Mahsulot PL-1"
 
 
-# ---------- bosh sahifa kollaji ----------
-
-
 def test_featured_one_per_factory_with_images(client, shop):
     owner = shop["owner"]
     client.patch(f"{API}/products/{shop['polo']['id']}", headers=owner, json={"image_url": "/media/a.jpg", "model_image_url": "/media/a-model.jpg"})
     client.patch(f"{API}/products/{shop['tee']['id']}", headers=owner, json={"image_url": "/media/b.jpg"})
-    # Qoralama mahsulot surati bo'lsa ham chiqmaydi
     client.patch(f"{API}/products/{shop['draft']['id']}", headers=owner, json={"image_url": "/media/c.jpg"})
     other, _ = register_owner(client, "b@b.uz", "Beta")
     beta = product(client, other, "B-1", image_url="/media/d.jpg")
 
     featured = client.get(f"{API}/store/featured").json()
-    assert len(featured) == 2  # har zavoddan bittadan
+    assert len(featured) == 2
     by_factory = {f["factory_id"]: f for f in featured}
     alpha = by_factory[shop["factory_id"]]
-    # Odam ustidagi surati bor mahsulot afzal
     assert alpha["product_id"] == shop["polo"]["id"]
     assert alpha["image_url"] == "/media/a-model.jpg"
     assert alpha["factory_name"] == "Alpha Textile"
@@ -215,14 +201,11 @@ def test_featured_one_per_factory_with_images(client, shop):
 
 
 def test_featured_skips_products_without_images_and_hidden_factories(client, shop):
-    assert client.get(f"{API}/store/featured").json() == []  # suratsiz mahsulotlar
+    assert client.get(f"{API}/store/featured").json() == []
     client.patch(f"{API}/products/{shop['polo']['id']}", headers=shop["owner"], json={"image_url": "/media/a.jpg"})
     assert len(client.get(f"{API}/store/featured").json()) == 1
     client.patch(f"{API}/factories/{shop['factory_id']}", headers=shop["owner"], json={"is_public": False})
     assert client.get(f"{API}/store/featured").json() == []
-
-
-# ---------- mijozning "Buyurtmalarim" bo'limi ----------
 
 
 def test_my_orders_returns_only_paid(client, shop):
@@ -258,20 +241,16 @@ def test_find_order_by_number_and_phone(client, shop):
     def find(num, phone):
         return client.post(f"{API}/store/orders/find", json={"order_number": num, "customer_phone": phone})
 
-    # Telefon boshqa formatda yozilsa ham topiladi
     r = find(number.lower(), "90 123 45 67")
     assert r.status_code == 200 and r.json()["public_token"] == order["public_token"]
-    assert find(number, "+998 90 000 00 00").status_code == 404  # telefon mos emas
-    assert find("B-999999", "+998 90 123 45 67").status_code == 404  # raqam mos emas
+    assert find(number, "+998 90 000 00 00").status_code == 404
+    assert find("B-999999", "+998 90 123 45 67").status_code == 404
 
 
 def test_find_unpaid_order_not_found(client, shop):
     order = checkout(client, shop).json()["order"]
     r = client.post(f"{API}/store/orders/find", json={"order_number": order["order_number"], "customer_phone": "+998 90 123 45 67"})
     assert r.status_code == 404
-
-
-# ---------- o'lcham va rang (variantlar) ----------
 
 
 @pytest.fixture()
@@ -284,7 +263,7 @@ def test_variant_lines_are_separate(client, shop, tee_variants):
     items = [
         {"product_id": pid, "quantity": 20, "size": "M", "color": "Oq"},
         {"product_id": pid, "quantity": 30, "size": "L", "color": "Qora"},
-        {"product_id": pid, "quantity": 5, "size": "M", "color": "Oq"},  # birinchi qator bilan birlashadi
+        {"product_id": pid, "quantity": 5, "size": "M", "color": "Oq"},
     ]
     order = checkout(client, shop, items=items).json()["order"]
     lines = sorted((i["size"], i["color"], i["quantity"]) for i in order["items"])
@@ -301,10 +280,10 @@ def test_variant_lines_are_separate(client, shop, tee_variants):
 @pytest.mark.parametrize(
     "variant",
     [
-        {},  # o'lcham ham, rang ham tanlanmagan
-        {"size": "M"},  # rang tanlanmagan
-        {"size": "XXL", "color": "Oq"},  # bunday o'lcham yo'q
-        {"size": "M", "color": "Yashil"},  # bunday rang yo'q
+        {},
+        {"size": "M"},
+        {"size": "XXL", "color": "Oq"},
+        {"size": "M", "color": "Yashil"},
     ],
 )
 def test_variant_required_and_validated(client, shop, tee_variants, variant):
@@ -313,12 +292,8 @@ def test_variant_required_and_validated(client, shop, tee_variants, variant):
 
 
 def test_variant_not_allowed_for_simple_product(client, shop):
-    # polo'da o'lcham/rang yo'q — yuborilsa rad etiladi
     r = checkout(client, shop, items=[{"product_id": shop["polo"]["id"], "quantity": 1, "size": "M"}])
     assert r.status_code == 422
-
-
-# ---------- zavod tomonidagi buyurtmalar ----------
 
 
 @pytest.fixture()
@@ -370,9 +345,6 @@ def test_orders_search(client, shop, paid_order):
     assert client.get(f"{API}/orders", headers=headers, params={"status": "SHIPPED"}).json()["total"] == 0
 
 
-# ---------- rasm yuklash ----------
-
-
 def test_upload_image(client, shop):
     r = client.post(f"{API}/uploads/images", headers=shop["owner"], files={"file": ("logo.png", PNG_1PX, "image/png")})
     assert r.status_code == 201, r.text
@@ -405,7 +377,6 @@ def test_upload_image_to_supabase(client, shop, monkeypatch):
     assert target == f"https://abc.supabase.co/storage/v1/object/media/{name}"
     assert kw["data"] == PNG_1PX and kw["headers"]["Content-Type"] == "image/png"
     assert kw["headers"]["apikey"] == "sb_secret_test"
-    # To'liq https manzil zavod profiliga saqlanadi
     r = client.patch(f"{API}/factories/{shop['factory_id']}", headers=shop["owner"], json={"logo_url": url})
     assert r.json()["logo_url"] == url
 
@@ -419,7 +390,6 @@ def test_upload_image_to_supabase(client, shop, monkeypatch):
 
 
 def test_upload_rejects_non_images(client, shop):
-    # Kengaytma .png bo'lsa ham, ichidagi ma'lumot rasm emas
     r = client.post(f"{API}/uploads/images", headers=shop["owner"], files={"file": ("x.png", b"<script>", "image/png")})
     assert r.status_code == 422
 

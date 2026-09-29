@@ -20,7 +20,6 @@ sys.path.insert(0, str(BACKEND))
 
 env = os.environ
 if not env.get("DATABASE_URL"):
-    # Vercel'ning Neon/Postgres integratsiyalari turli nomlar bilan beradi
     for key in ("POSTGRES_URL", "NEON_DATABASE_URL", "DATABASE_URL_UNPOOLED", "POSTGRES_URL_NON_POOLING"):
         if env.get(key):
             env["DATABASE_URL"] = env[key]
@@ -31,13 +30,13 @@ if not env.get("DATABASE_URL"):
 if not env.get("JWT_SECRET_KEY"):
     env["JWT_SECRET_KEY"] = hashlib.sha256(("tfai-jwt:" + env["DATABASE_URL"]).encode()).hexdigest()
 
-env.setdefault("MEDIA_DIR", "/tmp/media")  # serverless'da faqat /tmp yoziladi (yuklangan rasmlar saqlanmaydi)
+env.setdefault("MEDIA_DIR", "/tmp/media")
 env.setdefault("SEED_PUBLIC_DEMO", "true")
 env.setdefault("BOOTSTRAP_SUPERADMIN", "true" if env.get("SUPERADMIN_PASSWORD") else "false")
-env.setdefault("RATE_LIMIT_BACKEND", "db")  # serverless nusxalar xotirani bo'lishmaydi — hisob bazada
-env.setdefault("CORS_ORIGINS", "")  # frontend bilan bir domen — CORS kerak emas
+env.setdefault("RATE_LIMIT_BACKEND", "db")
+env.setdefault("CORS_ORIGINS", "")
 
-from app.main import app, prepare  # noqa: E402
+from app.main import app, prepare
 
 prepare()
 

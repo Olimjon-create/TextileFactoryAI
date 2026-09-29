@@ -20,7 +20,6 @@ def test_registration_closed_and_owner_created_by_admin(client, monkeypatch):
     owner = r.json()
     assert owner["role"] == "FACTORY_OWNER" and owner["factory"]["name"] == "Baraka Tekstil"
 
-    # Ega shu login (email) va parol bilan kiradi va o'z fabrikasini boshqaradi
     login = client.post(f"{API}/auth/login", json={"email": "akmal@baraka.uz", "password": "Baraka-2026"})
     assert login.status_code == 200
     h = {"Authorization": f"Bearer {login.json()['access_token']}"}
@@ -29,7 +28,6 @@ def test_registration_closed_and_owner_created_by_admin(client, monkeypatch):
     assert client.post(f"{API}/users", headers=h, json={"full_name": "Xodim Bir", "email": "x1@baraka.uz", "password": "secret12", "role": "MANAGER"}).status_code == 201
     assert client.post(f"{API}/auth/login", json={"email": "akmal@baraka.uz", "password": "noto'g'ri"}).status_code == 401
 
-    # Band email bilan — fabrika ham yaratilmaydi; yangi fabrikani faqat super admin ochadi
     factories_before = len(client.get(f"{API}/factories", headers=admin).json())
     r = client.post(f"{API}/users", headers=admin, json={"full_name": "Ikkinchi", "email": "akmal@baraka.uz", "password": "secret12",
                                                          "role": "FACTORY_OWNER", "factory_name": "Takror"})

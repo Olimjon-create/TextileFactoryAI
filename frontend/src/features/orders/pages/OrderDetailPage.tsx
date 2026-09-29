@@ -90,7 +90,6 @@ export default function OrderDetailPage() {
     const started = Date.now();
     try {
       const updated = await ordersApi.updateStatus(order.id, status);
-      // Juda tez javobda ham aylanish ko'rinib ulgursin
       await new Promise((r) => setTimeout(r, Math.max(0, 500 - (Date.now() - started))));
       setOrder(updated);
       toast.success(tr("Holat yangilandi: {0}", ORDER_STATUS_LABELS[updated.status]));
@@ -185,7 +184,6 @@ export default function OrderDetailPage() {
               {tr("Status")}
             </Button>
             <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}>
-              {/* Holat faqat oldinga yuradi (backend order_service.MANUAL_FLOW) */}
               {ORDER_STATUSES.filter((s) => s !== 'CANCELLED' && ORDER_STATUSES.indexOf(s) > ORDER_STATUSES.indexOf(order.status)).map((s) => (
                 <MenuItem key={s} onClick={() => changeStatus(s)}>
                   {ORDER_STATUS_LABELS[s]}

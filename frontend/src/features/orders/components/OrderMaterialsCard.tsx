@@ -72,7 +72,6 @@ function MaterialName({ line }: { line: MaterialRequirement }) {
   );
 }
 
-/** Buyurtma bo'yicha material ehtiyoji: BOM × miqdor, ombordagi qoldiq, chiqarilgan, ortiqcha sarf */
 export default function OrderMaterialsCard({ order }: { order: Order }) {
   const isMobile = useIsMobile();
   const canIssue = useCanEditInventory();
@@ -97,7 +96,6 @@ export default function OrderMaterialsCard({ order }: { order: Order }) {
 
   const closed = ['SHIPPED', 'COMPLETED', 'CANCELLED'].includes(order.status);
   const anyIssued = data?.lines.some((l) => l.issued > 0);
-  // Xarid kerak: yetishmovchilik yo'ldagi (yuborilgan xarid) miqdordan ko'p bo'lgan materiallar
   const toBuy = (data?.lines ?? []).filter((l) => l.material_id && l.shortage - l.on_order > 0);
   const buy = () => {
     const prefill: PurchasePrefill = {

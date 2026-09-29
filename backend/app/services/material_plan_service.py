@@ -28,9 +28,7 @@ from app.schemas.material_plan import (
 from app.services import inventory_service, order_service, procurement_service
 from app.core.i18n import t
 
-# Buyurtmaga material chiqarish/qaytarish — ombor xodimlari (ombor tahrirlash huquqi)
 ISSUE_ROLES = inventory_service.INVENTORY_EDITOR_ROLES
-# Bu holatlarda buyurtmaga material chiqarilmaydi
 NO_ISSUE_STATUSES = (OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.CANCELLED)
 Q = Decimal("0.001")
 
@@ -69,7 +67,6 @@ def requirements(db: Session, actor: User, order_id: int) -> OrderMaterials:
         p.id: p for p in db.scalars(select(Product).where(Product.id.in_(product_ids)).options(selectinload(Product.bom_items)))
     }
 
-    # key: material_id (katalog) yoki ("text", nom, birlik) — bog'lanmagan BOM qatorlari
     planned: dict = defaultdict(Decimal)
     meta: dict = {}
     used_in: dict = defaultdict(set)
@@ -87,7 +84,6 @@ def requirements(db: Session, actor: User, order_id: int) -> OrderMaterials:
             meta.setdefault(key, bom)
 
     issued = _issued_by_material(db, order.id)
-    # Rejada bo'lmasa ham buyurtmaga chiqarilgan materiallar (ortiqcha/boshqa material)
     for material_id in issued:
         planned.setdefault(material_id, Decimal(0))
     catalog_ids = {k for k in planned if isinstance(k, int)}
@@ -139,7 +135,7 @@ def requirements(db: Session, actor: User, order_id: int) -> OrderMaterials:
 
     order_of = {RequirementStatus.SHORTAGE: 0, RequirementStatus.OVERUSED: 1, RequirementStatus.NOT_LINKED: 2, RequirementStatus.ENOUGH: 3, RequirementStatus.ISSUED: 4}
     lines.sort(key=lambda r: (order_of[r.status], r.material_name.lower()))
-    count = lambda s: sum(1 for r in lines if r.status == s)  # noqa: E731
+    count = lambda s: sum(1 for r in lines if r.status == s)
     return OrderMaterials(
         order_id=order.id,
         lines=lines,

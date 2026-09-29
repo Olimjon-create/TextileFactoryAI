@@ -25,7 +25,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  factory: Factory | null; // null — yangi fabrika
+  factory: Factory | null;
   canToggleActive: boolean;
   onClose: () => void;
   onSaved: () => void;

@@ -6,14 +6,11 @@ import { downloadCsv, today, type CsvValue } from '@/shared/utils/csv';
 import { tr } from '@/i18n';
 
 interface Props {
-  /** Fayl nomi boshi, masalan "materiallar" → materiallar_2026-09-28.csv */
   name: string;
   headers: string[];
-  /** Joriy filtr bo'yicha hamma qatorlar (fetchAll bilan) */
   load: () => Promise<CsvValue[][]>;
 }
 
-/** "Excel" tugmasi: ro'yxatni joriy filtr bilan CSV (Excel'da ochiladi) sifatida yuklab beradi */
 export default function ExportButton({ name, headers, load }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

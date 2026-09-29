@@ -20,9 +20,6 @@ def _code(value: str, max_len: int = 50) -> str:
     return code
 
 
-# ---------- Materiallar ----------
-
-
 class MaterialCreate(BaseModel):
     code: str
     name: str = Field(min_length=2, max_length=200)
@@ -32,7 +29,7 @@ class MaterialCreate(BaseModel):
     min_stock: float = Field(default=0, ge=0, le=MAX_QTY)
     unit_cost: float | None = Field(default=None, ge=0, le=MAX_COST)
     notes: str | None = Field(default=None, max_length=500)
-    factory_id: int | None = None  # faqat SUPER_ADMIN uchun majburiy
+    factory_id: int | None = None
 
     @field_validator("code")
     @classmethod
@@ -94,7 +91,6 @@ class MaterialOut(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-    # Hisoblangan qiymatlar (harakatlar jurnalidan)
     stock: float = 0
     stock_value: float | None = None
     is_low: bool = False
@@ -114,10 +110,7 @@ class LocationStock(BaseModel):
 
 class MaterialDetail(MaterialOut):
     locations: list[LocationStock] = []
-    bom_usage_count: int = 0  # nechta mahsulot BOM'ida ishlatilgan
-
-
-# ---------- Joylashuvlar ----------
+    bom_usage_count: int = 0
 
 
 class LocationCreate(BaseModel):
@@ -161,10 +154,7 @@ class LocationOut(BaseModel):
     name: str
     is_active: bool
     created_at: datetime
-    materials_count: int = 0  # shu joyda qoldig'i bor materiallar soni
-
-
-# ---------- Harakatlar ----------
+    materials_count: int = 0
 
 
 class MovementInput(str, enum.Enum):
@@ -182,8 +172,7 @@ class MovementCreate(BaseModel):
     movement_type: MovementInput
     material_id: int
     location_id: int
-    to_location_id: int | None = None  # faqat TRANSFER uchun
-    # ADJUSTMENT uchun — sanoq natijasi (joydagi haqiqiy qoldiq); boshqalar uchun — miqdor (> 0)
+    to_location_id: int | None = None
     quantity: float = Field(ge=0, le=MAX_QTY)
     unit_cost: float | None = Field(default=None, ge=0, le=MAX_COST)
     order_id: int | None = None

@@ -30,7 +30,6 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  /** Oldindan tanlangan material (material sahifasidan ochilganda) */
   material?: Material | null;
   initialType?: MovementInput;
   onClose: () => void;
@@ -72,7 +71,6 @@ export default function MovementFormDialog({ open, material: preset, initialType
     setNote('');
   }, [open, preset, initialType, save.reset]);
 
-  // Material qidiruvi (katalogdan, faqat faollar)
   useEffect(() => {
     if (!open || preset) return;
     const t = setTimeout(() => {
@@ -84,7 +82,6 @@ export default function MovementFormDialog({ open, material: preset, initialType
     return () => clearTimeout(t);
   }, [open, query, preset]);
 
-  // Tanlangan material: joylar bo'yicha qoldiq va shu fabrikaning joylari
   useEffect(() => {
     if (!material) {
       setDetail(null);

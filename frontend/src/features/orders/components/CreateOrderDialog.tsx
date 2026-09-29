@@ -51,7 +51,6 @@ const emptyLine = (): Line => ({ key: nextKey++, product: null, size: '', color:
 const num = (v: string) => (v.trim() === '' ? null : Number(v.replace(/\s/g, '').replace(',', '.')));
 const today = () => new Date().toISOString().slice(0, 10);
 
-/** Menejer CRM'dagi mijoz uchun buyurtma kiritadi (B2B). Mahsulot, variant va narx katalogdan olinadi. */
 export default function CreateOrderDialog({ open, onClose, onSaved }: Props) {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -89,7 +88,6 @@ export default function CreateOrderDialog({ open, onClose, onSaved }: Props) {
     return () => clearTimeout(t);
   }, [open, customerQuery]);
 
-  // Mahsulotlar — faqat mijoz zavodining sotuvdagi (faol) mahsulotlari
   useEffect(() => {
     if (!customer) {
       setProducts([]);

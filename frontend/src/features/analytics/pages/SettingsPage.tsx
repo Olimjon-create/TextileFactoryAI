@@ -30,7 +30,6 @@ const FIELDS: { key: keyof Form; label: string; unit: string; hint: string; min:
   { key: 'low_margin_percent', label: tr("Past foyda chegarasi"), unit: '%', hint: tr("Buyurtma foydasi shundan past bo'lsa — ogohlantirish"), min: -100, max: 100 },
 ];
 
-/** Sozlamalar: profil (hamma), zavod nomi (ega/admin) va moliyaviy sozlamalar (ega/menejer/admin) */
 export default function SettingsPage() {
   const { hasRole } = useAuth();
   const canFinance = hasRole(...FINANCE_ROLES);
@@ -97,7 +96,6 @@ function ProfileCard() {
   );
 }
 
-/** Zavod nomi — sidebar'dagi logo tagida shu nom chiqadi. O'zgartirish: zavod egasi va super admin */
 function FactoryNameCard() {
   const { user, refreshUser } = useAuth();
   const isSuper = user?.role === 'SUPER_ADMIN';
@@ -173,7 +171,6 @@ function FactoryNameCard() {
   );
 }
 
-/** Telegram: zavod chatini botga ulash — yangi buyurtma, material tugashi, buzilish, javob so'rovi xabarlari */
 function TelegramCard() {
   const { user } = useAuth();
   const toast = useToast();
@@ -299,7 +296,6 @@ function TelegramCard() {
   );
 }
 
-/** Moliya: tannarx va ogohlantirish chegaralari (kodga emas, bazaga yoziladi) */
 function FinanceSettingsCard() {
   const { user } = useAuth();
   const isSuper = user?.role === 'SUPER_ADMIN';

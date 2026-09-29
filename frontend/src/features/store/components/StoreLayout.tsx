@@ -35,7 +35,6 @@ import BrandLogo from '@/shared/components/BrandLogo';
 import { BRAND_NAME } from '@/shared/constants/brand';
 import { tr } from '@/i18n';
 
-/** Kompyuter: o'ng pastdagi dumaloq savat tugmasi */
 function CartFab() {
   const cart = useCart();
   return (
@@ -54,10 +53,6 @@ function CartFab() {
   );
 }
 
-/**
- * Telefon: pastdagi savat paneli — mahsulot tugmalarini yopmaydi,
- * savatdagi son va jami summa doim ko'rinib turadi.
- */
 function CartBar() {
   const cart = useCart();
   const empty = cart.lines.length === 0;
@@ -75,7 +70,6 @@ function CartBar() {
           borderRadius: '20px 20px 0 0',
           px: 2,
           pt: 1.25,
-          // iPhone'dagi pastki "home" chizig'i uchun joy
           pb: 'calc(10px + env(safe-area-inset-bottom))',
           display: 'flex',
           alignItems: 'center',
@@ -158,14 +152,12 @@ function StaffButton() {
   );
 }
 
-/** Katalogga moda uslubidagi mavzuni qo'llaydi (Light/Dark tanlovi saqlanadi) */
 function StoreThemeProvider({ children }: { children: ReactNode }) {
   const outer = useTheme();
   const theme = useMemo(() => createStoreTheme(outer), [outer]);
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
-/** Mijozlar uchun ochiq katalog karkasi: sodda sarlavha, sahifa va savat */
 export default function StoreLayout() {
   return (
     <StoreThemeProvider>
@@ -212,7 +204,6 @@ function StoreShell() {
               </Toolbar>
             </Container>
           </AppBar>
-          {/* Pastki bo'shliq — savat paneli/tugmasi kontentni yopmasligi uchun */}
           <Container maxWidth="lg" sx={{ pt: { xs: 2, md: 4 }, pb: { xs: 13, md: 14 } }}>
             <Suspense fallback={<CatalogSkeleton />}>
               <Outlet />

@@ -17,9 +17,6 @@ class Ref(BaseModel):
     name: str
 
 
-# ---------- yetkazib beruvchilar ----------
-
-
 class _SupplierFields(BaseModel):
     @field_validator("name", "contact_person", "address", "notes", "tax_id", mode="before", check_fields=False)
     @classmethod
@@ -49,7 +46,7 @@ class _SupplierFields(BaseModel):
 
 class SupplierCreate(_SupplierFields):
     name: str = Field(min_length=2, max_length=200)
-    code: str | None = Field(default=None, max_length=30)  # bo'sh bo'lsa SUP-00001 ...
+    code: str | None = Field(default=None, max_length=30)
     contact_person: str | None = Field(default=None, max_length=200)
     phone: str | None = Field(default=None, max_length=50)
     email: EmailStr | None = None
@@ -95,7 +92,6 @@ class SupplierOut(BaseModel):
     notes: str | None
     is_active: bool
     created_at: datetime
-    # Hisoblanadi (xarid buyurtmalari va kirimlardan)
     open_orders: int = 0
     received_value: float = 0
 
@@ -109,18 +105,14 @@ class SupplierStats(BaseModel):
     orders_total: int
     open_orders: int
     overdue_orders: int
-    received_value: float  # qabul qilingan tovar qiymati
-    open_value: float  # hali kelmagan qism qiymati
-    # Muddatida yetkazish: to'liq qabul qilingan va kutilgan sanasi bor buyurtmalar orasida
+    received_value: float
+    open_value: float
     on_time_pct: float | None
-    avg_lead_days: float | None  # yuborilgandan oxirgi kirimgacha, kun
+    avg_lead_days: float | None
 
 
 class SupplierDetail(SupplierOut):
     stats: SupplierStats
-
-
-# ---------- xarid buyurtmalari ----------
 
 
 class PurchaseLineIn(BaseModel):
@@ -137,7 +129,7 @@ class PurchaseLineIn(BaseModel):
 
 class PurchaseOrderCreate(BaseModel):
     supplier_id: int
-    order_date: date | None = None  # bo'sh — bugun
+    order_date: date | None = None
     expected_date: date | None = None
     order_id: int | None = None
     currency: str = Field(default="UZS", pattern=r"^[A-Z]{3}$")
@@ -221,7 +213,7 @@ class ReceiveLine(BaseModel):
 class ReceiveRequest(BaseModel):
     location_id: int
     lines: list[ReceiveLine] = Field(min_length=1, max_length=200)
-    document_no: str | None = Field(default=None, max_length=50)  # yetkazib beruvchi yuk xati / faktura raqami
+    document_no: str | None = Field(default=None, max_length=50)
     note: str | None = Field(default=None, max_length=500)
 
     @field_validator("document_no", "note")
@@ -235,5 +227,5 @@ class ProcurementSummary(BaseModel):
     open_orders: int
     overdue_orders: int
     drafts: int
-    open_value: float  # hali qabul qilinmagan tovar qiymati
-    expected_7d: int  # 7 kun ichida kutilayotgan buyurtmalar
+    open_value: float
+    expected_7d: int

@@ -119,8 +119,6 @@ export interface NotificationList {
   unread: number;
 }
 
-// ---------- tushum (kunlik / haftalik / oylik / yillik) ----------
-
 export type RevenuePeriod = 'day' | 'week' | 'month' | 'year';
 
 export interface RevenueBucket {

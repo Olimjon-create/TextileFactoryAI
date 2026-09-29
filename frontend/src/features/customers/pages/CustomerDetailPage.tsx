@@ -87,7 +87,6 @@ export default function CustomerDetailPage() {
             <Skeleton width="20%" />
           </Box>
         </Box>
-        {/* Aloqa, manzil va izoh kartalari */}
         <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
           <CardSkeleton lines={3} />
           <CardSkeleton lines={2} />

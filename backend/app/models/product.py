@@ -69,10 +69,8 @@ class Product(Base, TimestampMixin):
     status: Mapped[ProductStatus] = mapped_column(
         Enum(ProductStatus, name="product_status"), default=ProductStatus.DRAFT, index=True
     )
-    # 1 ishlab chiqarish birligi narxi (so'm). Katalogda faqat narxi bor FAOL mahsulotlar ko'rinadi.
     price: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
     image_url: Mapped[str | None] = mapped_column(String(500))
-    # Kiyim odam (model) ustida qanday turishini ko'rsatuvchi rasm
     model_image_url: Mapped[str | None] = mapped_column(String(500))
 
     factory: Mapped["Factory"] = relationship()

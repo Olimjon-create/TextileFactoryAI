@@ -7,7 +7,6 @@ import { hideSplash } from '@/app/splash';
 import { AuthProvider, useAuth } from '@/features/auth/AuthContext';
 import { ToastProvider } from '@/shared/components/Toast';
 
-/** Foydalanuvchi sessiyasi tekshirilgach (yoki sessiya bo'lmasa darhol) splash yashiriladi */
 function SplashGate({ children }: { children: ReactNode }) {
   const { initializing } = useAuth();
   useEffect(() => {

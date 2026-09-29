@@ -33,7 +33,6 @@ export const MATERIAL_TYPE_LABELS: Record<MaterialType, string> = {
   OTHER: tr("Boshqa"),
 };
 
-// Material turi tanlanganda taklif qilinadigan o'lchov birligi
 export const DEFAULT_MATERIAL_UNIT: Record<MaterialType, MaterialUnit> = {
   FABRIC: 'METER',
   THREAD: 'METER',

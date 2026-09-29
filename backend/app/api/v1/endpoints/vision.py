@@ -33,9 +33,6 @@ can_view = require_roles(*svc.VISION_VIEW_ROLES)
 can_edit = require_roles(*svc.VISION_EDITOR_ROLES)
 
 
-# ---------- qurilma API'si ----------
-
-
 @router.post("/ingest", response_model=IngestResponse)
 def ingest(
     data: IngestRequest,
@@ -50,9 +47,6 @@ def ingest(
     device = svc.authenticate(db, x_device_key)
     rate_limit.hit(f"device:{device.id}", 600, 60)
     return svc.ingest(db, device, data, rate_limit.client_ip(request))
-
-
-# ---------- boshqaruv ----------
 
 
 @router.get("/summary", response_model=VisionSummary)

@@ -14,7 +14,6 @@ import { tr } from '@/i18n';
 
 const PAY_TYPE: Record<string, string> = { PIECE: tr('ishbay'), HOURLY: tr('soatbay'), MONTHLY: tr('oylik') };
 
-/** Buyurtma sahifasida: tannarx (material + ish haqi + ustama), reja bilan solishtirish va foyda. Faqat moliya rollari */
 export default function OrderCostingCard({ order }: { order: { id: number; status: string } }) {
   const canSee = useCanSeeFinance();
   const [data, setData] = useState<OrderCosting | null>(null);

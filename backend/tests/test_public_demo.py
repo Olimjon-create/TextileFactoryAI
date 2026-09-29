@@ -13,7 +13,7 @@ REAL_BRANDS = re.compile(
 
 def test_seed_public_is_idempotent_and_brand_free(client):
     assert seed_public() == 8
-    assert seed_public() == 0  # qayta ishga tushirish — dublikat yo'q
+    assert seed_public() == 0
 
     factories = client.get(f"{API}/store/factories").json()
     assert len(factories) == 8

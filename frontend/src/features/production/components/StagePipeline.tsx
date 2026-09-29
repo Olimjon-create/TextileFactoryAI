@@ -4,7 +4,6 @@ import { STAGE_SHORT } from '../constants';
 import type { WorkOrder } from '../types';
 import { tr } from '@/i18n';
 
-/** 5 bosqich: yaroqli / kelgan, brak va qolgan — joriy bosqich ajratib ko'rsatiladi */
 export default function StagePipeline({ wo, compact = false }: { wo: WorkOrder; compact?: boolean }) {
   return (
     <Box sx={{ display: 'grid', gap: compact ? 0.75 : 1.5, gridTemplateColumns: { xs: compact ? 'repeat(5, 1fr)' : '1fr 1fr', sm: 'repeat(5, 1fr)' } }}>

@@ -7,7 +7,7 @@ from app.models.product import MaterialType, MaterialUnit, ProductionUnit, Produ
 from app.schemas.common import media_url
 from app.schemas.factory import FactoryBrief
 
-MAX_PRICE = 100_000_000_000  # 100 mlrd so'm
+MAX_PRICE = 100_000_000_000
 
 CODE_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9._-]{1,49}$")
 MAX_VARIANTS = 50
@@ -49,11 +49,7 @@ def _strip_optional(value: str | None) -> str | None:
     return value or None
 
 
-# ---------- BOM ----------
-
-
 class BOMItemBase(BaseModel):
-    # Ombor katalogidagi material (ixtiyoriy). Berilsa nom/tur/birlik katalogdan olinadi
     material_id: int | None = None
     material_type: MaterialType
     material_name: str = Field(min_length=2, max_length=200)
@@ -111,9 +107,6 @@ class BOMItemOut(BOMItemBase):
     created_at: datetime
 
 
-# ---------- Product ----------
-
-
 class ProductBase(BaseModel):
     name: str = Field(min_length=2, max_length=200)
     code: str = Field(min_length=2, max_length=50)
@@ -159,7 +152,6 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    # Faqat SUPER_ADMIN uchun majburiy; boshqalarda o'z fabrikasi olinadi
     factory_id: int | None = None
     bom_items: list[BOMItemCreate] = Field(default_factory=list, max_length=200)
 

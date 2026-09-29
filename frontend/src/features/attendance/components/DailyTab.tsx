@@ -57,7 +57,6 @@ interface Props {
   canEdit: boolean;
   canApprove: boolean;
   onOpenEmployee: (id: number) => void;
-  /** Javob so'rovi yaratilganda boshqa tablar yangilansin */
   onLeaveChanged: () => void;
   refreshKey: number;
 }
@@ -110,7 +109,6 @@ export default function DailyTab({ canEdit, canApprove, onOpenEmployee, onLeaveC
   useEffect(() => {
     resourcesApi.shifts().then(setShifts).catch(() => undefined);
   }, []);
-  // Bugungi jadval har daqiqada yangilanadi (boshqa qurilmadan belgilanganlar ham ko'rinsin)
   useEffect(() => {
     if (day !== isoDate()) return;
     const t = setInterval(load, 60_000);
@@ -120,7 +118,6 @@ export default function DailyTab({ canEdit, canApprove, onOpenEmployee, onLeaveC
   const isToday = day === isoDate();
 
   const doCheck = async (row: DailyRow, kind: 'in' | 'out') => {
-    // O'tgan kun uchun vaqtni qo'lda kiritish kerak
     if (!isToday) {
       setMark({ row, status: 'PRESENT' });
       return;
@@ -219,7 +216,6 @@ export default function DailyTab({ canEdit, canApprove, onOpenEmployee, onLeaveC
         </Alert>
       )}
 
-      {/* Sana tanlash */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <IconButton onClick={() => setDay(shiftDate(day, -1))} aria-label={tr("Oldingi kun")}>
           <ChevronLeftIcon />
@@ -241,7 +237,6 @@ export default function DailyTab({ canEdit, canApprove, onOpenEmployee, onLeaveC
         )}
       </Box>
 
-      {/* Qisqa hisobot — bosilganda filtr bo'ladi */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)', lg: 'repeat(8, 1fr)' }, gap: 1.25, mb: 2.5 }}>
         {SUMMARY.map((c) => {
           const active = state === c.key;

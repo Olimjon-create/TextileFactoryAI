@@ -5,12 +5,9 @@ import { tr } from '@/i18n';
 
 const BACKGROUND = '/brand/bg-knitwear.jpg';
 
-// ---------- To'lqinlar ----------
-// SVG kengligi 2 davr (2880), bitta davr 1440 — chapga 50% siljitilsa, chok sezilmaydi.
 const PERIOD = 1440;
 const HEIGHT = 320;
 
-/** Sinusoidal to'lqin: yuqori qirrasi to'lqinli, pasti to'la bo'yalgan (yoki faqat chiziq) */
 function wavePath({ base, amp, waves, phase = 0, closed = true }: { base: number; amp: number; waves: number; phase?: number; closed?: boolean }) {
   const pts: string[] = [];
   for (let x = 0; x <= PERIOD * 2; x += 24) {
@@ -34,7 +31,6 @@ const driftReverse = keyframes`from { transform: translateX(-50%); } to { transf
 const bob = keyframes`0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); }`;
 const glow = keyframes`0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, 30px) scale(1.08); }`;
 
-/** Bitta cheksiz oqadigan to'lqin qatlami. Tashqi quti — sekin tebranish, ichki — gorizontal oqim */
 function WaveLayer({
   d,
   fill,
@@ -72,11 +68,6 @@ function WaveLayer({
   );
 }
 
-/**
- * Butun katalog orqasidagi fon: kiyimlar fotosurati — kuchli blur, ustida mavzu rangidagi
- * yumshoq qatlam va mato kabi sekin oqib turadigan to'lqinlar. Kontent (kartalar) "shisha"
- * bo'lib ko'rinadi va matn doim o'qiladi.
- */
 export default function StoreBackdrop() {
   const theme = useTheme();
   const dark = theme.palette.mode === 'dark';
@@ -92,7 +83,6 @@ export default function StoreBackdrop() {
         zIndex: -1,
         overflow: 'hidden',
         bgcolor: base,
-        // "Animatsiyani kamaytirish" yoqilgan bo'lsa — to'lqinlar joyida turadi
         '@media (prefers-reduced-motion: reduce)': { '& *': { animation: 'none !important' } },
       }}
     >
@@ -108,7 +98,6 @@ export default function StoreBackdrop() {
           opacity: dark ? 0.6 : 0.95,
         }}
       />
-      {/* Rang qatlami: tepada yengilroq (rasm sezilsin), pastda zichroq (kontent o'qilsin) */}
       <Box
         sx={{
           position: 'absolute',
@@ -116,7 +105,6 @@ export default function StoreBackdrop() {
           background: `linear-gradient(180deg, ${alpha(base, dark ? 0.5 : 0.22)} 0%, ${alpha(base, dark ? 0.72 : 0.55)} 50%, ${alpha(base, dark ? 0.88 : 0.8)} 100%)`,
         }}
       />
-      {/* Iliq "mokko" nur — chap yuqoridan, sekin suzadi */}
       <Box
         sx={{
           position: 'absolute',
@@ -142,11 +130,9 @@ export default function StoreBackdrop() {
         }}
       />
 
-      {/* Ekran o'rtasidan o'tadigan ingichka "ipak" chiziqlar */}
       <WaveLayer d={WAVES.silkA} stroke={alpha(primary, dark ? 0.35 : 0.45)} duration={40} bobDuration={11} sx={{ top: '26%', height: { xs: 160, md: 220 } }} />
       <WaveLayer d={WAVES.silkB} stroke={alpha(secondary, dark ? 0.3 : 0.4)} duration={52} bobDuration={14} reverse sx={{ top: '30%', height: { xs: 160, md: 220 } }} />
 
-      {/* Pastdagi uch qavat to'lqin: orqadagisi sekin, oldingisi tezroq — chuqurlik hissi */}
       <WaveLayer d={WAVES.back} fill={alpha(primary, dark ? 0.16 : 0.2)} duration={34} bobDuration={9} sx={{ bottom: -10, height: { xs: '30vh', md: '38vh' } }} />
       <WaveLayer d={WAVES.middle} fill={alpha(secondary, dark ? 0.14 : 0.18)} duration={24} bobDuration={7} reverse sx={{ bottom: -10, height: { xs: '26vh', md: '32vh' } }} />
       <WaveLayer d={WAVES.front} fill={alpha(base, dark ? 0.55 : 0.6)} duration={18} bobDuration={8} sx={{ bottom: -10, height: { xs: '22vh', md: '26vh' } }} />

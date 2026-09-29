@@ -11,9 +11,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  /** Yangi jo'natma — buyurtma bo'yicha */
   orderId?: number;
-  /** Tahrirlash: tayyorlanayotganda qatorlar ham, yo'lga chiqqandan keyin faqat transport */
   shipment?: ShipmentDetail | null;
   onClose: () => void;
   onSaved: (sh: ShipmentDetail) => void;
@@ -53,7 +51,6 @@ export default function ShipmentFormDialog({ open, orderId, shipment, onClose, o
       .orderShipping(targetOrder)
       .then((s) => {
         const own = new Map((shipment?.lines ?? []).map((l) => [l.order_item_id, l.quantity]));
-        // Tahrirlashda shu jo'natmadagi miqdor "bo'sh" hisoblanadi
         const adjusted = s.lines.map((l) => ({ ...l, remaining: l.remaining + (own.get(l.order_item_id) ?? 0) }));
         setLines(adjusted);
         setQty(
@@ -76,7 +73,6 @@ export default function ShipmentFormDialog({ open, orderId, shipment, onClose, o
     e.preventDefault();
     if (!valid || !targetOrder) return;
     setError('');
-    // Yo'lga chiqqan jo'natmada rejadagi sana o'zgarmaydi — yuborilmaydi
     const entries = Object.entries(form).filter(([k]) => editItems || k !== 'planned_date');
     const transport = Object.fromEntries(entries.map(([k, v]) => [k, v.trim() || null])) as unknown as TransportFields;
     const items = chosen.map(({ l, v }) => ({ order_item_id: l.order_item_id, quantity: v }));

@@ -5,10 +5,6 @@ import { inventoryApi } from '../api';
 import type { WarehouseLocation } from '../types';
 import { tr } from '@/i18n';
 
-/**
- * Ombor joyi hali yo'q: kirim oynasidan chiqmasdan birinchi joyni ("A-1 — Asosiy ombor") yaratish.
- * Keyin «Ombor joylari» sahifasida nomini o'zgartirish yoki yangilarini qo'shish mumkin.
- */
 export default function NoLocationsAlert({ factoryId, onCreated }: { factoryId?: number; onCreated: (l: WarehouseLocation) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

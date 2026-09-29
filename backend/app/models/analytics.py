@@ -12,7 +12,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base, TimestampMixin
 
-# Sozlama hali saqlanmagan fabrika uchun boshlang'ich qiymatlar (fabrika o'zi o'zgartiradi)
 SETTINGS_DEFAULTS = {
     "overhead_percent": Decimal("0"),
     "monthly_work_hours": Decimal("208"),
@@ -26,13 +25,9 @@ class FactorySettings(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), unique=True)
-    # Umumiy xarajatlar (ijara, elektr, boshqaruv): material + ish haqi ustiga foiz
     overhead_percent: Mapped[Decimal] = mapped_column(Numeric(6, 2), default=SETTINGS_DEFAULTS["overhead_percent"])
-    # Oylik maoshli xodimning soatlik narxi = oylik / shu soat (ish vaqti yozuvlari bo'yicha taqsimlash)
     monthly_work_hours: Mapped[Decimal] = mapped_column(Numeric(6, 1), default=SETTINGS_DEFAULTS["monthly_work_hours"])
-    # Ish buyurtmasida brak ulushi shundan oshsa — ogohlantirish
     defect_alert_percent: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=SETTINGS_DEFAULTS["defect_alert_percent"])
-    # Buyurtma foydasi shundan past bo'lsa — ogohlantirish
     low_margin_percent: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=SETTINGS_DEFAULTS["low_margin_percent"])
 
 

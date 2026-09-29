@@ -20,11 +20,11 @@ if TYPE_CHECKING:
 
 
 class PurchaseStatus(str, enum.Enum):
-    DRAFT = "DRAFT"  # qoralama — qatorlarni o'zgartirish mumkin
-    ORDERED = "ORDERED"  # yetkazib beruvchiga yuborildi
-    PARTIAL = "PARTIAL"  # qisman qabul qilindi
-    RECEIVED = "RECEIVED"  # to'liq qabul qilindi
-    CLOSED = "CLOSED"  # qolgani kelmaydi — qisman qabul bilan yopildi
+    DRAFT = "DRAFT"
+    ORDERED = "ORDERED"
+    PARTIAL = "PARTIAL"
+    RECEIVED = "RECEIVED"
+    CLOSED = "CLOSED"
     CANCELLED = "CANCELLED"
 
 
@@ -34,17 +34,16 @@ class Supplier(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), index=True)
-    code: Mapped[str] = mapped_column(String(30), index=True)  # SUP-00001
+    code: Mapped[str] = mapped_column(String(30), index=True)
     name: Mapped[str] = mapped_column(String(200), index=True)
     contact_person: Mapped[str | None] = mapped_column(String(200))
     phone: Mapped[str | None] = mapped_column(String(50))
     email: Mapped[str | None] = mapped_column(String(255))
     country: Mapped[str | None] = mapped_column(String(2))
     address: Mapped[str | None] = mapped_column(String(300))
-    tax_id: Mapped[str | None] = mapped_column(String(30))  # STIR / INN
-    # Shartnoma shartlari — har bir yetkazib beruvchi uchun alohida (qattiq yozilmaydi)
+    tax_id: Mapped[str | None] = mapped_column(String(30))
     payment_terms_days: Mapped[int | None] = mapped_column(Integer)
-    lead_time_days: Mapped[int | None] = mapped_column(Integer)  # odatiy yetkazish muddati
+    lead_time_days: Mapped[int | None] = mapped_column(Integer)
     notes: Mapped[str | None] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
 
@@ -55,14 +54,13 @@ class PurchaseOrder(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), index=True)
-    number: Mapped[str] = mapped_column(String(20), index=True)  # PO-000001
+    number: Mapped[str] = mapped_column(String(20), index=True)
     supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id", ondelete="RESTRICT"), index=True)
     status: Mapped[PurchaseStatus] = mapped_column(
         Enum(PurchaseStatus, name="purchase_status"), default=PurchaseStatus.DRAFT, index=True
     )
     order_date: Mapped[date] = mapped_column(Date)
     expected_date: Mapped[date | None] = mapped_column(Date, index=True)
-    # Qaysi mijoz buyurtmasi uchun olinmoqda (ixtiyoriy)
     order_id: Mapped[int | None] = mapped_column(ForeignKey("orders.id", ondelete="SET NULL"), index=True)
     currency: Mapped[str] = mapped_column(String(3), default="UZS")
     notes: Mapped[str | None] = mapped_column(Text)

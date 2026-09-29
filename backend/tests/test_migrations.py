@@ -71,7 +71,6 @@ def test_legacy_database_is_stamped_and_upgraded(fresh_engine):
     assert _diff(fresh_engine) == []
     with fresh_engine.connect() as conn:
         assert conn.scalar(text("SELECT email FROM users")) == "old@a.uz"
-        # Yangi ustun eski qatorlar uchun standart qiymat oladi
         assert conn.scalar(text("SELECT is_public FROM factories")) == 1
 
 

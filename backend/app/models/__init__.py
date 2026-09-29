@@ -1,6 +1,3 @@
-# Barcha modellar shu yerda import qilinadi, shunda Base.metadata ularni ko'radi.
-# Yangi modul (warehouse, production, ...) qo'shilganda modelini shu yerga qo'shing
-# va migrations/versions ichida yangi Alembic migratsiyasini yarating.
 from app.models.attendance import Attendance, AttendanceStatus, LeaveRequest, LeaveStatus, LeaveType
 from app.models.analytics import FactorySettings, NotificationRead
 from app.models.audit import AuditLog

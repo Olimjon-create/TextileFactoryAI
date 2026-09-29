@@ -1,7 +1,3 @@
-# TextileCore - qo'riqchi (supervisor).
-# Backend (8001) va frontendni (5180) yashirin ishga tushiradi, har 20 soniyada tekshiradi,
-# qotib qolsa yoki yopilib qolsa - o'zi qayta ishga tushiradi. Loglar: logs\ papkasida.
-# Backend --reload SIZ ishlaydi: Windows'da --reload jarayoni qotib qolib, sayt "Yuklanmoqda..." da turib qolardi.
 param([switch]$OpenBrowser)
 
 $ErrorActionPreference = 'Continue'
@@ -40,7 +36,6 @@ function Stop-Port([int]$port) {
         ForEach-Object { Stop-Tree $_ }
 }
 
-# uvicorn --reload dan qolib ketgan "yetim" jarayonlar (otasi o'lgan) - ular eski kod bilan portni band qiladi
 function Stop-OrphanUvicorn {
     Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue |
         Where-Object {
@@ -50,7 +45,6 @@ function Stop-OrphanUvicorn {
         ForEach-Object { Stop-Tree $_.ProcessId }
 }
 
-# Faqat bitta qo'riqchi ishlasin: eskisi bo'lsa to'xtatiladi
 if (Test-Path $pidFile) {
     $old = (Get-Content $pidFile -ErrorAction SilentlyContinue | Select-Object -First 1)
     if ($old -and ([int]$old -ne $PID)) {
@@ -105,8 +99,6 @@ $feOk = Wait-Url $FrontendUrl 90
 Log ("Tayyor: backend={0}, frontend={1}" -f $beOk, $feOk)
 if ($OpenBrowser) { Start-Process 'http://localhost:5180' }
 
-# Kunlik zaxira: bugun hali nusxa olinmagan bo'lsa (backend\backups\textilecore-YYYYMMDD-*.db), orqa fonda oladi.
-# Supabase Free'da avtomatik zaxira yo'q; skript oxirgi 14 ta nusxani saqlaydi.
 function Invoke-DailyBackup {
     $dir = Join-Path $backend 'backups'
     $stamp = Get-Date -Format 'yyyyMMdd'

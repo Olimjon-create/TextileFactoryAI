@@ -81,7 +81,6 @@ export default function FactoriesPage() {
     }
   };
 
-  // Tahrirlash (egasi va admin) / o'chirish (faqat admin) — jadvalda ham, telefon kartalarida ham
   const rowActions = (f: Factory) => (
     <>
       <Tooltip title={tr("Tahrirlash")}>
@@ -162,7 +161,6 @@ export default function FactoriesPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Birinchi yuklanishda — jadval qatorlari shaklidagi skeleton */}
               {loading && factories.length === 0 && <TableRowsSkeleton cols={canEdit ? 7 : 6} />}
               {factories.map((f) => (
                 <TableRow key={f.id} hover>

@@ -13,7 +13,6 @@ import { tr } from '@/i18n';
 
 const NO_SHIP = ['PENDING_PAYMENT', 'CANCELLED', 'COMPLETED'];
 
-/** Buyurtma sahifasida: nima jo'natildi, nima omborda, jo'natmalar ro'yxati */
 export default function OrderShippingCard({ order, onChanged }: { order: { id: number; status: string }; onChanged?: () => void }) {
   const navigate = useNavigate();
   const { canView, canEdit } = useLogisticsPermissions();

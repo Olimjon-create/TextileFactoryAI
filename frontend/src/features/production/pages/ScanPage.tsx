@@ -24,10 +24,6 @@ const KIND_LABELS: Record<TraceResult['kind'], string> = {
   PURCHASE_ORDER: tr("Xarid buyurtmasi"),
 };
 
-/**
- * QR / shtrix-kod skaneri: USB/Bluetooth skaner klaviatura kabi ishlaydi — kodni maydonga "yozadi" va Enter bosadi.
- * Partiya, quti, ish buyurtmasi, buyurtma, material yoki mashina kodi tanib olinadi.
- */
 export default function ScanPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [code, setCode] = useState('');

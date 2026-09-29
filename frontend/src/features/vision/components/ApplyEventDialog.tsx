@@ -12,7 +12,6 @@ import { EVENT_TYPE_LABELS } from '../constants';
 import type { VisionEvent } from '../types';
 import { tr } from '@/i18n';
 
-/** Hodisani tasdiqlash: kerak bo'lsa ish buyurtmasi, bosqich va miqdorni aniqlashtirish */
 export default function ApplyEventDialog({ event, onClose, onDone }: { event: VisionEvent | null; onClose: () => void; onDone: (e: VisionEvent) => void }) {
   const [wos, setWos] = useState<WorkOrder[]>([]);
   const [woId, setWoId] = useState<number | ''>('');

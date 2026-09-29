@@ -50,7 +50,6 @@ import { tr } from '@/i18n';
 
 const when = (v: string | null) => (v ? formatDateTime(v.length === 10 ? `${v}T00:00:00` : v) : '—');
 
-/** Yuk xati (delivery note): QR — jo'natma raqami, skanerda kuzatiladi */
 async function printNote(sh: ShipmentDetail) {
   const w = window.open('', '_blank', 'width=900,height=1000');
   if (!w) return;

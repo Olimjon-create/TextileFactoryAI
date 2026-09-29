@@ -30,7 +30,6 @@ def t_lang(lang: str, template: str, **kwargs) -> str:
     return text.format(**kwargs) if kwargs else text
 
 
-# Ishlab chiqarish bosqichlari (xabarlar ichida)
 STAGES = {
     "Kesish": {"ru": "Раскрой", "en": "Cutting"},
     "Tikuv": {"ru": "Пошив", "en": "Sewing"},
@@ -63,7 +62,6 @@ def _m(ru: str, en: str) -> dict[str, str]:
 
 
 MESSAGES: dict[str, dict[str, str]] = {
-    # --- bildirishnomalar ---
     "Buyurtma {number} kechikmoqda": _m("Заказ {number} просрочен", "Order {number} is overdue"),
     "{customer} · muddat {date}": _m("{customer} · срок {date}", "{customer} · due {date}"),
     "Yangi buyurtma {number}": _m("Новый заказ {number}", "New order {number}"),
@@ -86,13 +84,10 @@ MESSAGES: dict[str, dict[str, str]] = {
     "Kamera/sensor hodisalarini ko'rib chiqing": _m("Проверьте события камер/датчиков", "Review camera/sensor events"),
     "{code}: aloqa yo'q": _m("{code}: нет связи", "{code}: offline"),
     "{name} · oxirgi aloqa {seen} (UTC)": _m("{name} · последняя связь {seen} (UTC)", "{name} · last seen {seen} (UTC)"),
-    # --- tushum grafigi ---
     "{year}-yil": _m("{year} г.", "{year}"),
-    # --- tannarx ---
     "Buyurtma hali tugallanmagan ({packed}/{ordered} dona qadoqlangan) — foyda yakuniy emas, xarajatlar hali qo'shiladi": _m(
         "Заказ ещё не завершён (упаковано {packed}/{ordered} шт.) — прибыль не окончательная, расходы ещё добавятся",
         "The order is not finished yet ({packed}/{ordered} pcs packed) — profit is not final, costs will still be added"),
-    # --- takrorlanadigan kod ---
     "'{code}' kodli mijoz allaqachon mavjud": _m("Клиент с кодом '{code}' уже существует", "A customer with code '{code}' already exists"),
     "'{code}' kodli yetkazib beruvchi allaqachon mavjud": _m("Поставщик с кодом '{code}' уже существует", "A supplier with code '{code}' already exists"),
     "'{code}' kodli material allaqachon mavjud": _m("Материал с кодом '{code}' уже существует", "A material with code '{code}' already exists"),
@@ -104,11 +99,9 @@ MESSAGES: dict[str, dict[str, str]] = {
     "'{code}' tabel raqami band": _m("Табельный номер '{code}' занят", "Employee ID '{code}' is taken"),
     "{label} topilmadi": _m("{label}: не найдено", "{label} not found"),
     "«{code}» kodi topilmadi": _m("Код «{code}» не найден", "Code «{code}» not found"),
-    # --- davomat ---
     "{name} bu kuni {time} da kelgan deb belgilangan": _m("{name} в этот день отмечен пришедшим в {time}", "{name} is already marked as arrived at {time} that day"),
     "{name} kelgani belgilanmagan": _m("Приход {name} не отмечен", "{name}'s arrival is not marked"),
     "{name} {time} da ketgan deb belgilangan": _m("{name} уже отмечен ушедшим в {time}", "{name} is already marked as left at {time}"),
-    # --- ishlab chiqarish ---
     "Bu qator uchun faqat {left} dona rejalashtirish mumkin": _m("Для этой позиции можно запланировать только {left} шт.", "Only {left} pcs can be planned for this line"),
     "Allaqachon {cut} dona kesilgan — rejani undan kam qilib bo'lmaydi": _m("Уже раскроено {cut} шт. — план не может быть меньше", "{cut} pcs are already cut — the plan cannot be lower"),
     "Buyurtma qatori uchun ko'pi bilan {left} dona": _m("Для позиции заказа не более {left} шт.", "At most {left} pcs for the order line"),
@@ -123,7 +116,6 @@ MESSAGES: dict[str, dict[str, str]] = {
     "«{stage}» bosqichi bu miqdorni allaqachon ishlagan — avval o'sha yozuvni o'chiring": _m("Этап «{stage}» уже обработал это количество — сначала удалите ту запись", "The «{stage}» stage has already processed this quantity — delete that record first"),
     "{label} {limit} dona, ulardan {used} tasi allaqachon partiyalarga ajratilgan": _m("{label} {limit} шт., из них {used} уже распределено по партиям", "{label} {limit} pcs, of which {used} are already split into batches"),
     "{label} {limit} dona, ulardan {used} tasi allaqachon qutilarga ajratilgan": _m("{label} {limit} шт., из них {used} уже разложено по коробкам", "{label} {limit} pcs, of which {used} are already packed into boxes"),
-    # --- xarid, ombor ---
     "{code}: material nofaol": _m("{code}: материал неактивен", "{code}: material is inactive"),
     "{code}: ko'pi bilan {left} qabul qilinadi (buyurtmada qolgani)": _m("{code}: можно принять не более {left} (остаток по заказу)", "{code}: at most {left} can be received (remaining on the order)"),
     "{code}: qaysi joyga qaytarilishini tanlang": _m("{code}: выберите, в какое место вернуть", "{code}: choose where to return it"),
@@ -135,7 +127,6 @@ MESSAGES: dict[str, dict[str, str]] = {
     "«{product}»: ko'pi bilan {left} dona (buyurtmada {ordered}, jo'natmalarda {shipped})": _m("«{product}»: не более {left} шт. (в заказе {ordered}, в отгрузках {shipped})", "«{product}»: at most {left} pcs (ordered {ordered}, in shipments {shipped})"),
     "«{product}» katalogdan o'chirilgan — ombor qoldig'i yo'q": _m("«{product}» удалено из каталога — складского остатка нет", "«{product}» was removed from the catalog — no stock"),
     "«{product}»: omborda {have} dona, kerak {need}": _m("«{product}»: на складе {have} шт., нужно {need}", "«{product}»: {have} pcs in stock, {need} needed"),
-    # --- buyurtma va mahsulot ---
     "«{product}» uchun {label}ni tanlang": _m("Выберите {label} для «{product}»", "Choose a {label} for «{product}»"),
     "«{product}» uchun bunday {label} yo'q: {value}": _m("У «{product}» нет такого значения ({label}): {value}", "«{product}» has no such {label}: {value}"),
     "«{product}» uchun {label} tanlanmaydi": _m("Для «{product}» {label} не выбирается", "«{product}» has no {label} option"),
@@ -145,7 +136,6 @@ MESSAGES: dict[str, dict[str, str]] = {
     "«{product}» uchun narx kiriting": _m("Укажите цену для «{product}»", "Enter a price for «{product}»"),
     "Rasm hajmi {mb} MB dan oshmasligi kerak": _m("Размер изображения не должен превышать {mb} МБ", "Image must not exceed {mb} MB"),
     "To'lov provayderi sozlanmagan: {provider}": _m("Платёжный провайдер не настроен: {provider}", "Payment provider is not configured: {provider}"),
-    # --- parolni tiklash ---
     "Parolni tiklash sozlanmagan — administratorga murojaat qiling": _m("Восстановление пароля не настроено — обратитесь к администратору", "Password reset is not configured — contact the administrator"),
     "Salom, {name}!": _m("Здравствуйте, {name}!", "Hello, {name}!"),
     "TextileCore hisobingiz parolini tiklash so'raldi. Yangi parol o'rnatish uchun havolani bosing (1 soat amal qiladi):": _m(
@@ -158,7 +148,6 @@ MESSAGES: dict[str, dict[str, str]] = {
     "TextileCore: parolni tiklash": _m("TextileCore: восстановление пароля", "TextileCore: password reset"),
     "Xatni yuborib bo'lmadi, keyinroq urinib ko'ring": _m("Не удалось отправить письмо, попробуйте позже", "Could not send the email, try again later"),
     "Havola yaroqsiz yoki muddati o'tgan — qaytadan so'rang": _m("Ссылка недействительна или устарела — запросите новую", "The link is invalid or expired — request a new one"),
-    # --- Telegram ---
     "Telegram bot sozlanmagan": _m("Telegram-бот не настроен", "Telegram bot is not configured"),
     "Telegram bilan bog'lanib bo'lmadi, keyinroq urinib ko'ring": _m("Не удалось связаться с Telegram, попробуйте позже", "Could not reach Telegram, try again later"),
     "Botda «Start» bosilmagan — havolani ochib, Start tugmasini bosing va qayta tekshiring": _m(
@@ -183,7 +172,6 @@ MESSAGES: dict[str, dict[str, str]] = {
     "🙋 Javob so'rovi: <b>{name}</b>, {period}\nSabab: {reason}\nTasdiqlash: Davomat → Javob so'rovlari": _m(
         "🙋 Запрос на отгул: <b>{name}</b>, {period}\nПричина: {reason}\nПодтвердить: Посещаемость → Запросы на отгул",
         "🙋 Leave request: <b>{name}</b>, {period}\nReason: {reason}\nApprove: Attendance → Leave requests"),
-    # --- Telegram bot (mijozlar) ---
     "👋 Assalomu alaykum, {name}!\n\n<b>TextileCore</b> — tikuv fabrikalari katalogi. Kiyimlarni to'g'ridan-to'g'ri ishlab chiqaruvchidan buyurtma qiling.\n\n🛍 «Do'konni ochish» tugmasini bosing: mahsulotni tanlang, savatga qo'shing va to'lang.\n📦 Buyurtmangiz holati haqida shu yerga xabar beramiz.": _m(
         "👋 Здравствуйте, {name}!\n\n<b>TextileCore</b> — каталог швейных фабрик. Заказывайте одежду напрямую у производителя.\n\n🛍 Нажмите «Открыть магазин»: выберите товар, добавьте в корзину и оплатите.\n📦 О статусе заказа мы сообщим сюда.",
         "👋 Hello, {name}!\n\n<b>TextileCore</b> is a catalog of garment factories. Order clothing directly from the manufacturer.\n\n🛍 Tap “Open shop”: pick a product, add it to the cart and pay.\n📦 We will send your order status updates here."),

@@ -26,8 +26,8 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  user: User | null; // null — yangi foydalanuvchi
-  factories: Factory[]; // faqat SUPER_ADMIN uchun kerak
+  user: User | null;
+  factories: Factory[];
   onClose: () => void;
   onSaved: () => void;
 }
@@ -43,12 +43,10 @@ export default function UserFormDialog({ open, user, factories, onClose, onSaved
     phone: '',
     password: '',
     role: 'WORKER' as Role,
-    // 'new' — super admin zavod egasi bilan birga yangi fabrika ochadi
     factory_id: '' as number | '' | 'new',
     factory_name: '',
     is_active: true,
   });
-  // Yaratilgandan keyin egaga beriladigan login/parol (bir marta ko'rsatiladi)
   const [created, setCreated] = useState<{ login: string; password: string; factory: string } | null>(null);
   const [error, setError] = useState('');
   const save = useSaveAction();
@@ -62,7 +60,6 @@ export default function UserFormDialog({ open, user, factories, onClose, onSaved
       email: user?.email ?? '',
       phone: user?.phone ?? '',
       password: '',
-      // Super admin odatda zavod egalarini qo'shadi
       role: user?.role ?? (isSuperAdmin ? 'FACTORY_OWNER' : 'WORKER'),
       factory_id: user?.factory_id ?? (isSuperAdmin ? 'new' : ''),
       factory_name: '',
@@ -73,7 +70,6 @@ export default function UserFormDialog({ open, user, factories, onClose, onSaved
   }, [open, user, isSuperAdmin, save.reset]);
 
   const needsFactory = isSuperAdmin && form.role !== 'SUPER_ADMIN';
-  // Yangi fabrika faqat yangi zavod egasi bilan birga ochiladi
   const canCreateFactory = isSuperAdmin && !user && form.role === 'FACTORY_OWNER';
   const newFactory = canCreateFactory && form.factory_id === 'new';
 

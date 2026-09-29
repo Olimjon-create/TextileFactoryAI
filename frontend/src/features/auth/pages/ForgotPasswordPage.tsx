@@ -6,7 +6,6 @@ import { getErrorMessage } from '@/shared/api/client';
 import { isValidEmail } from '@/shared/utils/validators';
 import { authApi } from '../api';
 
-/** Parolni unutdingizmi? — emailga tiklash havolasi yuboriladi */
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);

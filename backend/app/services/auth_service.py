@@ -59,7 +59,6 @@ def login_with_google(db: Session, identity: GoogleIdentity) -> User:
     user = User(
         email=identity.email,
         full_name=identity.full_name,
-        # Parol bilan kirib bo'lmaydigan tasodifiy parol; kerak bo'lsa keyin o'rnatiladi
         hashed_password=hash_password(secrets.token_urlsafe(32)),
         role=Role.FACTORY_OWNER,
         factory=factory,

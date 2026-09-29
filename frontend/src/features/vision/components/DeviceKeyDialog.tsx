@@ -4,7 +4,6 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import type { DeviceWithKey } from '../types';
 import { tr } from '@/i18n';
 
-/** Qurilma kaliti faqat shu yerda bir marta ko'rsatiladi (bazada faqat xeshi saqlanadi) */
 export default function DeviceKeyDialog({ device, onClose }: { device: DeviceWithKey | null; onClose: () => void }) {
   const [copied, setCopied] = useState('');
   if (!device) return null;

@@ -15,7 +15,6 @@ interface Props {
   onSaved: (order: Order) => void;
 }
 
-/** Topshirish muddati, yetkazib berish manzili va izoh */
 export default function OrderEditDialog({ open, order, onClose, onSaved }: Props) {
   const [dueDate, setDueDate] = useState('');
   const [address, setAddress] = useState('');

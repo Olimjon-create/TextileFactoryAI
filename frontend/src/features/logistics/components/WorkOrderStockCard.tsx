@@ -27,7 +27,6 @@ import { useLogisticsPermissions } from '../permissions';
 import type { WorkOrderStock } from '../types';
 import { tr } from '@/i18n';
 
-/** Ish buyurtmasi: qadoqlangan mahsulotni tayyor mahsulot omboriga topshirish */
 export default function WorkOrderStockCard({ woId, packedKey }: { woId: number; packedKey: number }) {
   const { canView, canReceive } = useLogisticsPermissions();
   const toast = useToast();
@@ -43,7 +42,6 @@ export default function WorkOrderStockCard({ woId, packedKey }: { woId: number; 
   const load = useCallback(() => {
     if (canView) logisticsApi.workOrderStock(woId).then(setStock).catch(() => setStock(null));
   }, [woId, canView]);
-  // packedKey — qadoqlangan miqdor o'zgarganda qayta yuklash uchun
   useEffect(load, [load, packedKey]);
 
   if (!stock || stock.packed === 0) return null;

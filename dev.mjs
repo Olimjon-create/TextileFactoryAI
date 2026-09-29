@@ -1,6 +1,3 @@
-// `npm run dev` (loyiha ildizida): backend (:8001) va frontend (:5180) ni bitta oynada ishga tushiradi.
-// Backend allaqachon ishlab turgan bo'lsa (masalan ishga-tushirish.bat orqali), faqat frontend yoqiladi.
-// To'xtatish: Ctrl+C — ikkalasi ham yopiladi.
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import net from 'node:net';
@@ -21,7 +18,6 @@ function listening(port, host) {
   });
 }
 
-// Vite "localhost" da tinglaydi — Windows'da bu ko'pincha faqat IPv6 (::1), shuning uchun ikkalasi tekshiriladi
 async function portBusy(port) {
   return (await listening(port, '127.0.0.1')) || (await listening(port, '::1'));
 }
@@ -41,7 +37,6 @@ function shutdown(code) {
   stopping = true;
   for (const child of children) {
     if (child.exitCode !== null) continue;
-    // Windows'da uvicorn --reload ichki jarayoni yetim qolmasligi uchun butun daraxtni yopamiz
     if (isWin) spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { stdio: 'ignore' });
     else child.kill('SIGTERM');
   }
@@ -50,10 +45,8 @@ function shutdown(code) {
 process.on('SIGINT', () => shutdown(0));
 process.on('SIGTERM', () => shutdown(0));
 
-// Qo'shimcha argumentlar vite'ga uzatiladi, masalan: npm run dev -- --port 5181
 const viteArgs = process.argv.slice(2);
 
-// Ikkalasi ham band — dastur allaqachon ishlayapti (odatda ishga-tushirish.bat orqali, orqa fonda)
 if (!viteArgs.includes('--port') && (await portBusy(5180)) && (await portBusy(8001))) {
   console.log('\nDastur allaqachon ishlab turibdi: http://localhost:5180');
   console.log("  Orqa fonda ishlayotgan bo'lsa (ishga-tushirish.bat) — shu manzilni oching, qayta yoqish shart emas.");

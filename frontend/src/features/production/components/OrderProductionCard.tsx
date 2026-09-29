@@ -37,7 +37,6 @@ interface OrderLike {
   total_quantity: number;
 }
 
-/** Buyurtma sahifasida: ishlab chiqarishga berish va ish buyurtmalari holati */
 export default function OrderProductionCard({ order, onChanged }: { order: OrderLike; onChanged?: () => void }) {
   const navigate = useNavigate();
   const toast = useToast();

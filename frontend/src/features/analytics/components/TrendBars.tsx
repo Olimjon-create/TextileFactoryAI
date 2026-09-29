@@ -3,9 +3,7 @@ import type { DayPoint } from '../types';
 
 interface Props {
   points: DayPoint[];
-  /** Asosiy ustun rangi (theme palette kaliti) */
   color?: 'primary' | 'success' | 'info' | 'warning';
-  /** extra — ustun ustida qizil qism (masalan, brak) */
   extraLabel?: string;
   format?: (v: number) => string;
   height?: number;
@@ -16,7 +14,6 @@ const dayLabel = (iso: string) => {
   return `${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`;
 };
 
-/** Kunlik ko'rsatkichlar uchun ixcham ustunli diagramma (tashqi kutubxonasiz) */
 export default function TrendBars({ points, color = 'primary', extraLabel, format = (v) => String(v), height = 140 }: Props) {
   const theme = useTheme();
   const max = Math.max(1, ...points.map((p) => p.value + p.extra));

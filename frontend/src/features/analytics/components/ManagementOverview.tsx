@@ -33,7 +33,6 @@ function Tile({ to, onClick, children }: { to?: string; onClick?: () => void; ch
   );
 }
 
-/** Kartalar to'ri: telefonda 2, planshetda 3, kompyuterda 4, juda keng ekranda 6 ustun (12 karta — to'liq qatorlar) */
 export const TILE_GRID = {
   display: 'grid',
   gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(3, 1fr)', lg: 'repeat(4, 1fr)' },
@@ -41,7 +40,6 @@ export const TILE_GRID = {
   gap: { xs: 1.5, sm: 2 },
 } as const;
 
-/** Rahbar dashboardi kartalari: har bir bo'lim backend ruxsat bergan (null emas) bo'lsagina ko'rinadi */
 export default function ManagementOverview({ data, onRevenueClick }: { data: Overview; onRevenueClick?: () => void }) {
   const { sales, production, inventory, finished_goods: fg, procurement, resources } = data;
   const out7 = production?.summary.output_7d ?? [];
@@ -110,7 +108,6 @@ function SectionTitle({ title, subtitle, action }: { title: string; subtitle?: s
 
 const shortDay = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}`;
 
-/** Qadoqlangan mahsulot va brak — 14 kun */
 export function PackedCard({ data }: { data: NonNullable<Overview['production']> }) {
   const total = data.packed_by_day.reduce((s, d) => s + d.value, 0);
   const defects = data.packed_by_day.reduce((s, d) => s + d.extra, 0);
@@ -136,7 +133,6 @@ export function PackedCard({ data }: { data: NonNullable<Overview['production']>
   );
 }
 
-/** Buyurtmalar holati bo'yicha taqsimot */
 export function OrdersStatusCard({ sales }: { sales: NonNullable<Overview['sales']> }) {
   const navigate = useNavigate();
   const statuses = (Object.keys(sales.by_status) as OrderStatus[]).filter((s) => sales.by_status[s]);
@@ -172,7 +168,6 @@ export function OrdersStatusCard({ sales }: { sales: NonNullable<Overview['sales
   );
 }
 
-/** Asosiy brak sabablari — 30 kun */
 export function DefectsCard({ data }: { data: NonNullable<Overview['production']> }) {
   const max = Math.max(1, ...data.top_defects.map((d) => d.quantity));
   return (

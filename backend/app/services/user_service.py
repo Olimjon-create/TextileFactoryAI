@@ -73,7 +73,6 @@ def get_user(db: Session, actor: User, user_id: int) -> User:
 def create_user(db: Session, actor: User, data: UserCreate) -> User:
     new_factory = None
     if data.factory_name and data.factory_id is None:
-        # Super admin zavod egasini yaratayotganda yangi fabrikani ham shu yerda ochadi
         if actor.role != Role.SUPER_ADMIN or data.role != Role.FACTORY_OWNER:
             raise _forbidden("Yangi fabrikani faqat super admin zavod egasi bilan birga ocha oladi")
         _ensure_email_free(db, data.email.lower())

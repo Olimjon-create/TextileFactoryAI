@@ -1,7 +1,6 @@
 import type { MaterialType, MaterialUnit } from '@/features/products/types';
 import type { FactoryBrief } from '@/shared/types';
 
-/** STORE — mijoz katalogdan bergan; MANUAL — menejer CRM'dagi mijoz uchun kiritgan (B2B) */
 export type OrderSource = 'STORE' | 'MANUAL';
 
 export type OrderStatus =
@@ -41,7 +40,6 @@ export interface OrderListItem {
   total_quantity: number;
   source: OrderSource;
   due_date: string | null;
-  /** Muddati o'tgan, hali jo'natilmagan */
   is_overdue: boolean;
   created_at: string;
   paid_at: string | null;
@@ -90,8 +88,6 @@ export interface OrderUpdatePayload {
   comment?: string | null;
 }
 
-// ---------- material ehtiyoji ----------
-
 export type RequirementStatus = 'NOT_LINKED' | 'SHORTAGE' | 'ENOUGH' | 'ISSUED' | 'OVERUSED';
 
 export interface MaterialRequirement {
@@ -105,7 +101,6 @@ export interface MaterialRequirement {
   remaining: number;
   available: number;
   shortage: number;
-  /** Yuborilgan xarid buyurtmalarida kelishi kutilayotgan (barcha buyurtmalar uchun) */
   on_order: number;
   variance: number;
   variance_pct: number | null;

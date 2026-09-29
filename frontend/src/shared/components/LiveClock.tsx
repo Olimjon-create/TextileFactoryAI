@@ -8,17 +8,14 @@ import { tr } from '@/i18n';
 const WEEKDAYS = [tr("Yakshanba"), tr("Dushanba"), tr("Seshanba"), tr("Chorshanba"), tr("Payshanba"), tr("Juma"), tr("Shanba")];
 const pad = (n: number) => String(n).padStart(2, '0');
 
-/** Hozirgi sana va vaqt; daqiqa almashganda yangilanadi (soniyasiz — ortiqcha qayta chizish yo'q) */
 function useNow() {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
-    // Keyingi daqiqa boshigacha kutib, keyin har 60 soniyada
     const timeout = setTimeout(() => {
       setNow(new Date());
       interval = setInterval(() => setNow(new Date()), 60_000);
     }, 60_000 - (Date.now() % 60_000));
-    // Uyqu rejimidan/boshqa tabdan qaytganda darhol to'g'rilash
     const onVisible = () => document.visibilityState === 'visible' && setNow(new Date());
     document.addEventListener('visibilitychange', onVisible);
     return () => {
@@ -30,7 +27,6 @@ function useNow() {
   return now;
 }
 
-/** 📅 28.09.2026 · 🕐 22:03 — yuqori paneldagi sana va soat */
 export default function LiveClock({ sx }: { sx?: SxProps<Theme> }) {
   const now = useNow();
   return (
@@ -58,7 +54,6 @@ export default function LiveClock({ sx }: { sx?: SxProps<Theme> }) {
       >
         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.6 }}>
           <CalendarMonthOutlinedIcon />
-          {/* Keng ekranda hafta kuni ham */}
           <Box component="span" sx={{ display: { xs: 'none', lg: 'inline' } }}>
             {WEEKDAYS[now.getDay()]},
           </Box>

@@ -43,7 +43,5 @@ api_router.include_router(audit.router)
 api_router.include_router(uploads.router)
 api_router.include_router(telegram.router)
 api_router.include_router(cron.router)
-# Ochiq (login talab qilinmaydigan) katalog
 api_router.include_router(store.router)
 
-# Keyingi modullar shu yerga ulanadi, masalan:

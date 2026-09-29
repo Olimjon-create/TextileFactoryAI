@@ -32,7 +32,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  customer: Customer | null; // null — yangi mijoz
+  customer: Customer | null;
   onClose: () => void;
   onSaved: (customer: Customer) => void;
 }
@@ -140,7 +140,6 @@ export default function CustomerFormDialog({ open, customer, onClose, onSaved }:
       notes: orNull(form.notes),
     };
     if (needsFactory) payload.factory_id = Number(form.factory_id);
-    // Tahrirlashda kodni bo'shatib bo'lmaydi — bo'sh bo'lsa yubormaymiz
     if (customer && !payload.customer_code) delete (payload as Partial<CustomerPayload>).customer_code;
     try {
       const saved = await save.run(() => (customer ? customersApi.update(customer.id, payload) : customersApi.create(payload)));

@@ -11,8 +11,6 @@ from app.schemas.procurement import ProcurementSummary
 from app.schemas.production import ProductionSummary
 from app.schemas.resources import ResourcesSummary
 
-# ---------- sozlamalar ----------
-
 
 class SettingsOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -31,17 +29,14 @@ class SettingsUpdate(BaseModel):
     low_margin_percent: float | None = Field(default=None, ge=-100, le=100)
 
 
-# ---------- tannarx ----------
-
-
 class CostLine(BaseModel):
     material_id: int
     code: str
     name: str
     unit: str
-    quantity: float  # buyurtmaga chiqarilgan (qaytarilgani ayirilgan)
+    quantity: float
     cost: float
-    unpriced: bool  # narxi noma'lum — tannarxga kirmagan
+    unpriced: bool
 
 
 class LaborLine(BaseModel):
@@ -51,7 +46,7 @@ class LaborLine(BaseModel):
     good: int
     minutes: int
     cost: float
-    unpriced_logs: int  # stavka yoki ish vaqti kiritilmagan yozuvlar
+    unpriced_logs: int
 
 
 class OrderCosting(BaseModel):
@@ -60,8 +55,8 @@ class OrderCosting(BaseModel):
     currency: str
     revenue: float
     ordered_qty: int
-    produced_qty: int  # qadoqlangan
-    material_planned: float  # BOM × miqdor × joriy narx
+    produced_qty: int
+    material_planned: float
     material_actual: float
     labor: float
     overhead_percent: float
@@ -73,10 +68,7 @@ class OrderCosting(BaseModel):
     low_margin: bool
     materials: list[CostLine]
     labor_lines: list[LaborLine]
-    warnings: list[str]  # hisob to'liq emasligi sabablari
-
-
-# ---------- dashboard ----------
+    warnings: list[str]
 
 
 class DayPoint(BaseModel):
@@ -90,14 +82,14 @@ class SalesSection(BaseModel):
     open_orders: int
     overdue: int
     due_7d: int
-    revenue_30d: float  # to'langan buyurtmalar
+    revenue_30d: float
     orders_30d: int
     revenue_by_day: list[DayPoint]
 
 
 class ProductionSection(BaseModel):
     summary: ProductionSummary
-    packed_by_day: list[DayPoint]  # value — qadoqlangan, extra — brak (barcha bosqichlar)
+    packed_by_day: list[DayPoint]
     top_defects: list[dict[str, Any]]
 
 
@@ -108,10 +100,8 @@ class OverviewOut(BaseModel):
     finished_goods: FgSummary | None = None
     procurement: ProcurementSummary | None = None
     resources: ResourcesSummary | None = None
-    material_issued_30d: float | None = None  # moliya: buyurtmalarga chiqarilgan material qiymati
+    material_issued_30d: float | None = None
 
-
-# ---------- hisobotlar ----------
 
 ReportKind = Literal["production", "defects", "employees", "sales", "costing", "inventory", "suppliers"]
 
@@ -137,9 +127,6 @@ class ReportInfo(BaseModel):
     title: str
     description: str
     uses_dates: bool
-
-
-# ---------- bildirishnomalar ----------
 
 
 class Notification(BaseModel):

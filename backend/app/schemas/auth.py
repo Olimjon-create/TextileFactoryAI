@@ -34,7 +34,6 @@ class ChangePasswordRequest(BaseModel):
 
 
 class GoogleLoginRequest(BaseModel):
-    # Google Identity Services qaytargan ID token (JWT)
     credential: str = Field(min_length=20, max_length=4096)
 
 

@@ -8,7 +8,6 @@ export function MachineStatusChip({ machine, size = 'small' }: { machine: Pick<M
   return <Chip size={size} color={MACHINE_STATUS_COLORS[machine.status]} label={MACHINE_STATUS_LABELS[machine.status]} variant={machine.status === 'IDLE' ? 'outlined' : 'filled'} />;
 }
 
-/** Keyingi texnik xizmat: muddati o'tgan — qizil, 7 kun ichida — sariq */
 export function MaintenanceDue({ machine }: { machine: Machine }) {
   if (!machine.next_maintenance_date) {
     return (

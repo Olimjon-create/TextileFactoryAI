@@ -13,7 +13,6 @@ interface AuthContextValue {
   register: (data: RegisterPayload) => Promise<void>;
   logout: () => void;
   hasRole: (...roles: Role[]) => boolean;
-  /** Profil yoki zavod nomi o'zgargach — foydalanuvchini serverdan qayta o'qish */
   refreshUser: () => Promise<void>;
 }
 
@@ -29,7 +28,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  // Sahifa yangilanganda saqlangan token orqali foydalanuvchini tiklash
   useEffect(() => {
     if (!tokenStorage.get()) {
       setInitializing(false);

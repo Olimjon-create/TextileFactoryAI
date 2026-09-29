@@ -11,7 +11,7 @@ from tests.conftest import ADMIN_EMAIL, API, auth, register_owner
 @pytest.fixture()
 def f(client):
     owner, factory_id = register_owner(client, "owner@a.uz", "Audit Tekstil")
-    post = lambda url, body=None: client.post(f"{API}{url}", headers=owner, json=body or {})  # noqa: E731
+    post = lambda url, body=None: client.post(f"{API}{url}", headers=owner, json=body or {})
     product = post("/products", {"name": "Polo", "code": "PL-1", "category": "Polo", "status": "ACTIVE", "price": 1000, "sizes": ["M"]}).json()
     customer = post("/customers", {"name": "Baraka", "customer_type": "COMPANY", "status": "ACTIVE", "phone": "+998901234567"}).json()
     loc = post("/inventory/locations", {"code": "TM", "name": "Tayyor"}).json()
@@ -49,21 +49,18 @@ def test_status_respects_shipments_and_cancel_cascades(client, f):
     f["post"]("/finished-goods/receive", {"work_order_id": wo["id"], "location_id": f["loc"]["id"], "quantity": 10})
     item_id = client.get(f"{API}/orders/{o['id']}/shipping", headers=f["owner"]).json()["lines"][0]["order_item_id"]
     sh = f["post"]("/shipments", {"order_id": o["id"], "items": [{"order_item_id": item_id, "quantity": 4}]}).json()
-    # Tayyorlanayotgan jo'natma bor — qo'lda "Jo'natildi"/"Yakunlandi" qilinmaydi
     assert set_status(client, f, o["id"], "SHIPPED").status_code == 409
     assert set_status(client, f, o["id"], "COMPLETED").status_code == 409
 
-    # Bekor qilish: tayyorlanayotgan jo'natma ham bekor bo'ladi
     o2 = f["order"]()
     wo2 = client.post(f"{API}/orders/{o2['id']}/work-orders", headers=f["owner"], json={}).json()[0]
     f["post"](f"/production/work-orders/{wo2['id']}/logs", {"stage": "CUTTING", "quantity_good": 5})
     assert set_status(client, f, o2["id"], "CANCELLED").status_code == 200
     assert client.get(f"{API}/production/work-orders/{wo2['id']}", headers=f["owner"]).json()["status"] == "CANCELLED"
     r = f["post"](f"/production/work-orders/{wo2['id']}/logs", {"stage": "SEWING", "quantity_good": 1})
-    assert r.status_code == 409  # bekor buyurtmaga ishlab chiqarish davom etmaydi
+    assert r.status_code == 409
     assert client.post(f"{API}/orders/{o2['id']}/payment", headers=f["owner"]).status_code == 409
 
-    # Mahsulot yo'lga chiqqandan keyin buyurtma bekor qilinmaydi
     client.post(f"{API}/shipments/{sh['id']}/ship", headers=f["owner"], json={})
     r = set_status(client, f, o["id"], "CANCELLED")
     assert r.status_code == 409 and "jo'natilgan" in r.json()["detail"]
@@ -87,7 +84,7 @@ def test_payment_after_delivery_completes_order(client, f):
     sh = f["post"]("/shipments", {"order_id": o["id"], "items": [{"order_item_id": item_id, "quantity": 10}]}).json()
     f["post"](f"/shipments/{sh['id']}/ship")
     f["post"](f"/shipments/{sh['id']}/deliver", {"received_by": "Ali"})
-    assert status_of(client, f, o["id"]) == "SHIPPED"  # hali to'lanmagan
+    assert status_of(client, f, o["id"]) == "SHIPPED"
     assert client.post(f"{API}/orders/{o['id']}/payment", headers=f["owner"]).status_code == 200
     assert status_of(client, f, o["id"]) == "COMPLETED"
 
@@ -127,7 +124,7 @@ def test_production_settings_are_validated():
     strong = Settings(ENVIRONMENT="production", JWT_SECRET_KEY="x" * 40, SUPERADMIN_PASSWORD="Strong-pass-12345",
                       PAYMENT_PROVIDER="demo", ALLOW_DEMO_PAYMENTS=True, _env_file=None)
     strong.validate_for_production()
-    Settings(ENVIRONMENT="development", _env_file=None).validate_for_production()  # dev — tekshirilmaydi
+    Settings(ENVIRONMENT="development", _env_file=None).validate_for_production()
 
 
 def test_demo_payment_disabled_in_production(client, f, monkeypatch):
@@ -154,8 +151,8 @@ def test_login_rate_limit_db_backend(client, monkeypatch):
     """Vercel rejimi: hisob bazada — xotira tozalansa ham (boshqa nusxa) cheklov saqlanadi."""
     monkeypatch.setattr(settings, "RATE_LIMIT_ENABLED", True)
     monkeypatch.setattr(settings, "RATE_LIMIT_BACKEND", "db")
-    login = lambda i: client.post(f"{API}/auth/login", json={"email": "victim@a.uz", "password": f"wrong{i}"}).status_code  # noqa: E731
+    login = lambda i: client.post(f"{API}/auth/login", json={"email": "victim@a.uz", "password": f"wrong{i}"}).status_code
     codes = [login(i) for i in range(10)]
-    rate_limit.reset()  # xotira bo'shadi — lekin hisob bazada
+    rate_limit.reset()
     codes.append(login(10))
     assert codes[:10] == [401] * 10 and codes[10] == 429

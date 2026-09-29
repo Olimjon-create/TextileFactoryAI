@@ -17,7 +17,6 @@ from app.core.scope import scoped
 from app.models import AuditLog, User
 from app.schemas.audit import AuditLogOut, AuditLogPage
 
-# Audit jurnalini ko'rish huquqi
 AUDIT_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER)
 
 

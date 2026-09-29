@@ -43,7 +43,6 @@ def _site_url(request: Request) -> str:
 
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(rate_limit.by_ip("forgot", 5, 900))])
 def forgot_password(data: ForgotPasswordRequest, request: Request, db: Session = Depends(get_db)):
-    # Bir email'ga xat bombardimoni bo'lmasin
     rate_limit.hit(f"forgot-email:{data.email.lower()}", 3, 3600)
     password_reset_service.request_reset(db, data.email, _site_url(request))
 
@@ -61,7 +60,6 @@ def _log_login(db: Session, user: User, request: Request, method: str) -> None:
 
 @router.post("/login", response_model=TokenResponse, dependencies=[Depends(rate_limit.by_ip("login", 30, 300))])
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    # Bitta akkauntga parol tanlashga qarshi (IP almashtirilsa ham)
     rate_limit.hit(f"login-email:{data.email.lower()}", 10, 900)
     user = auth_service.authenticate(db, data.email, data.password)
     _log_login(db, user, request, "parol")

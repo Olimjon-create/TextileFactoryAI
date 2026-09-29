@@ -22,20 +22,20 @@ if TYPE_CHECKING:
 
 
 class ProductMovementType(str, enum.Enum):
-    PRODUCTION = "PRODUCTION"  # ishlab chiqarishdan omborga qabul (+), ish buyurtmasi bo'yicha
-    SHIPMENT = "SHIPMENT"  # mijozga jo'natildi (−)
-    RETURN = "RETURN"  # mijozdan qaytdi (+)
-    WRITE_OFF = "WRITE_OFF"  # hisobdan chiqarildi: shikast, yo'qotish (−)
-    ADJUSTMENT = "ADJUSTMENT"  # inventarizatsiya natijasi (±)
-    RECEIPT = "RECEIPT"  # qo'lda kirim: tashqaridan kelgan / boshlang'ich qoldiq (+)
-    TRANSFER_OUT = "TRANSFER_OUT"  # boshqa joyga ko'chirildi (−)
-    TRANSFER_IN = "TRANSFER_IN"  # boshqa joydan keldi (+)
+    PRODUCTION = "PRODUCTION"
+    SHIPMENT = "SHIPMENT"
+    RETURN = "RETURN"
+    WRITE_OFF = "WRITE_OFF"
+    ADJUSTMENT = "ADJUSTMENT"
+    RECEIPT = "RECEIPT"
+    TRANSFER_OUT = "TRANSFER_OUT"
+    TRANSFER_IN = "TRANSFER_IN"
 
 
 class ShipmentStatus(str, enum.Enum):
-    PREPARING = "PREPARING"  # tayyorlanmoqda — qatorlar o'zgartiriladi, ombordan hali chiqmagan
-    SHIPPED = "SHIPPED"  # yo'lda — ombordan chiqdi
-    DELIVERED = "DELIVERED"  # mijoz qabul qildi
+    PREPARING = "PREPARING"
+    SHIPPED = "SHIPPED"
+    DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
 
 
@@ -47,7 +47,6 @@ class ProductStockMovement(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), index=True)
-    # Tarixi bor mahsulot/joyni o'chirib bo'lmaydi — arxivlanadi / nofaol qilinadi
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id", ondelete="RESTRICT"))
     size: Mapped[str | None] = mapped_column(String(30))
     color: Mapped[str | None] = mapped_column(String(30))
@@ -72,21 +71,21 @@ class Shipment(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), index=True)
-    number: Mapped[str] = mapped_column(String(20), index=True)  # SH-000001
+    number: Mapped[str] = mapped_column(String(20), index=True)
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"), index=True)
     status: Mapped[ShipmentStatus] = mapped_column(
         Enum(ShipmentStatus, name="shipment_status"), default=ShipmentStatus.PREPARING, index=True
     )
     planned_date: Mapped[date | None] = mapped_column(Date, index=True)
     delivery_address: Mapped[str | None] = mapped_column(String(300))
-    carrier: Mapped[str | None] = mapped_column(String(100))  # tashuvchi kompaniya yoki "o'z transporti"
+    carrier: Mapped[str | None] = mapped_column(String(100))
     vehicle_no: Mapped[str | None] = mapped_column(String(30))
     driver_name: Mapped[str | None] = mapped_column(String(100))
     driver_phone: Mapped[str | None] = mapped_column(String(50))
     tracking_no: Mapped[str | None] = mapped_column(String(60))
     shipped_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    received_by: Mapped[str | None] = mapped_column(String(100))  # mijoz tomonida kim qabul qildi
+    received_by: Mapped[str | None] = mapped_column(String(100))
     notes: Mapped[str | None] = mapped_column(Text)
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
 

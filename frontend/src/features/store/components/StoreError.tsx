@@ -13,7 +13,6 @@ interface Props {
   showBack?: boolean;
 }
 
-/** Katalog mijozlar uchun — texnik tafsilotlarsiz, tushunarli xabar va "Qayta urinish" */
 export default function StoreError({ error, onRetry, showBack }: Props) {
   const unavailable = isServerUnavailable(error);
   const Icon = unavailable ? CloudOffOutlinedIcon : SearchOffOutlinedIcon;

@@ -65,5 +65,5 @@ def test_refuses_to_duplicate_without_replace(source, monkeypatch):
         run(monkeypatch, "--source", source)
     run(monkeypatch, "--source", source, "--replace")
     with SessionLocal() as db:
-        assert db.get(Factory, 7).logo_url == "/media/tfai-test-logo.png"  # Supabase sozlanmagan — o'zgarmaydi
+        assert db.get(Factory, 7).logo_url == "/media/tfai-test-logo.png"
         assert len(db.scalars(select(User)).all()) == 1

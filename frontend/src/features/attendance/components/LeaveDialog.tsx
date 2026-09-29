@@ -28,7 +28,6 @@ type Picked = Pick<Employee, 'id' | 'full_name' | 'employee_code' | 'phone'> | E
 
 interface Props {
   open: boolean;
-  /** Oldindan tanlangan xodim va sana (kunlik jadvaldagi "Javob berish" dan) */
   employee?: EmployeeBrief | null;
   date?: string;
   canApprove: boolean;

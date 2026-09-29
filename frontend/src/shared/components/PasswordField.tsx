@@ -4,7 +4,6 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { tr } from '@/i18n';
 
-/** Parol maydoni: ko'z ikonkasi bilan parolni ko'rsatish/yashirish */
 export default function PasswordField(props: Omit<TextFieldProps, 'type'>) {
   const [visible, setVisible] = useState(false);
   const label = visible ? tr("Parolni yashirish") : tr("Parolni ko'rsatish");
@@ -25,7 +24,6 @@ export default function PasswordField(props: Omit<TextFieldProps, 'type'>) {
                   edge="end"
                   size="small"
                   onClick={() => setVisible((v) => !v)}
-                  // Bosilganda fokus maydondan ketmasin
                   onMouseDown={(e) => e.preventDefault()}
                 >
                   {visible ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}

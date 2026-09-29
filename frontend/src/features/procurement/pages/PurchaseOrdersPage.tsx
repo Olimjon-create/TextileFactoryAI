@@ -68,7 +68,6 @@ export default function PurchaseOrdersPage() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  // Buyurtma sahifasidan "Xarid qilish" bilan kelinganda forma oldindan to'ldiriladi
   const incoming = (location.state as { prefill?: PurchasePrefill } | null)?.prefill ?? null;
   const [prefill, setPrefill] = useState<PurchasePrefill | null>(incoming);
   const [formOpen, setFormOpen] = useState(!!incoming && canEdit);

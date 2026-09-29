@@ -28,7 +28,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { user, hasRole } = useAuth();
   const { newCount } = useNewOrders();
   const { pathname } = useLocation();
-  // Zavod xodimi — o'z zavodi; super admin — tizimda yagona zavod bo'lsa (dastur bitta zavodga o'rnatilgan)
   const [onlyFactory, setOnlyFactory] = useState<string | null>(null);
   const isSuper = user?.role === 'SUPER_ADMIN';
   useEffect(() => {
@@ -41,7 +40,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const factoryName = user?.factory?.name ?? (isSuper ? onlyFactory : null);
 
   const matches = (path: string) => (path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(`${path}/`));
-  // Bir nechta band mos kelsa (/production va /production/kpi) — faqat eng aniq (uzun) yo'l faol
   const activePath = [...NAVIGATION.flatMap((s) => s.items), ...BOTTOM_NAVIGATION]
     .filter((item) => !item.external && matches(item.path))
     .reduce<string | null>((best, item) => (best === null || item.path.length > best.length ? item.path : best), null);
@@ -73,7 +71,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             bgcolor: active ? alpha(primary, 0.12) : alpha(theme.palette.text.primary, 0.04),
             color: active ? 'primary.main' : 'text.primary',
           },
-          // Faol band chap tomonida ingichka "ip" chizig'i
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -130,7 +127,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             )}
           </Box>
         </Box>
-        {/* Qaysi zavod — nom tagida (zavod o'zgartirilsa Sozlamalar → Zavod) */}
         {factoryName && (
           <Box
             title={factoryName}
@@ -220,7 +216,6 @@ export default function Sidebar({ mobileOpen, onMobileClose }: Props) {
   const bg = SIDEBAR_BG[theme.palette.mode];
   return (
     <Box component="nav" sx={{ width: { lg: SIDEBAR_WIDTH + SHELL_GAP }, flexShrink: { lg: 0 } }}>
-      {/* Mobil / planshet */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -233,7 +228,6 @@ export default function Sidebar({ mobileOpen, onMobileClose }: Props) {
       >
         <SidebarContent onNavigate={onMobileClose} />
       </Drawer>
-      {/* Desktop — ekran chetidan ajralgan "suzuvchi" panel */}
       <Drawer
         variant="permanent"
         open

@@ -1,11 +1,6 @@
 import { alpha, createTheme, type PaletteMode, type Theme } from '@mui/material/styles';
 import { tr } from '@/i18n';
 
-/**
- * Mijozlar katalogi uchun moda do'koni uslubidagi mavzu.
- * Ranglar — 2025–2026 trendlari: Pantone 2025 "Mocha Mousse" (asosiy), Pantone 2026 "Cloud Dancer" (fon),
- * espresso (matn) va sage (qo'shimcha). Xodimlar paneli o'zining ERP mavzusida qoladi.
- */
 const palettes = {
   light: {
     primary: { main: '#a47864', light: '#c49a86', dark: '#7d5a4a', contrastText: '#ffffff' },
@@ -25,14 +20,12 @@ const palettes = {
 
 export const SERIF = tr("\"Playfair Display\", Georgia, \"Times New Roman\", serif");
 
-/** "Shisha" (glass) sirt — blur qilingan fon ustida kontent o'qiladigan bo'lsin */
 export const glass = (theme: Theme, opacity = 0.72) => ({
   backgroundColor: alpha(theme.palette.background.paper, opacity),
   backdropFilter: 'blur(18px) saturate(140%)',
   WebkitBackdropFilter: 'blur(18px) saturate(140%)',
 });
 
-/** Ilova mavzusi ustiga katalog uslubini qo'shadi (Light/Dark rejim saqlanadi) */
 export function createStoreTheme(base: Theme): Theme {
   const mode: PaletteMode = base.palette.mode;
   const p = palettes[mode];
@@ -55,7 +48,6 @@ export function createStoreTheme(base: Theme): Theme {
     components: {
       MuiButton: {
         styleOverrides: {
-          // Moda do'konlaridagidek yumaloq "pill" tugmalar
           root: { borderRadius: 999, paddingInline: 18 },
           containedPrimary: {
             boxShadow: `0 8px 20px ${alpha(p.primary.main, 0.28)}`,
@@ -71,8 +63,6 @@ export function createStoreTheme(base: Theme): Theme {
             border: `1px solid ${alpha('#ffffff', mode === 'dark' ? 0.06 : 0.6)}`,
             boxShadow: `0 10px 30px ${alpha('#2b211c', mode === 'dark' ? 0.35 : 0.08)}`,
             transition: 'transform 0.35s cubic-bezier(.2,.7,.2,1), box-shadow 0.35s ease, border-color 0.35s ease',
-            // Sichqoncha borganda: karta sal ko'tariladi, soya chuqurlashadi, cheti mokko rangda yonadi.
-            // Faqat sichqonchali qurilmalarda — telefonda "yopishib qolgan" hover bo'lmasin
             '@media (hover: hover) and (pointer: fine)': {
               '&:hover': {
                 transform: 'translateY(-4px)',

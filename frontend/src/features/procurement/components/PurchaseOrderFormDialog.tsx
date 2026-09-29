@@ -31,7 +31,6 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  /** Tahrirlash (faqat qoralama) */
   po?: PurchaseOrderDetail | null;
   prefill?: PurchasePrefill | null;
   supplierId?: number | null;

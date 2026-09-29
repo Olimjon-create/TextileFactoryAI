@@ -11,7 +11,6 @@ from app.models.customer import CustomerStatus, CustomerType
 from app.schemas.customer import CustomerCreate, CustomerPage, CustomerStats, CustomerUpdate
 from app.core.i18n import t
 
-# Mijozlar ro'yxati va ma'lumotlarini ko'ra oladigan rollar (WORKER — yo'q)
 CUSTOMER_VIEW_ROLES = (
     Role.SUPER_ADMIN,
     Role.FACTORY_OWNER,
@@ -20,13 +19,11 @@ CUSTOMER_VIEW_ROLES = (
     Role.WAREHOUSE_MANAGER,
     Role.QUALITY_MANAGER,
 )
-# Mijoz yaratish / tahrirlash / o'chirish huquqi
 CUSTOMER_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER)
 
 AUTO_CODE_PREFIX = "CUS-"
 _AUTO_CODE_RE = re.compile(rf"^{AUTO_CODE_PREFIX}(\d+)$")
 
-# Bo'shatib bo'lmaydigan maydonlar: None kelsa "o'zgartirmaslik" deb qabul qilinadi
 _REQUIRED_FIELDS = {"name", "customer_code", "customer_type", "status"}
 
 
@@ -49,7 +46,7 @@ def _get(db: Session, actor: User, customer_id: int) -> Customer:
 
 def _resolve_factory_id(db: Session, actor: User, factory_id: int | None) -> int:
     if actor.role != Role.SUPER_ADMIN:
-        return actor.factory_id  # type: ignore[return-value]
+        return actor.factory_id
     if factory_id is None:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Fabrikani tanlang")
     if db.get(Factory, factory_id) is None:
@@ -82,7 +79,6 @@ def _commit(db: Session) -> None:
     try:
         db.commit()
     except IntegrityError:
-        # Parallel so'rovlar bir xil kodni olsa — unique constraint himoya qiladi
         db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "Bu kodli mijoz allaqachon mavjud")
 

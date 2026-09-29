@@ -11,7 +11,6 @@ class Role(str, enum.Enum):
     WORKER = "WORKER"
 
 
-# Yuqori darajadagi rol faqat o'zidan pastroq darajadagi foydalanuvchilarni boshqaradi.
 ROLE_LEVELS: dict[Role, int] = {
     Role.SUPER_ADMIN: 100,
     Role.FACTORY_OWNER: 80,
@@ -22,7 +21,6 @@ ROLE_LEVELS: dict[Role, int] = {
     Role.WORKER: 10,
 }
 
-# Foydalanuvchilarni boshqarish huquqiga ega rollar
 USER_MANAGER_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER)
 
 

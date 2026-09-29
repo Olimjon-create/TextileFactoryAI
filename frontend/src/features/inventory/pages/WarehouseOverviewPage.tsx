@@ -29,7 +29,6 @@ import { tr } from '@/i18n';
 
 type ChipColor = 'success' | 'warning' | 'info' | 'error' | 'default' | 'secondary';
 
-/** Oxirgi harakatlar: materiallar va tayyor mahsulot bitta ro'yxatda */
 interface FeedItem {
   key: string;
   at: string;
@@ -80,7 +79,6 @@ interface Data {
   productsCount: number;
 }
 
-/** Ombor: materiallar va tayyor mahsulot bo'yicha umumiy holat, ogohlantirishlar va tezkor amallar */
 export default function WarehouseOverviewPage() {
   const navigate = useNavigate();
   const canEdit = useCanEditInventory();
@@ -103,7 +101,6 @@ export default function WarehouseOverviewPage() {
       const feed = [...mMoves.items.map(fromMaterial), ...pMoves.items.map(fromProduct)]
         .sort((a, b) => b.at.localeCompare(a.at))
         .slice(0, 8);
-      // Avval tugaganlar, keyin kam qolganlar
       setData({ inv, fg, lowMaterials: [...out.items, ...low.items].slice(0, 6), topStock: stock.items, feed, productsCount: products.length });
       setError('');
     } catch (e) {
@@ -151,7 +148,6 @@ export default function WarehouseOverviewPage() {
       />
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      {/* Birinchi sozlash: nima qilinganini va keyingi qadamni ko'rsatadi */}
       {steps && !setupDone && (
         <Card sx={{ mb: 2.5 }}>
           <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>

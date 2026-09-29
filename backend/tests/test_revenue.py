@@ -9,7 +9,7 @@ from app.models.order import OrderStatus, PaymentStatus
 from app.services import revenue_service
 from tests.conftest import API, add_user, register_owner
 
-TODAY = date(2026, 9, 26)  # shanba
+TODAY = date(2026, 9, 26)
 
 
 def _order(factory_id: int, paid_at: datetime | None, amount: float, status=OrderStatus.COMPLETED, paid=PaymentStatus.PAID):
@@ -25,14 +25,14 @@ def test_revenue_periods(client, monkeypatch):
     monkeypatch.setattr(revenue_service, "_today", lambda: TODAY)
     owner, fid = register_owner(client, "rev@t.uz", "Tushum Tekstil")
     utc = timezone.utc
-    _order(fid, datetime(2026, 9, 26, 5, 0, tzinfo=utc), 1_000_000)  # bugun 10:00 (Toshkent)
-    _order(fid, datetime(2026, 9, 25, 20, 30, tzinfo=utc), 500_000)  # UTC bo'yicha 25-sen, Toshkentda 26-sen 01:30
-    _order(fid, datetime(2026, 9, 22, 8, 0, tzinfo=utc), 200_000)  # shu hafta dushanba
-    _order(fid, datetime(2026, 9, 2, 8, 0, tzinfo=utc), 300_000)  # shu oy
-    _order(fid, datetime(2026, 3, 10, 8, 0, tzinfo=utc), 400_000)  # shu yil
-    _order(fid, datetime(2025, 5, 10, 8, 0, tzinfo=utc), 700_000)  # o'tgan yil
-    _order(fid, datetime(2026, 9, 26, 6, 0, tzinfo=utc), 9_999_999, paid=PaymentStatus.PENDING)  # to'lanmagan — hisobga olinmaydi
-    get = lambda period: client.get(f"{API}/dashboard/revenue", headers=owner, params={"period": period}).json()  # noqa: E731
+    _order(fid, datetime(2026, 9, 26, 5, 0, tzinfo=utc), 1_000_000)
+    _order(fid, datetime(2026, 9, 25, 20, 30, tzinfo=utc), 500_000)
+    _order(fid, datetime(2026, 9, 22, 8, 0, tzinfo=utc), 200_000)
+    _order(fid, datetime(2026, 9, 2, 8, 0, tzinfo=utc), 300_000)
+    _order(fid, datetime(2026, 3, 10, 8, 0, tzinfo=utc), 400_000)
+    _order(fid, datetime(2025, 5, 10, 8, 0, tzinfo=utc), 700_000)
+    _order(fid, datetime(2026, 9, 26, 6, 0, tzinfo=utc), 9_999_999, paid=PaymentStatus.PENDING)
+    get = lambda period: client.get(f"{API}/dashboard/revenue", headers=owner, params={"period": period}).json()
 
     day = get("day")
     assert len(day["buckets"]) == 30 and day["buckets"][-1]["start"] == "2026-09-26" and day["buckets"][-1]["current"]

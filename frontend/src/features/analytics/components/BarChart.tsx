@@ -4,16 +4,11 @@ import { tr } from '@/i18n';
 
 export interface BarDatum {
   key: string;
-  /** O'q ostidagi qisqa yozuv */
   label: string;
-  /** Maslahat (tooltip) sarlavhasi */
   fullLabel?: string;
   value: number;
-  /** Ustun ustidagi qo'shimcha qism (masalan, brak) */
   extra?: number;
-  /** Joriy (tugamagan) davr — boshqacha ko'rinadi */
   current?: boolean;
-  /** Maslahatdagi qo'shimcha qator */
   note?: string;
 }
 
@@ -21,17 +16,13 @@ interface Props {
   data: BarDatum[];
   height?: number;
   color?: 'primary' | 'secondary' | 'success' | 'info' | 'warning';
-  /** Maslahatdagi qiymat formati */
   format?: (v: number) => string;
-  /** Y o'qi yozuvlari formati (qisqa) */
   axisFormat?: (v: number) => string;
   extraLabel?: string;
   emptyText?: ReactNode;
-  /** Kichik (dashboard kartasi) yoki katta (batafsil) ko'rinish */
   compact?: boolean;
 }
 
-/** Y o'qi: yaxlit maksimum va uni teng, yaxlit qadamlarga bo'ladigan chiziqlar soni (5 mln → 0,1,2,3,4,5) */
 function niceScale(v: number): { max: number; divisions: number } {
   if (v <= 0) return { max: 1, divisions: 4 };
   const pow = 10 ** Math.floor(Math.log10(v));
@@ -40,7 +31,6 @@ function niceScale(v: number): { max: number; divisions: number } {
   return { max: step * pow, divisions: step === 1 || step === 2 ? 4 : 5 };
 }
 
-/** Tashqi kutubxonasiz, o'lchamga moslashadigan ustunli diagramma (o'qlar, to'r chiziqlari, maslahat) */
 export default function BarChart({
   data,
   height = 220,
@@ -77,8 +67,6 @@ export default function BarChart({
   const slot = chartW / n;
   const barW = Math.max(2, Math.min(slot * (compact ? 0.62 : 0.66), 56));
   const ticks = Array.from({ length: divisions + 1 }, (_, i) => i / divisions);
-  // X yozuvlari bir-birining ustiga chiqmasin: oxirgi (joriy) davr doim ko'rinadi,
-  // unga juda yaqin oddiy yozuv esa tashlab ketiladi
   const labelEvery = Math.max(1, Math.ceil(n / Math.max(1, Math.floor(chartW / (compact ? 44 : 52)))));
   const showLabel = (i: number) => i === n - 1 || (i % labelEvery === 0 && n - 1 - i >= labelEvery);
   const y = (v: number) => padT + chartH - (v / max) * chartH;
@@ -100,14 +88,12 @@ export default function BarChart({
             const cx = padL + slot * i + slot / 2;
             const v = d.value + (d.extra ?? 0);
             const top = y(v);
-            // Juda kichik qiymat ham ko'rinsin (kamida 3px), lekin nuqtaga aylanmasin
             const bh = v > 0 ? Math.max(padT + chartH - top, 3) : 0;
             const eh = d.extra ? (d.extra / max) * chartH : 0;
             const active = hover === i;
             const fill = d.current ? alpha(main, 0.55) : main;
             return (
               <g key={d.key} onMouseEnter={() => setHover(i)} onClick={() => setHover(i)} style={{ cursor: 'default' }}>
-                {/* Sichqoncha uchun butun ustun balandligidagi ko'rinmas maydon */}
                 <rect x={padL + slot * i} y={padT} width={slot} height={chartH} fill={active ? alpha(main, 0.07) : 'transparent'} rx={6} />
                 {bh > 0 && (
                   <>

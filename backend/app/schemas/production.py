@@ -13,15 +13,12 @@ class Ref(BaseModel):
     name: str
 
 
-# ---------- ish buyurtmasi ----------
-
-
 class WorkOrderCreate(BaseModel):
     product_id: int
     quantity: int = Field(ge=1, le=1_000_000)
     size: str | None = Field(default=None, max_length=30)
     color: str | None = Field(default=None, max_length=30)
-    order_item_id: int | None = None  # buyurtma qatoriga bog'lash (buyurtma avtomatik aniqlanadi)
+    order_item_id: int | None = None
     line_id: int | None = None
     planned_start: date | None = None
     planned_end: date | None = None
@@ -40,7 +37,7 @@ class WorkOrdersFromOrder(BaseModel):
 
     line_id: int | None = None
     planned_start: date | None = None
-    planned_end: date | None = None  # bo'sh — buyurtmaning topshirish muddati
+    planned_end: date | None = None
     overcut_pct: float = Field(default=0, ge=0, le=50)
 
 
@@ -63,10 +60,9 @@ class StageProgress(BaseModel):
     stage: ProductionStage
     good: int
     defect: int
-    # Shu bosqichga kelgan (qayta ishlash mumkin bo'lgan) miqdor: kesish — reja (+ortiqcha kesish), qolganlari — oldingi bosqichning yaroqlisi
     available: int
-    remaining: int  # available − (good + defect)
-    defect_rate: float | None  # defect / (good + defect) × 100
+    remaining: int
+    defect_rate: float | None
 
 
 class WorkOrderOut(BaseModel):
@@ -93,10 +89,10 @@ class WorkOrderOut(BaseModel):
     completed_at: datetime | None
     created_at: datetime
     progress: list[StageProgress]
-    current_stage: ProductionStage | None  # hali tugallanmagan birinchi bosqich
-    finished: int  # qadoqlangan (tayyor) dona
-    percent: float  # finished / quantity × 100
-    is_late: bool  # rejadagi tugash sanasi o'tgan, lekin hali tugallanmagan
+    current_stage: ProductionStage | None
+    finished: int
+    percent: float
+    is_late: bool
 
 
 class WorkOrderPage(BaseModel):
@@ -112,12 +108,12 @@ class LogCreate(BaseModel):
     fabric_used: float | None = Field(default=None, ge=0, le=10_000_000)
     fabric_waste: float | None = Field(default=None, ge=0, le=10_000_000)
     duration_minutes: int | None = Field(default=None, ge=0, le=24 * 60)
-    work_date: date | None = None  # bo'sh — bugun
+    work_date: date | None = None
     employee_id: int | None = None
     machine_id: int | None = None
-    line_id: int | None = None  # bo'sh — xodimning yoki ish buyurtmasining liniyasi
-    shift_id: int | None = None  # bo'sh — xodimning smenasi
-    unit_code: str | None = Field(default=None, max_length=40)  # partiya/quti kodi (skanerdan)
+    line_id: int | None = None
+    shift_id: int | None = None
+    unit_code: str | None = Field(default=None, max_length=40)
     source: LogSource = LogSource.MANUAL
     note: str | None = Field(default=None, max_length=500)
 
@@ -173,17 +169,16 @@ class UnitOut(BaseModel):
     product_name: str
     note: str | None
     created_at: datetime
-    # Qaysi bosqichlardan o'tgan (shu partiya/quti bo'yicha yozuvlar)
     stages_done: list[ProductionStage] = []
 
 
 class FabricUsage(BaseModel):
-    planned: float | None  # BOM (mato) × reja × (1 + isrof %)
-    used: float  # kesishda sarflangan
-    waste: float  # kesish chiqindisi
-    waste_pct: float | None  # waste / used × 100
-    per_piece: float | None  # used / kesilgan dona
-    per_piece_planned: float | None  # BOM bo'yicha 1 donaga (isrof bilan)
+    planned: float | None
+    used: float
+    waste: float
+    waste_pct: float | None
+    per_piece: float | None
+    per_piece_planned: float | None
 
 
 class WorkOrderDetail(WorkOrderOut):
@@ -195,11 +190,11 @@ class WorkOrderDetail(WorkOrderOut):
 class TraceResult(BaseModel):
     """Kod bo'yicha qidiruv (QR/shtrix-kod skaneri): nima ekanligi va qayerga o'tish kerakligi."""
 
-    kind: str  # BUNDLE | BOX | WORK_ORDER | ORDER | MATERIAL | MACHINE | SHIPMENT | PURCHASE_ORDER
+    kind: str
     code: str
     title: str
     subtitle: str | None = None
-    path: str  # frontend sahifasi
+    path: str
     work_order: WorkOrderOut | None = None
     unit: UnitOut | None = None
     logs: list[LogOut] = []
@@ -214,10 +209,10 @@ class EmployeeKpi(BaseModel):
     defect: int
     defect_rate: float | None
     daily_norm: int | None
-    norm_total: int | None  # me'yor × ishlagan kunlar
-    efficiency_pct: float | None  # good / norm_total × 100
+    norm_total: int | None
+    efficiency_pct: float | None
     minutes: int
-    per_hour: float | None  # yaroqli dona / soat (vaqt kiritilgan bo'lsa)
+    per_hour: float | None
 
 
 class StageOutput(BaseModel):

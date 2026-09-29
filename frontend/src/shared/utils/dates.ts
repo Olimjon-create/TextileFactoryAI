@@ -1,8 +1,5 @@
-// Sana va vaqt — butun ilovada bir xil: 28.09.2026 va 28.09.2026 18:01 (brauzer tiliga bog'liq emas)
-
 const pad = (n: number) => String(n).padStart(2, '0');
 
-/** "2026-09-28" (faqat sana) mahalliy kun sifatida o'qiladi — UTC tufayli bir kun surilib ketmasin */
 function toDate(value: string | Date): Date {
   if (value instanceof Date) return value;
   return new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value);

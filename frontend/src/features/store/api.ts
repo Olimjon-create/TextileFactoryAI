@@ -8,7 +8,6 @@ import type {
   StoreFeaturedProduct,
 } from './types';
 
-// Ochiq katalog — login talab qilinmaydi
 export const storeApi = {
   factories: (search?: string) =>
     api.get<StoreFactoryCard[]>('/store/factories', { params: { search: search || undefined } }).then((r) => r.data),
@@ -22,7 +21,6 @@ export const storeApi = {
     api
       .post<PublicOrder>('/store/orders/find', { order_number: orderNumber, customer_phone: phone })
       .then((r) => r.data),
-  // Test rejimi: karta raqami serverga yuborilmaydi — faqat oxirgi 4 raqam (chek uchun)
   payDemo: (token: string, cardLast4: string) =>
     api.post<PublicOrder>(`/store/orders/${token}/pay/demo`, { card_last4: cardLast4 }).then((r) => r.data),
 };

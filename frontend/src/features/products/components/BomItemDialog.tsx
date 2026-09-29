@@ -36,7 +36,7 @@ import { tr } from '@/i18n';
 interface Props {
   open: boolean;
   product: Product;
-  item: BOMItem | null; // null — yangi qator
+  item: BOMItem | null;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -48,7 +48,6 @@ export default function BomItemDialog({ open, product, item, onClose, onSaved }:
   const [unit, setUnit] = useState<MaterialUnit>('METER');
   const [waste, setWaste] = useState('0');
   const [notes, setNotes] = useState('');
-  // Ombor katalogidan tanlangan material — nom, tur va birlik undan olinadi (qayta kiritilmaydi)
   const [linked, setLinked] = useState<{ id: number; code: string; label: string } | null>(null);
   const [options, setOptions] = useState<Material[]>([]);
   const [query, setQuery] = useState('');
@@ -76,7 +75,7 @@ export default function BomItemDialog({ open, product, item, onClose, onSaved }:
       inventoryApi
         .materials({ search: query.trim(), is_active: true, factory_id: product.factory_id, limit: 20 })
         .then((r) => setOptions(r.items))
-        .catch(() => setOptions([])); // ombor ko'rish huquqi yo'q — faqat qo'lda kiritiladi
+        .catch(() => setOptions([]));
     }, 250);
     return () => clearTimeout(t);
   }, [open, query, product.factory_id]);

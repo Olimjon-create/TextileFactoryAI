@@ -9,7 +9,6 @@ interface Props extends Omit<ButtonProps, 'color'> {
   savedText?: string;
 }
 
-/** Saqlash tugmasi: bosilganda aylanadi, muvaffaqiyatli bo'lsa yashil "Saqlandi ✓" bo'ladi */
 export default function SaveButton({
   status,
   children = tr("Saqlash"),

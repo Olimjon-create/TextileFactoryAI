@@ -34,15 +34,12 @@ STATUS_UZ = {
 }
 
 
-def C(key: str, label: str, type_: str = "text") -> ReportColumn:  # noqa: N802
+def C(key: str, label: str, type_: str = "text") -> ReportColumn:
     return ReportColumn(key=key, label=label, type=type_)
 
 
 def _range(date_from: date, date_to: date) -> tuple[datetime, datetime]:
     return datetime.combine(date_from, time.min), datetime.combine(date_to + timedelta(days=1), time.min)
-
-
-# ---------- hisobotlar ----------
 
 
 def production(db: Session, actor: User, date_from: date, date_to: date) -> ReportTable:

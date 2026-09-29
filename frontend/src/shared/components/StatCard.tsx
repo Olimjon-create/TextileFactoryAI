@@ -10,7 +10,6 @@ interface Props {
   hint?: string;
 }
 
-/** Telefonda ixcham (2 ustunli to'rga sig'adi), kompyuterda to'liq o'lchamda */
 export default function StatCard({ label, value, icon, color = 'primary.main', hint }: Props) {
   const theme = useTheme();
   const c = resolveColor(theme, color);
@@ -22,7 +21,6 @@ export default function StatCard({ label, value, icon, color = 'primary.main', h
         overflow: 'hidden',
         transition: 'transform .18s ease, box-shadow .18s ease',
         '&:hover': { transform: 'translateY(-2px)' },
-        // Kartaning yuqori chetida rangli ingichka chiziq
         '&::after': {
           content: '""',
           position: 'absolute',

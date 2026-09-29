@@ -16,9 +16,7 @@ import { tr } from '@/i18n';
 
 interface Props {
   open: boolean;
-  /** Qoldiq qatoridan ochilsa — mahsulot va variant tanlangan bo'ladi */
   row?: StockRow | null;
-  /** Oyna qaysi amal bilan ochilsin (standart — kirim) */
   initialKind?: FgMovementInput;
   onClose: () => void;
   onSaved: () => void;
@@ -56,13 +54,11 @@ export default function FgMovementDialog({ open, row, initialKind = 'RECEIPT', o
         setProducts(ps);
         setLocations(ls);
         setProduct(row ? ps.find((p) => p.id === row.product.id) ?? null : null);
-        // Joy bitta bo'lsa yoki qator bitta joyda bo'lsa — o'zi tanlanadi
         setLocationId(row?.locations.length === 1 ? row.locations[0].location.id : ls.length === 1 ? ls[0].id : '');
       })
       .catch((e) => setError(getErrorMessage(e)));
   }, [open, row, initialKind, save.reset]);
 
-  // Tanlangan joy va variantdagi joriy qoldiq (inventarizatsiyada farqni ko'rsatish uchun)
   useEffect(() => {
     if (!open || !product || locationId === '') {
       setCurrent(null);

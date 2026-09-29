@@ -30,9 +30,6 @@ def summary(factory_id: int | None = None, db: Session = Depends(get_db), actor:
     return svc.summary(db, actor, factory_id)
 
 
-# ---------- yetkazib beruvchilar ----------
-
-
 @router.get("/suppliers", response_model=SupplierPage)
 def list_suppliers(
     search: str | None = Query(default=None, max_length=100),
@@ -64,9 +61,6 @@ def update_supplier(supplier_id: int, data: SupplierUpdate, db: Session = Depend
 @router.delete("/suppliers/{supplier_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_supplier(supplier_id: int, db: Session = Depends(get_db), actor: User = Depends(can_edit)):
     svc.delete_supplier(db, actor, supplier_id)
-
-
-# ---------- xarid buyurtmalari ----------
 
 
 @router.get("/purchase-orders", response_model=PurchaseOrderPage)

@@ -34,7 +34,6 @@ interface Props {
 
 const num = (v: string) => (v.trim() === '' ? 0 : Number(v.replace(/\s/g, '').replace(',', '.')));
 
-/** Kelgan tovarni omborga kirim qilish: qolgan miqdor oldindan to'ldiriladi, kelmaganini 0 qiling */
 export default function ReceiveDialog({ open, po, onClose, onSaved }: Props) {
   const [locations, setLocations] = useState<WarehouseLocation[]>([]);
   const [locationId, setLocationId] = useState<number | ''>('');

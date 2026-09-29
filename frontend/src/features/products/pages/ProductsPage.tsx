@@ -131,7 +131,6 @@ export default function ProductsPage() {
 
   const colSpan = 10 + (isSuperAdmin ? 1 : 0);
 
-  // Tahrirlash/o'chirish tugmalari — jadvalda ham, telefon kartalarida ham bir xil
   const rowActions = (p: ProductListItem) => (
     <>
       <Tooltip title={tr("Tahrirlash")}>
@@ -266,7 +265,6 @@ export default function ProductsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Birinchi yuklanishda — jadval qatorlari shaklidagi skeleton */}
               {loading && products.length === 0 && <TableRowsSkeleton cols={colSpan} />}
               {products.map((p) => (
                 <TableRow key={p.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/products/${p.id}`)}>
@@ -314,7 +312,6 @@ export default function ProductsPage() {
         onSaved={(saved) => {
           setFormOpen(false);
           loadCategories();
-          // Yangi mahsulotdan so'ng BOM kiritish uchun batafsil sahifaga o'tamiz
           if (!editing) navigate(`/products/${saved.id}`);
           else load();
         }}

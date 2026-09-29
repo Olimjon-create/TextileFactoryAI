@@ -18,15 +18,12 @@ class Factory(Base, TimestampMixin):
     phone: Mapped[str | None] = mapped_column(String(50))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    # --- Mijozlar katalogi (ochiq do'kon) uchun profil ---
     city: Mapped[str | None] = mapped_column(String(100))
     short_description: Mapped[str | None] = mapped_column(String(200))
     description: Mapped[str | None] = mapped_column(Text)
     logo_url: Mapped[str | None] = mapped_column(String(500))
     cover_url: Mapped[str | None] = mapped_column(String(500))
-    # Katalogda ko'rsatilsinmi
     is_public: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
-    # Telegram bildirishnomalar: ulangan chat va xabarlar tili (uz/ru/en)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(32))
     telegram_lang: Mapped[str | None] = mapped_column(String(2))
 

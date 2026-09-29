@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from app.models.resources import Employee, Machine, ProductionLine, Shift
     from app.models.user import User
 
-# Bosqichlar tartibi (marshrut): har bir bosqich oldingisining yaroqli chiqishidan ko'p ishlamaydi
 STAGE_ROUTE: tuple[ProductionStage, ...] = (
     ProductionStage.CUTTING,
     ProductionStage.SEWING,
@@ -40,14 +39,14 @@ class WorkOrderStatus(str, enum.Enum):
 
 
 class LogSource(str, enum.Enum):
-    MANUAL = "MANUAL"  # xodim/usta qo'lda kiritdi
-    SCANNER = "SCANNER"  # QR/shtrix-kod skaneri orqali
-    CAMERA = "CAMERA"  # kamera/AI sanog'i (Computer Vision)
+    MANUAL = "MANUAL"
+    SCANNER = "SCANNER"
+    CAMERA = "CAMERA"
 
 
 class UnitKind(str, enum.Enum):
-    BUNDLE = "BUNDLE"  # kesishdan chiqqan partiya (to'plam) — tikuvga shu holda boradi
-    BOX = "BOX"  # qadoqlangan quti
+    BUNDLE = "BUNDLE"
+    BOX = "BOX"
 
 
 class WorkOrder(Base, TimestampMixin):
@@ -56,17 +55,15 @@ class WorkOrder(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), index=True)
-    number: Mapped[str] = mapped_column(String(20), index=True)  # WO-000001
+    number: Mapped[str] = mapped_column(String(20), index=True)
     order_id: Mapped[int | None] = mapped_column(ForeignKey("orders.id", ondelete="SET NULL"), index=True)
     order_item_id: Mapped[int | None] = mapped_column(ForeignKey("order_items.id", ondelete="SET NULL"), index=True)
     product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id", ondelete="SET NULL"), index=True)
-    # Mahsulot o'zgarsa/o'chirilsa ham ish buyurtmasi tarixi saqlanadi
     product_name: Mapped[str] = mapped_column(String(200))
     product_code: Mapped[str] = mapped_column(String(50))
     size: Mapped[str | None] = mapped_column(String(30))
     color: Mapped[str | None] = mapped_column(String(30))
-    quantity: Mapped[int] = mapped_column(Integer)  # rejadagi dona
-    # Kesishda rejadan ortiq kesishga ruxsat (%), masalan brak zaxirasi uchun
+    quantity: Mapped[int] = mapped_column(Integer)
     overcut_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=0)
     status: Mapped[WorkOrderStatus] = mapped_column(
         Enum(WorkOrderStatus, name="work_order_status"), default=WorkOrderStatus.PLANNED, index=True
@@ -74,7 +71,7 @@ class WorkOrder(Base, TimestampMixin):
     line_id: Mapped[int | None] = mapped_column(ForeignKey("production_lines.id", ondelete="SET NULL"), index=True)
     planned_start: Mapped[date | None] = mapped_column(Date)
     planned_end: Mapped[date | None] = mapped_column(Date, index=True)
-    priority: Mapped[int] = mapped_column(Integer, default=0)  # katta — muhimroq
+    priority: Mapped[int] = mapped_column(Integer, default=0)
     notes: Mapped[str | None] = mapped_column(Text)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -102,7 +99,6 @@ class ProductionLog(Base):
     quantity_good: Mapped[int] = mapped_column(Integer, default=0)
     quantity_defect: Mapped[int] = mapped_column(Integer, default=0)
     defect_reason: Mapped[str | None] = mapped_column(String(300))
-    # Faqat kesish: sarflangan mato va chiqindi (asosiy mato o'lchov birligida, odatda metr)
     fabric_used: Mapped[Decimal | None] = mapped_column(Numeric(12, 3))
     fabric_waste: Mapped[Decimal | None] = mapped_column(Numeric(12, 3))
     duration_minutes: Mapped[int | None] = mapped_column(Integer)

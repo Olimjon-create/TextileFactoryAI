@@ -17,7 +17,6 @@ import EmployeesCard from '../components/EmployeesCard';
 import RevenueCard from '../components/RevenueCard';
 import { tr } from '@/i18n';
 
-/** Keng ekranda ustunlarga bo'linadigan qator */
 function Row({ children, cols }: { children: ReactNode; cols: { lg: string; xl?: string } }) {
   return (
     <Box
@@ -67,7 +66,6 @@ export default function DashboardPage() {
   const isSuperAdmin = user.role === 'SUPER_ADMIN';
   const visibleRoles = ROLES.filter((r) => isSuperAdmin || r !== 'SUPER_ADMIN');
   const canSeeAttendance = hasRole(...ATTENDANCE_VIEW_ROLES);
-  // Xodimlar ro'yxatini ko'ra olmaydigan (masalan, ombor mudiri) — faqat bugungi davomat
   const sideCard = hasRole(...WORKFORCE_VIEW_ROLES) ? <EmployeesCard /> : canSeeAttendance ? <AttendanceTodayCard /> : null;
   const sales = overview?.sales ?? null;
   const production = overview?.production ?? null;
@@ -81,7 +79,6 @@ export default function DashboardPage() {
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-      {/* Asosiy ko'rsatkichlar (rolga qarab) */}
       {overviewLoading ? (
         <Box sx={{ ...TILE_GRID, mb: 2.5 }}>
           {Array.from({ length: 8 }).map((_, i) => (
@@ -92,7 +89,6 @@ export default function DashboardPage() {
         overview && <ManagementOverview data={overview} onRevenueClick={() => setRevenueOpen(true)} />
       )}
 
-      {/* Tushum + o'ngda xodimlar (bugungi davomat bilan) */}
       {(sales || sideCard) && (
         <Row cols={sales && sideCard ? { lg: tr("2fr 1fr"), xl: tr("5fr 2fr") } : { lg: '1fr' }}>
           {sales && <RevenueCard />}
@@ -100,11 +96,9 @@ export default function DashboardPage() {
         </Row>
       )}
 
-      {/* Ishlab chiqarish va savdo */}
       {(production || sales) && (
         <Row cols={{ lg: production ? tr("3fr 2fr") : '1fr', xl: production && sales ? tr("2fr 1fr 1fr") : undefined }}>
           {production && <PackedCard data={production} />}
-          {/* O'rta ekranda o'ng ustunda ustma-ust, juda keng ekranda — alohida ustunlar */}
           <Box sx={{ display: 'grid', gap: { xs: 1.5, sm: 2 }, '@media (min-width: 1900px)': { display: 'contents' } }}>
             {sales && <OrdersStatusCard sales={sales} />}
             {production && <DefectsCard data={production} />}
@@ -112,7 +106,6 @@ export default function DashboardPage() {
         </Row>
       )}
 
-      {/* Tizim foydalanuvchilari va profil */}
       <Row cols={{ lg: tr("2fr 1fr") }}>
         <Card>
           <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
@@ -144,7 +137,6 @@ export default function DashboardPage() {
                             {count}
                           </Typography>
                         </Box>
-                        {/* Yengil fon — 0 qiymat to'la chiziqdek ko'rinmasin (dark rejimda ham) */}
                         <Box sx={(t) => ({ height: 8, borderRadius: 4, bgcolor: alpha(t.palette.text.primary, 0.07), overflow: 'hidden' })}>
                           <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: 'primary.main', borderRadius: 4, transition: 'width .4s ease' }} />
                         </Box>

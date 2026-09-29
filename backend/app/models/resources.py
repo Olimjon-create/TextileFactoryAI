@@ -35,9 +35,9 @@ if TYPE_CHECKING:
 
 
 class ProductionStage(str, enum.Enum):
-    CUTTING = "CUTTING"  # bichish / kesish
-    SEWING = "SEWING"  # tikuv
-    FINISHING = "FINISHING"  # pardoz: dazmollash, ip qirqish, tugma
+    CUTTING = "CUTTING"
+    SEWING = "SEWING"
+    FINISHING = "FINISHING"
     QUALITY_CONTROL = "QUALITY_CONTROL"
     PACKING = "PACKING"
 
@@ -49,15 +49,15 @@ class Department(str, enum.Enum):
     QUALITY_CONTROL = "QUALITY_CONTROL"
     PACKING = "PACKING"
     WAREHOUSE = "WAREHOUSE"
-    MAINTENANCE = "MAINTENANCE"  # mexaniklar
+    MAINTENANCE = "MAINTENANCE"
     ADMINISTRATION = "ADMINISTRATION"
     OTHER = "OTHER"
 
 
 class PayType(str, enum.Enum):
-    MONTHLY = "MONTHLY"  # oylik maosh
-    HOURLY = "HOURLY"  # soatbay
-    PIECE = "PIECE"  # ishbay (donabay)
+    MONTHLY = "MONTHLY"
+    HOURLY = "HOURLY"
+    PIECE = "PIECE"
 
 
 class EmployeeStatus(str, enum.Enum):
@@ -67,18 +67,18 @@ class EmployeeStatus(str, enum.Enum):
 
 
 class MachineType(str, enum.Enum):
-    CUTTING = "CUTTING"  # bichish mashinasi
-    SPREADING = "SPREADING"  # mato yoyish
-    LOCKSTITCH = "LOCKSTITCH"  # to'g'ri chok (universal)
+    CUTTING = "CUTTING"
+    SPREADING = "SPREADING"
+    LOCKSTITCH = "LOCKSTITCH"
     OVERLOCK = "OVERLOCK"
-    COVERSTITCH = "COVERSTITCH"  # rasposhivalka
-    BUTTONHOLE = "BUTTONHOLE"  # ilgak (petlya)
-    BUTTON_ATTACH = "BUTTON_ATTACH"  # tugma qadash
-    BARTACK = "BARTACK"  # zakrepka
-    EMBROIDERY = "EMBROIDERY"  # kashta
-    PRINTING = "PRINTING"  # bosma
-    PRESS = "PRESS"  # dazmol / press
-    KNITTING = "KNITTING"  # to'quv
+    COVERSTITCH = "COVERSTITCH"
+    BUTTONHOLE = "BUTTONHOLE"
+    BUTTON_ATTACH = "BUTTON_ATTACH"
+    BARTACK = "BARTACK"
+    EMBROIDERY = "EMBROIDERY"
+    PRINTING = "PRINTING"
+    PRESS = "PRESS"
+    KNITTING = "KNITTING"
     OTHER = "OTHER"
 
 
@@ -90,8 +90,8 @@ class MachineStatus(str, enum.Enum):
 
 
 class MaintenanceKind(str, enum.Enum):
-    PREVENTIVE = "PREVENTIVE"  # rejali texnik xizmat
-    REPAIR = "REPAIR"  # ta'mirlash (buzilishdan keyin)
+    PREVENTIVE = "PREVENTIVE"
+    REPAIR = "REPAIR"
 
 
 class ProductionLine(Base, TimestampMixin):
@@ -105,7 +105,6 @@ class ProductionLine(Base, TimestampMixin):
     code: Mapped[str] = mapped_column(String(30))
     name: Mapped[str] = mapped_column(String(100))
     stage: Mapped[ProductionStage] = mapped_column(Enum(ProductionStage, name="production_stage"))
-    # Bir smenada chiqarish quvvati (dona) — rejalashtirish uchun
     capacity_per_shift: Mapped[int | None] = mapped_column(Integer)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
 
@@ -135,16 +134,14 @@ class Employee(Base, TimestampMixin):
     employee_code: Mapped[str] = mapped_column(String(30), index=True)
     full_name: Mapped[str] = mapped_column(String(200), index=True)
     phone: Mapped[str | None] = mapped_column(String(50))
-    position: Mapped[str | None] = mapped_column(String(100))  # lavozim: tikuvchi, bichuvchi, mexanik...
+    position: Mapped[str | None] = mapped_column(String(100))
     department: Mapped[Department] = mapped_column(Enum(Department, name="department"), index=True)
     line_id: Mapped[int | None] = mapped_column(ForeignKey("production_lines.id", ondelete="SET NULL"), index=True)
     shift_id: Mapped[int | None] = mapped_column(ForeignKey("shifts.id", ondelete="SET NULL"), index=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), unique=True)
     hire_date: Mapped[date | None] = mapped_column(Date)
     pay_type: Mapped[PayType] = mapped_column(Enum(PayType, name="pay_type"), default=PayType.MONTHLY)
-    # Maxfiy: oylik (so'm/oy), soatbay (so'm/soat) yoki ishbay (so'm/dona) — tannarx hisobida ishlatiladi
     pay_rate: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
-    # Smenadagi me'yor (dona) — KPI (samaradorlik) shu bilan solishtiriladi
     daily_norm: Mapped[int | None] = mapped_column(Integer)
     status: Mapped[EmployeeStatus] = mapped_column(
         Enum(EmployeeStatus, name="employee_status"), default=EmployeeStatus.ACTIVE, index=True
@@ -162,7 +159,7 @@ class Machine(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     factory_id: Mapped[int] = mapped_column(ForeignKey("factories.id", ondelete="CASCADE"), index=True)
-    code: Mapped[str] = mapped_column(String(30), index=True)  # inventar raqami (QR/shtrix-kod shunga bosiladi)
+    code: Mapped[str] = mapped_column(String(30), index=True)
     name: Mapped[str] = mapped_column(String(150))
     machine_type: Mapped[MachineType] = mapped_column(Enum(MachineType, name="machine_type"), index=True)
     brand: Mapped[str | None] = mapped_column(String(100))
@@ -174,7 +171,6 @@ class Machine(Base, TimestampMixin):
     )
     status_since: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     purchase_date: Mapped[date | None] = mapped_column(Date)
-    # Rejali texnik xizmat har necha kunda (bo'sh — rejalashtirilmagan)
     maintenance_interval_days: Mapped[int | None] = mapped_column(Integer)
     last_maintenance_date: Mapped[date | None] = mapped_column(Date)
     notes: Mapped[str | None] = mapped_column(String(500))
@@ -215,7 +211,6 @@ class MachineMaintenance(Base):
     parts_used: Mapped[str | None] = mapped_column(String(500))
     duration_minutes: Mapped[int | None] = mapped_column(Integer)
     cost: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
-    # Kim bajardi: zavod xodimi (mexanik) yoki tashqi usta nomi
     technician_id: Mapped[int | None] = mapped_column(ForeignKey("employees.id", ondelete="SET NULL"))
     technician_name: Mapped[str | None] = mapped_column(String(200))
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))

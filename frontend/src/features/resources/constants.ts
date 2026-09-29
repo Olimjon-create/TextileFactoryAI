@@ -78,7 +78,6 @@ export const MAINTENANCE_KIND_LABELS: Record<MaintenanceKind, string> = {
 
 export const keys = <T extends string>(r: Record<T, unknown>) => Object.keys(r) as T[];
 
-/** 125 → "2 soat 5 daq" */
 export function formatDuration(minutes: number): string {
   if (minutes < 60) return tr("{0} daq", minutes);
   const days = Math.floor(minutes / 1440);

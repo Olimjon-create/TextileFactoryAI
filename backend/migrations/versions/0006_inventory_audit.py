@@ -126,5 +126,4 @@ def downgrade() -> None:
     op.drop_table("stock_movements")
     op.drop_table("warehouse_locations")
     op.drop_table("materials")
-    # 0006 da yaratilgan enum turi (material_type/material_unit — 0001 niki, ularga tegilmaydi)
     sa.Enum(name="movement_type").drop(op.get_bind(), checkfirst=True)

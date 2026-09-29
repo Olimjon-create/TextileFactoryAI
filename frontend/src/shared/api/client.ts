@@ -16,7 +16,6 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = tokenStorage.get();
   if (token) config.headers.Authorization = `Bearer ${token}`;
-  // Backend xabarlari (xatolar, bildirishnomalar) shu tilda qaytadi
   config.headers['Accept-Language'] = getLang();
   return config;
 });
@@ -34,7 +33,6 @@ api.interceptors.response.use(
   },
 );
 
-// Backend (Pydantic) maydon nomlari -> foydalanuvchiga ko'rinadigan nom
 const FIELD_LABELS: Record<string, string> = {
   email: tr("Email"),
   password: tr("Parol"),
@@ -96,7 +94,6 @@ function translateIssue(issue: ValidationIssue): string {
       return tr("son bo'lishi kerak");
     case 'value_error': {
       const msg = (issue.msg ?? '').replace(/^Value error, /, '');
-      // Email validator inglizcha xabar beradi
       if (/email/i.test(msg) || /@-sign/.test(msg)) return tr("noto'g'ri formatda");
       return msg;
     }
@@ -105,17 +102,14 @@ function translateIssue(issue: ValidationIssue): string {
   }
 }
 
-/** Server javob bermadi yoki ichki xato (5xx) — ya'ni foydalanuvchining aybi emas */
 export function isServerUnavailable(error: unknown): boolean {
   if (!axios.isAxiosError(error)) return false;
   return !error.response || error.response.status >= 500;
 }
 
-/** Backend xatosidan foydalanuvchiga ko'rsatiladigan (o'zbekcha) matnni ajratib oladi */
 export function getErrorMessage(error: unknown, fallback = tr("Xatolik yuz berdi")): string {
   if (axios.isAxiosError(error)) {
     const detail = (error.response?.data as { detail?: unknown } | undefined)?.detail;
-    // Backend xabarlari o'zbekcha: o'zgarmas matnlar lug'at orqali tarjima qilinadi
     if (typeof detail === 'string') return tr(detail);
     if (Array.isArray(detail) && detail.length > 0) {
       const issue = detail[0] as ValidationIssue;
@@ -125,7 +119,6 @@ export function getErrorMessage(error: unknown, fallback = tr("Xatolik yuz berdi
       return label ? `${label} ${text}` : text;
     }
     const statusCode = error.response?.status;
-    // Vite proxy backendga ulana olmasa 500/502/503/504 qaytaradi (detail bo'lmaydi)
     if (!error.response || (statusCode && statusCode >= 500)) {
       return tr("Server bilan bog'lanib bo'lmadi. Backend (port 8001) va PostgreSQL ishlayotganini tekshiring.");
     }

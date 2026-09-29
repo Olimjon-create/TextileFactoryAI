@@ -12,7 +12,6 @@ import { tr } from '@/i18n';
 interface Props {
   movements: Movement[];
   loading: boolean;
-  /** Material sahifasida material ustuni kerak emas */
   showMaterial?: boolean;
   emptyText: string;
 }
@@ -32,7 +31,6 @@ const TypeChip = ({ m }: { m: Movement }) => (
   <Chip size="small" label={MOVEMENT_TYPE_LABELS[m.movement_type]} color={MOVEMENT_TYPE_COLORS[m.movement_type]} variant="outlined" />
 );
 
-/** Harakatlar jurnali: kompyuterda jadval, telefonda kartalar */
 export default function MovementsTable({ movements, loading, showMaterial = true, emptyText }: Props) {
   const isMobile = useIsMobile();
 

@@ -23,7 +23,6 @@ from app.services.customer_service import _next_code as next_customer_code
 from app.core.i18n import t
 from app.services import telegram_service
 
-# Buyurtmalarni ko'ra oladigan rollar
 ORDER_VIEW_ROLES = (
     Role.SUPER_ADMIN,
     Role.FACTORY_OWNER,
@@ -31,11 +30,9 @@ ORDER_VIEW_ROLES = (
     Role.PRODUCTION_MANAGER,
     Role.WAREHOUSE_MANAGER,
 )
-# Buyurtma statusini o'zgartira oladigan rollar
 ORDER_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
 
 
-# Bu holatlardagi buyurtma kechikkan hisoblanmaydi (mijozga yuborilgan yoki yopilgan)
 CLOSED_STATUSES = (OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.CANCELLED)
 
 
@@ -45,9 +42,6 @@ def _is_overdue(order: Order, today: date | None = None) -> bool:
 
 def _digits(phone: str | None) -> str:
     return re.sub(r"\D", "", phone or "")
-
-
-# ---------- to'lov ----------
 
 
 def _link_customer(db: Session, order: Order) -> None:
@@ -92,9 +86,6 @@ def mark_paid(db: Session, order: Order, *, reference: str, card_last4: str | No
                             amount=f"{float(order.total_amount):,.0f} {order.currency}".replace(",", " "))
     telegram_service.notify_customer_paid(order)
     return order
-
-
-# ---------- xodimlar uchun ----------
 
 
 def _visible(query, actor: User):
@@ -212,7 +203,6 @@ def change_status(db: Session, actor: User, order: Order, new: OrderStatus, why:
     order.status = new
 
 
-# Qo'lda o'zgartirishda holatlar faqat oldinga yuradi (bekor qilish — istalgan ochiq holatdan)
 MANUAL_FLOW = (
     OrderStatus.NEW,
     OrderStatus.CONFIRMED,
@@ -284,9 +274,6 @@ def update_status(db: Session, actor: User, order_id: int, new_status: OrderStat
     order.status = new_status
     db.commit()
     return get_order(db, actor, order.id)
-
-
-# ---------- qo'lda kiritiladigan (B2B) buyurtma ----------
 
 
 def _check_variant(product: Product, size: str | None, color: str | None) -> None:
@@ -398,6 +385,6 @@ def record_manual_payment(db: Session, actor: User, order_id: int) -> OrderOut:
         summary=f"Buyurtma {order.order_number}: to'lov qabul qilindi", factory_id=order.factory_id,
         changes={"payment_status": ["PENDING", "PAID"]},
     )
-    complete_if_done(db, actor, order)  # yetkazilgandan keyin to'langan bo'lsa
+    complete_if_done(db, actor, order)
     db.commit()
     return get_order(db, actor, order.id)

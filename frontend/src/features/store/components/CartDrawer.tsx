@@ -72,7 +72,6 @@ export default function CartDrawer() {
   const close = () => {
     if (busy) return;
     cart.close();
-    // Yakunlangan buyurtmadan keyin keyingi safar savatdan boshlaymiz
     if (step === 'done') {
       setStep('cart');
       setPaidOrder(null);
@@ -89,7 +88,6 @@ export default function CartDrawer() {
       try {
         localStorage.setItem(CONTACT_KEY, JSON.stringify(contact));
       } catch {
-        // xotira yopiq — keyingi safar qayta kiritiladi
       }
       const res = await storeApi.checkout({
         factory_id: cart.factoryId,
@@ -100,7 +98,6 @@ export default function CartDrawer() {
         comment: orNull(comment),
         telegram_init_data: telegramInitData(),
       });
-      // Haqiqiy provayder (Payme/Click) bo'lsa — uning to'lov sahifasiga o'tamiz
       if (res.payment.checkout_url) {
         window.location.href = res.payment.checkout_url;
         return;
@@ -120,7 +117,7 @@ export default function CartDrawer() {
     setError('');
     try {
       const order = await storeApi.payDemo(checkout.order.public_token, cardLast4);
-      myOrders.add(order.public_token); // "Buyurtmalarim" bo'limida saqlanadi
+      myOrders.add(order.public_token);
       setPaidOrder(order);
       setCheckout(null);
       setComment('');
@@ -146,7 +143,6 @@ export default function CartDrawer() {
       </Box>
 
       <Box sx={{ flex: 1, overflowY: 'auto', p: 2.5 }}>
-        {/* ---------- 1. Savat ---------- */}
         {step === 'cart' &&
           (cart.lines.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}>
@@ -193,7 +189,6 @@ export default function CartDrawer() {
             </Stack>
           ))}
 
-        {/* ---------- 2. Kontakt ma'lumotlari ---------- */}
         {step === 'checkout' && (
           <Box component="form" id="checkout-form" onSubmit={submitCheckout} noValidate>
             <Stack spacing={2}>
@@ -240,7 +235,6 @@ export default function CartDrawer() {
           </Box>
         )}
 
-        {/* ---------- 3. To'lov ---------- */}
         {step === 'payment' && checkout && (
           <Stack spacing={2}>
             <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover' }}>
@@ -264,7 +258,6 @@ export default function CartDrawer() {
           </Stack>
         )}
 
-        {/* ---------- 4. Tasdiq ---------- */}
         {step === 'done' && paidOrder && (
           <Box sx={{ textAlign: 'center', pt: 4 }}>
             <CheckCircleIcon color="success" sx={{ fontSize: 72 }} />
@@ -297,7 +290,6 @@ export default function CartDrawer() {
         )}
       </Box>
 
-      {/* ---------- Pastki panel ---------- */}
       {(step === 'cart' || step === 'checkout') && cart.lines.length > 0 && (
         <Box sx={{ p: 2.5, borderTop: 1, borderColor: 'divider' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>

@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/';
-  // Pochta sozlangan bo'lsagina "Parolni unutdingizmi?" ko'rinadi
   const [resetEnabled, setResetEnabled] = useState(false);
   useEffect(() => {
     authApi.config().then((c) => setResetEnabled(c.password_reset_enabled)).catch(() => undefined);

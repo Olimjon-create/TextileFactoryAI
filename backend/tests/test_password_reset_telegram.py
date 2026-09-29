@@ -26,7 +26,6 @@ def _token(body: str) -> str:
 
 def test_password_reset_flow(client, mailbox):
     assert client.get(f"{API}/auth/config").json()["password_reset_enabled"] is True
-    # Noma'lum email — xat yo'q, lekin javob bir xil (email borligi oshkor qilinmaydi)
     assert client.post(f"{API}/auth/forgot-password", json={"email": "nobody@x.uz"}).status_code == 204
     assert mailbox == []
 
@@ -37,12 +36,11 @@ def test_password_reset_flow(client, mailbox):
     token = _token(body)
     with SessionLocal() as db:
         row = db.query(PasswordResetToken).one()
-        assert row.token_hash != token and len(row.token_hash) == 64  # tokenning o'zi saqlanmaydi
+        assert row.token_hash != token and len(row.token_hash) == 64
 
     assert client.post(f"{API}/auth/reset-password", json={"token": "x" * 40, "new_password": "NewPass123"}).status_code == 400
     assert client.post(f"{API}/auth/reset-password", json={"token": token, "new_password": "short"}).status_code == 422
     assert client.post(f"{API}/auth/reset-password", json={"token": token, "new_password": "NewPass123"}).status_code == 204
-    # Bir martalik; eski parol ishlamaydi, yangisi ishlaydi
     assert client.post(f"{API}/auth/reset-password", json={"token": token, "new_password": "Other1234"}).status_code == 400
     assert client.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": PASSWORD}).status_code == 401
     auth(client, ADMIN_EMAIL, "NewPass123")
@@ -92,37 +90,33 @@ def test_telegram_link_and_notifications(client, bot):
     st = client.get(f"{API}/telegram/status", headers=owner).json()
     assert st["enabled"] and not st["linked"] and st["link_url"].startswith("https://t.me/tc_test_bot?start=f")
     code = st["link_url"].split("start=")[1]
-    # Start bosilmagan
     assert client.post(f"{API}/telegram/check", headers=owner).status_code == 404
     bot["updates"] = [{"message": {"text": "/start boshqa-kod", "chat": {"id": 1}}}, {"message": {"text": f"/start {code}", "chat": {"id": 777}}}]
     r = client.post(f"{API}/telegram/check", headers={**owner, "Accept-Language": "en"})
     assert r.status_code == 200 and r.json()["linked"] is True
-    assert bot["sent"][-1]["chat_id"] == "777" and "connected" in bot["sent"][-1]["text"]  # ulagan foydalanuvchi tilida
-    # Boshqa zavod egasi bu kod bilan ulanmaydi, ishchi esa umuman kira olmaydi
+    assert bot["sent"][-1]["chat_id"] == "777" and "connected" in bot["sent"][-1]["text"]
     other, _ = register_owner(client, "other@t.uz", "Boshqa")
     assert client.post(f"{API}/telegram/check", headers=other).status_code == 404
     worker = add_user(client, owner, "w@t.uz", "WORKER")
     assert client.get(f"{API}/telegram/status", headers=worker).status_code == 403
 
-    # Hodisa: material minimumdan pastga tushdi → bitta xabar
-    post = lambda url, body: client.post(f"{API}{url}", headers=owner, json=body)  # noqa: E731
+    post = lambda url, body: client.post(f"{API}{url}", headers=owner, json=body)
     mat = post("/inventory/materials", {"code": "FAB", "name": "Pike", "material_type": "FABRIC", "unit": "METER", "min_stock": 10}).json()
     loc = post("/inventory/locations", {"code": "A-1", "name": "Mato"}).json()
-    mv = lambda kind, q: post("/inventory/movements", {"movement_type": kind, "material_id": mat["id"], "location_id": loc["id"], "quantity": q})  # noqa: E731
+    mv = lambda kind, q: post("/inventory/movements", {"movement_type": kind, "material_id": mat["id"], "location_id": loc["id"], "quantity": q})
     assert mv("RECEIPT", 15).status_code == 201
     before = len(bot["sent"])
-    assert mv("ISSUE", 3).status_code == 201  # 12 — hali yetarli
+    assert mv("ISSUE", 3).status_code == 201
     assert len(bot["sent"]) == before
-    assert mv("ISSUE", 4).status_code == 201  # 8 < 10 — ogohlantirish
+    assert mv("ISSUE", 4).status_code == 201
     assert len(bot["sent"]) == before + 1 and "running low" in bot["sent"][-1]["text"] and "FAB" in bot["sent"][-1]["text"]
-    assert mv("ISSUE", 1).status_code == 201  # allaqachon past — takror xabar yo'q
+    assert mv("ISSUE", 1).status_code == 201
     assert len(bot["sent"]) == before + 1
 
-    # Sinov xabari va uzish
     assert client.post(f"{API}/telegram/test", headers=owner).status_code == 204
     assert client.delete(f"{API}/telegram", headers=owner).json()["linked"] is False
     sent = len(bot["sent"])
-    mv("ISSUE", 8)  # tugadi, lekin chat uzilgan — xabar yo'q
+    mv("ISSUE", 8)
     assert len(bot["sent"]) == sent
     with SessionLocal() as db:
         assert db.get(Factory, factory_id).telegram_chat_id is None

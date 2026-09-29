@@ -23,7 +23,6 @@ const today = () => new Date().toISOString().slice(0, 10);
 const int = (v: string) => (v.trim() === '' ? 0 : Number(v));
 const num = (v: string) => (v.trim() === '' ? null : Number(v.replace(/\s/g, '').replace(',', '.')));
 
-/** Bosqich ishini qayd etish: kim, qaysi mashinada, qancha yaroqli va brak (kesishda — mato sarfi) */
 export default function LogDialog({ open, wo, onClose, onDone }: Props) {
   const { onlyQualityStage } = useProductionPermissions();
   const [stage, setStage] = useState<ProductionStage>('CUTTING');
@@ -72,7 +71,6 @@ export default function LogDialog({ open, wo, onClose, onDone }: Props) {
   const used = num(fabricUsed);
   const waste = num(fabricWaste);
   const valid = g + d > 0 && !qtyError && (d === 0 || reason.trim().length >= 2) && (used === null || used >= 0) && (waste === null || waste >= 0) && !!workDate && workDate <= today();
-  // Tanlangan bosqichga mos xodimlar birinchi
   const sorted = [...employees].sort((a, b) => Number(b.department === stage) - Number(a.department === stage));
 
   const submit = async (e: FormEvent) => {

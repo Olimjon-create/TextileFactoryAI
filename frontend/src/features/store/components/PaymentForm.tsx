@@ -5,7 +5,6 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { formatMoney } from '@/shared/utils/money';
 import { tr } from '@/i18n';
 
-/** Karta raqami nazorat summasi (Luhn) — UzCard, Humo, Visa, Mastercard raqamlari shunga mos */
 function luhnValid(digits: string): boolean {
   let sum = 0;
   for (let i = 0; i < digits.length; i++) {
@@ -44,7 +43,6 @@ interface Props {
   testMode: boolean;
   paying: boolean;
   error: string;
-  /** Faqat oxirgi 4 raqam uzatiladi — to'liq karta raqami komponentdan tashqariga chiqmaydi */
   onPay: (cardLast4: string) => void;
   onBack: () => void;
 }
@@ -91,7 +89,6 @@ export default function PaymentForm({ amount, currency, testMode, paying, error,
             p: 2.5,
             borderRadius: 4,
             color: '#fff',
-            // Katalog palitrasi: espresso → mokko
             background: `linear-gradient(135deg, #2b211c 0%, ${theme.palette.primary.dark} 55%, ${theme.palette.primary.main} 100%)`,
             boxShadow: '0 16px 36px rgba(43,33,28,0.3)',
           })}

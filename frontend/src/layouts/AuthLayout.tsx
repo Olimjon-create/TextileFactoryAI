@@ -32,7 +32,6 @@ export default function AuthLayout() {
           overflow: 'hidden',
           background:
             'radial-gradient(circle at 85% 15%, rgba(208,100,58,0.45) 0, transparent 40%), linear-gradient(150deg, #0a4237 0%, #0f5c4d 55%, #1b7361 100%)',
-          // To'qima (gazlama) naqshi
           '&::before': {
             content: '""',
             position: 'absolute',

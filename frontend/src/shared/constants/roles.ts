@@ -31,7 +31,6 @@ export const ROLE_COLORS: Record<Role, 'error' | 'primary' | 'secondary' | 'info
   WORKER: 'default',
 };
 
-// Backenddagi app/core/roles.py bilan bir xil bo'lishi kerak
 export const ROLE_LEVELS: Record<Role, number> = {
   SUPER_ADMIN: 100,
   FACTORY_OWNER: 80,
@@ -44,7 +43,6 @@ export const ROLE_LEVELS: Record<Role, number> = {
 
 export const USER_MANAGER_ROLES: Role[] = ['SUPER_ADMIN', 'FACTORY_OWNER', 'MANAGER'];
 
-/** actor tayinlashi/boshqarishi mumkin bo'lgan rollar */
 export function manageableRoles(actor: Role): Role[] {
   if (actor === 'SUPER_ADMIN') return ROLES;
   return ROLES.filter((r) => ROLE_LEVELS[actor] > ROLE_LEVELS[r]);

@@ -1,5 +1,3 @@
-# Ixtiyoriy: PostgreSQL'ni o'rnatmasdan Docker orqali ishga tushirish uchun.
-#   docker compose up -d
 services:
   postgres:
     image: postgres:16

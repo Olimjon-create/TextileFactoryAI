@@ -29,7 +29,6 @@ export const productionApi = {
   trace: (code: string) => api.get<TraceResult>('/production/trace', { params: { code } }).then((r) => r.data),
   kpi: (params: { date_from?: string; date_to?: string; line_id?: number | '' }) =>
     api.get<EmployeeKpi[]>('/production/kpi/employees', { params: clean(params) }).then((r) => r.data),
-  /** Buyurtmani ishlab chiqarishga berish (qatorlar bo'yicha ish buyurtmalari) */
   fromOrder: (orderId: number, data: { line_id?: number | null; planned_start?: string | null; planned_end?: string | null; overcut_pct?: number }) =>
     api.post<WorkOrder[]>(`/orders/${orderId}/work-orders`, data).then((r) => r.data),
 };

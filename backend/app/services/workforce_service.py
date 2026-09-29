@@ -28,10 +28,8 @@ from app.schemas.resources import (
 from app.services import audit_service
 from app.core.i18n import t
 
-# Xodimlar, smenalar va liniyalarni ko'rish/boshqarish
 WORKFORCE_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER, Role.QUALITY_MANAGER)
 WORKFORCE_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
-# Ish haqi stavkasi — maxfiy: faqat shu rollar ko'radi va o'zgartiradi
 PAY_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER)
 
 EMPLOYEE_CODE_PREFIX = "EMP-"
@@ -56,9 +54,6 @@ def _same_factory(db: Session, model, obj_id: int | None, factory_id: int, label
     obj = db.get(model, obj_id)
     if obj is None or obj.factory_id != factory_id:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, t("{label} topilmadi", label=label))
-
-
-# ---------- liniyalar ----------
 
 
 def list_lines(db: Session, actor: User, *, include_inactive: bool = False, factory_id: int | None = None) -> list[LineOut]:
@@ -136,11 +131,8 @@ def delete_line(db: Session, actor: User, line_id: int) -> None:
     line = _get(db, actor, ProductionLine, line_id, "Liniya topilmadi")
     audit_service.record(db, actor, entity="production_line", entity_id=line.id, action=AuditAction.DELETE,
                          summary=f"Liniya o'chirildi: {line.code}", factory_id=line.factory_id)
-    db.delete(line)  # xodim va mashinalar liniyasiz qoladi (SET NULL)
+    db.delete(line)
     db.commit()
-
-
-# ---------- smenalar ----------
 
 
 def _work_minutes(shift: Shift) -> tuple[int, bool]:
@@ -213,9 +205,6 @@ def delete_shift(db: Session, actor: User, shift_id: int) -> None:
                          summary=f"Smena o'chirildi: {shift.name}", factory_id=shift.factory_id)
     db.delete(shift)
     db.commit()
-
-
-# ---------- xodimlar ----------
 
 
 def _can_see_pay(actor: User) -> bool:
@@ -332,7 +321,6 @@ def create_employee(db: Session, actor: User, data: EmployeeCreate) -> EmployeeO
     return get_employee(db, actor, employee.id)
 
 
-# Bo'shatilishi mumkin bo'lgan (None qabul qiladigan) maydonlar
 _NULLABLE = {"phone", "position", "line_id", "shift_id", "user_id", "hire_date", "pay_rate", "daily_norm", "notes"}
 
 
@@ -347,20 +335,18 @@ def update_employee(db: Session, actor: User, employee_id: int, data: EmployeeUp
     for k, v in values.items():
         setattr(employee, k, v)
     if changes:
-        # Maosh qiymati audit tarixida ham ko'rsatilmaydi (faqat o'zgargani)
         if "pay_rate" in changes:
             changes["pay_rate"] = ["***", "***"]
         audit_service.record(db, actor, entity="employee", entity_id=employee.id, action=AuditAction.UPDATE,
                              summary=f"Xodim o'zgartirildi: {employee.employee_code} — {employee.full_name}",
                              factory_id=employee.factory_id, changes=changes)
     db.commit()
-    db.expire(employee)  # line/shift/user bog'lanishlari yangidan yuklansin
+    db.expire(employee)
     return get_employee(db, actor, employee.id)
 
 
 def delete_employee(db: Session, actor: User, employee_id: int) -> None:
     employee = _load_employee(db, actor, employee_id)
-    # Ishlab chiqarish yozuvlari bor xodim o'chirilsa KPI tarixi egasiz qoladi — bo'shatilgan deb belgilanadi
     if db.scalar(select(ProductionLog.id).where(ProductionLog.employee_id == employee.id).limit(1)) is not None or db.scalar(
         select(MachineMaintenance.id).where(MachineMaintenance.technician_id == employee.id).limit(1)
     ) is not None:
