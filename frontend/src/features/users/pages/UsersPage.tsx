@@ -195,7 +195,7 @@ export default function UsersPage() {
               {users.map((u) => (
                 <TableRow key={u.id} hover>
                   <TableCell>
-                    <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+                    <Typography component="div" sx={{ fontWeight: 600, fontSize: 14 }}>
                       {u.full_name} {u.id === actor.id && <Chip label={tr("Siz")} size="small" sx={{ ml: 0.5 }} />}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">

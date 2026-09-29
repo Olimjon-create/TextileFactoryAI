@@ -129,7 +129,7 @@ export default function ProductsPage() {
     }
   };
 
-  const colSpan = 10 + (isSuperAdmin ? 1 : 0);
+  const colSpan = 8 + (isSuperAdmin ? 1 : 0);
 
   const rowActions = (p: ProductListItem) => (
     <>
@@ -251,13 +251,11 @@ export default function ProductsPage() {
           <Table sx={{ minWidth: 960 }}>
             <TableHead>
               <TableRow>
-                <TableCell>{tr("Kod")}</TableCell>
                 <TableCell>{tr("Mahsulot")}</TableCell>
                 {isSuperAdmin && <TableCell>{tr("Fabrika")}</TableCell>}
                 <TableCell>{tr("Kategoriya")}</TableCell>
                 <TableCell>{tr("O'lchamlar")}</TableCell>
                 <TableCell>{tr("Ranglar")}</TableCell>
-                <TableCell>{tr("Birlik")}</TableCell>
                 <TableCell align="right">{tr("Narx")}</TableCell>
                 <TableCell align="center">{tr("BOM")}</TableCell>
                 <TableCell>{tr("Status")}</TableCell>
@@ -268,22 +266,22 @@ export default function ProductsPage() {
               {loading && products.length === 0 && <TableRowsSkeleton cols={colSpan} />}
               {products.map((p) => (
                 <TableRow key={p.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/products/${p.id}`)}>
-                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600, whiteSpace: 'nowrap' }}>{p.code}</TableCell>
                   <TableCell>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{p.code}</Typography>
                     <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{p.name}</Typography>
                     {p.description && (
-                      <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 260 }}>
+                      <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 220 }}>
                         {p.description}
                       </Typography>
                     )}
                   </TableCell>
                   {isSuperAdmin && <TableCell>{p.factory?.name ?? '—'}</TableCell>}
                   <TableCell>{p.category}</TableCell>
-                  <TableCell><VariantChips values={p.sizes} /></TableCell>
-                  <TableCell><VariantChips values={p.colors} max={3} /></TableCell>
-                  <TableCell>{PRODUCTION_UNIT_LABELS[p.unit]}</TableCell>
+                  <TableCell><VariantChips values={p.sizes} compact /></TableCell>
+                  <TableCell><VariantChips values={p.colors} compact range={false} /></TableCell>
                   <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                     {p.price !== null ? formatMoney(p.price) : <Typography variant="body2" color="text.secondary">—</Typography>}
+                    <Typography variant="caption" color="text.secondary" component="div">{PRODUCTION_UNIT_LABELS[p.unit]}</Typography>
                   </TableCell>
                   <TableCell align="center">{p.bom_items_count}</TableCell>
                   <TableCell><ProductStatusChip status={p.status} /></TableCell>

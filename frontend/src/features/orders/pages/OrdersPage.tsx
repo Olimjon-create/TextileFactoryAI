@@ -214,7 +214,7 @@ export default function OrdersPage() {
           <Box>
             {loading && orders.length === 0 && <MobileListSkeleton />}
             {orders.map((o) => (
-              <Box key={o.id} sx={{ bgcolor: o.status === 'NEW' ? 'rgba(211,47,47,0.05)' : undefined }}>
+              <Box key={o.id} sx={{ bgcolor: o.status === 'NEW' ? 'rgba(2,136,209,0.06)' : undefined }}>
                 <MobileListItem
                   onClick={() => navigate(`/orders/${o.id}`)}
                   overline={`${o.order_number} · ${formatDateTime(o.paid_at ?? o.created_at)}`}
@@ -231,7 +231,7 @@ export default function OrdersPage() {
                   meta={
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                       <Typography variant="caption" color="text.secondary">
-                        {o.items_count} {tr("xil ·")}{' '}{o.total_quantity} {tr("ta")}
+                        {o.items_count ? <>{o.items_count} {tr("xil ·")}{' '}{o.total_quantity} {tr("ta")}</> : '—'}
                       </Typography>
                       <DueDate order={o} />
                     </Box>
@@ -267,7 +267,7 @@ export default function OrdersPage() {
                   key={o.id}
                   hover
                   onClick={() => navigate(`/orders/${o.id}`)}
-                  sx={{ cursor: 'pointer', bgcolor: o.is_overdue ? 'rgba(211,47,47,0.07)' : o.status === 'NEW' ? 'rgba(211,47,47,0.04)' : undefined }}
+                  sx={{ cursor: 'pointer', bgcolor: o.is_overdue ? 'rgba(211,47,47,0.07)' : o.status === 'NEW' ? 'rgba(2,136,209,0.05)' : undefined }}
                 >
                   <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, whiteSpace: 'nowrap' }}>
                     {o.order_number}
@@ -282,7 +282,7 @@ export default function OrdersPage() {
                   </TableCell>
                   {isSuperAdmin && <TableCell>{o.factory?.name ?? '—'}</TableCell>}
                   <TableCell align="center">
-                    {o.items_count} {tr("xil ·")}{' '}{o.total_quantity} {tr("ta")}
+                    {o.items_count ? <>{o.items_count} {tr("xil ·")}{' '}{o.total_quantity} {tr("ta")}</> : '—'}
                   </TableCell>
                   <TableCell>
                     <DueDate order={o} />

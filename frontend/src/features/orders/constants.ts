@@ -14,8 +14,8 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 };
 
 export const ORDER_STATUS_COLORS: Record<OrderStatus, 'error' | 'info' | 'warning' | 'secondary' | 'primary' | 'success' | 'default'> = {
-  NEW: 'error',
-  CONFIRMED: 'info',
+  NEW: 'info',
+  CONFIRMED: 'primary',
   IN_PRODUCTION: 'warning',
   READY: 'secondary',
   SHIPPED: 'primary',

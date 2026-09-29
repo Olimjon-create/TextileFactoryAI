@@ -36,13 +36,15 @@ import { factoriesApi } from '@/features/factories/api';
 import { DEPARTMENT_LABELS, PAY_TYPE_LABELS } from '@/features/resources/constants';
 import { getErrorMessage } from '@/shared/api/client';
 import ConfirmDialog from '@/shared/components/ConfirmDialog';
+import { MobileListEmpty, MobileListItem, MobileListSkeleton } from '@/shared/components/MobileList';
 import PageHeader from '@/shared/components/PageHeader';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import StatCard from '@/shared/components/StatCard';
 import { useToast } from '@/shared/components/Toast';
 import type { Factory } from '@/shared/types';
 import { downloadCsv } from '@/shared/utils/csv';
 import { formatDate, formatDateTime } from '@/shared/utils/dates';
-import { formatMoney } from '@/shared/utils/money';
+import { formatMoney, formatMoneyShort } from '@/shared/utils/money';
 import { payrollApi, type Adjustment, type AdjustmentKind, type PayrollReport, type PayrollRow } from '../api';
 import { printPayslip } from '../payslip';
 import { intlLocale, tr } from '@/i18n';
@@ -203,6 +205,7 @@ function AdjustDialog({ row, month, onClose, onChanged }: { row: PayrollRow | nu
 export default function PayrollPage() {
   const { user } = useAuth();
   const toast = useToast();
+  const isMobile = useIsMobile();
   const isSuper = user?.role === 'SUPER_ADMIN';
   const [month, setMonth] = useState(currentMonth);
   const [factoryId, setFactoryId] = useState<number | ''>('');
@@ -311,11 +314,40 @@ export default function PayrollPage() {
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, mb: 2 }}>
         <StatCard label={tr('Xodimlar')} value={data ? data.totals.employees : '…'} icon={<GroupsOutlinedIcon />} />
-        <StatCard label={tr("Jami to'lanadi")} value={data ? formatMoney(data.totals.to_pay) : '…'} icon={<PaymentsOutlinedIcon />} color="info.main" />
-        <StatCard label={tr("To'langan")} value={data ? formatMoney(data.totals.paid) : '…'} icon={<CheckCircleOutlineIcon />} color="success.main" />
-        <StatCard label={tr("To'lanmagan")} value={data ? formatMoney(data.totals.unpaid) : '…'} icon={<PendingActionsOutlinedIcon />} color="warning.main" />
+        <StatCard label={tr("Jami to'lanadi")} value={data ? formatMoneyShort(data.totals.to_pay) : '…'} icon={<PaymentsOutlinedIcon />} color="info.main" />
+        <StatCard label={tr("To'langan")} value={data ? formatMoneyShort(data.totals.paid) : '…'} icon={<CheckCircleOutlineIcon />} color="success.main" />
+        <StatCard label={tr("To'lanmagan")} value={data ? formatMoneyShort(data.totals.unpaid) : '…'} icon={<PendingActionsOutlinedIcon />} color="warning.main" />
       </Box>
 
+      {isMobile ? (
+        <Card>
+          {data === null && <MobileListSkeleton rows={4} />}
+          {data?.rows.map((r) => (
+            <MobileListItem
+              key={r.employee_id}
+              overline={`${r.employee_code} · ${PAY_TYPE_LABELS[r.pay_type]}`}
+              title={r.full_name}
+              subtitle={`${workText(r)} · ${tr('Hisoblangan')}: ${money(r.base)}`}
+              trailing={
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography sx={{ fontWeight: 700, whiteSpace: 'nowrap', color: r.to_pay < 0 ? 'error.main' : 'text.primary' }}>{formatMoney(r.to_pay)}</Typography>
+                  {r.payment_id && <Chip size="small" color="success" label={tr("To'landi")} onClick={() => setCancelling(r)} sx={{ mt: 0.5 }} />}
+                </Box>
+              }
+              meta={(r.bonus || r.deduction || r.advance) ? `${tr('Bonus')}: ${money(r.bonus)} · ${tr('Jarima')}: ${money(r.deduction)} · ${tr('Avans')}: ${money(r.advance)}` : undefined}
+              actions={
+                <>
+                  <Button size="small" startIcon={<TuneIcon />} onClick={() => setEditing(r)}>{tr('Bonus, jarima, avans')}</Button>
+                  {!r.payment_id && (
+                    <Button size="small" variant="contained" disabled={r.to_pay <= 0} onClick={() => setPaying(r)}>{tr("To'lash")}</Button>
+                  )}
+                </>
+              }
+            />
+          ))}
+          {data?.rows.length === 0 && <MobileListEmpty>{tr("Xodimlar yo'q — avval Xodimlar bo'limida xodim qo'shing")}</MobileListEmpty>}
+        </Card>
+      ) : (
       <Card>
         <TableContainer>
           <Table size="small" sx={{ minWidth: 980 }}>
@@ -393,6 +425,7 @@ export default function PayrollPage() {
           </Table>
         </TableContainer>
       </Card>
+      )}
 
       <AdjustDialog row={editing} month={month} onClose={() => setEditing(null)} onChanged={load} />
       <ConfirmDialog

@@ -17,8 +17,9 @@ _CLEARABLE_FIELDS = {
 }
 
 
-def _to_out(db: Session, factory: Factory) -> FactoryOut:
-    count = db.scalar(select(func.count(User.id)).where(User.factory_id == factory.id)) or 0
+def _to_out(db: Session, factory: Factory, count: int | None = None) -> FactoryOut:
+    if count is None:
+        count = db.scalar(select(func.count(User.id)).where(User.factory_id == factory.id)) or 0
     out = FactoryOut.model_validate(factory)
     out.users_count = count
     return out
@@ -37,7 +38,11 @@ def list_factories(db: Session, actor: User, search: str | None = None) -> list[
         query = query.where(Factory.id == actor.factory_id)
     if search:
         query = query.where(Factory.name.ilike(f"%{search.strip()}%"))
-    return [_to_out(db, f) for f in db.scalars(query)]
+    factories = list(db.scalars(query))
+    counts = dict(db.execute(
+        select(User.factory_id, func.count(User.id)).where(User.factory_id.in_([f.id for f in factories])).group_by(User.factory_id)
+    ).all()) if factories else {}
+    return [_to_out(db, f, counts.get(f.id, 0)) for f in factories]
 
 
 def get_factory(db: Session, actor: User, factory_id: int) -> FactoryOut:

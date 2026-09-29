@@ -25,18 +25,20 @@ import NorthEastIcon from '@mui/icons-material/NorthEast';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { factoriesApi } from '@/features/factories/api';
 import { MATERIAL_TYPE_LABELS, MATERIAL_UNIT_LABELS } from '@/features/products/constants';
 import type { MaterialType } from '@/features/products/types';
 import { getErrorMessage } from '@/shared/api/client';
+import { MobileListEmpty, MobileListItem } from '@/shared/components/MobileList';
 import PageHeader from '@/shared/components/PageHeader';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import StatCard from '@/shared/components/StatCard';
 import type { Factory } from '@/shared/types';
 import { downloadCsv } from '@/shared/utils/csv';
 import { formatDate } from '@/shared/utils/dates';
-import { formatMoney } from '@/shared/utils/money';
+import { formatMoney, formatMoneyShort } from '@/shared/utils/money';
 import { inventoryApi, type TurnoverReport, type TurnoverRow } from '../api';
 import { intlLocale, tr } from '@/i18n';
 
@@ -72,6 +74,8 @@ function Qty({ value, sign }: { value: number; sign?: '+' | '-' }) {
 export default function WarehouseReportsPage() {
   const { user } = useAuth();
   const isSuper = user?.role === 'SUPER_ADMIN';
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [tab, setTab] = useState(0);
   const [preset, setPreset] = useState<Preset>('month');
   const [[from, to], setRange] = useState<[string, string]>(() => presetRange('month'));
@@ -178,10 +182,10 @@ export default function WarehouseReportsPage() {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, mb: 2 }}>
-        <StatCard label={tr("Davr boshidagi qiymat")} value={data ? formatMoney(data.totals.opening_value) : '…'} icon={<Inventory2OutlinedIcon />} />
-        <StatCard label={tr('Kirim')} value={data ? formatMoney(data.totals.receipts_value) : '…'} icon={<SouthWestIcon />} color="success.main" />
-        <StatCard label={tr('Chiqim (ishlab chiqarishga)')} value={data ? formatMoney(data.totals.issues_value) : '…'} icon={<NorthEastIcon />} color="warning.main" />
-        <StatCard label={tr('Davr oxiridagi qiymat')} value={data ? formatMoney(data.totals.closing_value) : '…'} icon={<Inventory2OutlinedIcon />} color="info.main"
+        <StatCard label={tr("Davr boshidagi qiymat")} value={data ? formatMoneyShort(data.totals.opening_value) : '…'} icon={<Inventory2OutlinedIcon />} />
+        <StatCard label={tr('Kirim')} value={data ? formatMoneyShort(data.totals.receipts_value) : '…'} icon={<SouthWestIcon />} color="success.main" />
+        <StatCard label={tr('Chiqim (ishlab chiqarishga)')} value={data ? formatMoneyShort(data.totals.issues_value) : '…'} icon={<NorthEastIcon />} color="warning.main" />
+        <StatCard label={tr('Davr oxiridagi qiymat')} value={data ? formatMoneyShort(data.totals.closing_value) : '…'} icon={<Inventory2OutlinedIcon />} color="info.main"
           hint={data?.totals.without_cost ? tr('{0} ta materialning narxi kiritilmagan', data.totals.without_cost) : undefined} />
       </Box>
 
@@ -193,6 +197,54 @@ export default function WarehouseReportsPage() {
 
       {!data ? (
         <Skeleton variant="rounded" height={320} />
+      ) : tab === 0 && isMobile ? (
+        <Card>
+          {moving.map((r) => (
+            <MobileListItem
+              key={r.material_id}
+              onClick={() => navigate(`/inventory/materials/${r.material_id}`)}
+              overline={`${r.code} · ${MATERIAL_TYPE_LABELS[r.material_type]}`}
+              title={r.name}
+              subtitle={`${tr("Boshlang'ich")}: ${num(r.opening)} · ${tr('Kirim')}: +${num(r.receipts)} · ${tr('Chiqim')}: −${num(r.issues + r.write_offs)}`}
+              trailing={
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{num(r.closing)} {unit(r)}</Typography>
+                  <Typography variant="caption" color="text.secondary">{r.closing_value != null ? formatMoney(r.closing_value) : tr("narx yo'q")}</Typography>
+                </Box>
+              }
+            />
+          ))}
+          {moving.length === 0 && <MobileListEmpty>{tr("Bu davrda ombor harakati yo'q")}</MobileListEmpty>}
+        </Card>
+      ) : tab === 2 && isMobile ? (
+        <Card>
+          <CardContent sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Typography variant="body2" sx={{ flex: 1, minWidth: 200 }}>
+              {tr('{0} kundan beri ishlatilmagan materiallar: {1} ta, qiymati {2}', idleDays, idle.length, formatMoney(idleValue))}
+            </Typography>
+            <TextField select size="small" fullWidth={false} label={tr('Harakatsiz')} value={idleDays} onChange={(e) => setIdleDays(Number(e.target.value))}>
+              {[30, 60, 90, 180, 365].map((d) => (
+                <MenuItem key={d} value={d}>{tr('{0} kundan ko\'p', d)}</MenuItem>
+              ))}
+            </TextField>
+          </CardContent>
+          {idle.map((r) => (
+            <MobileListItem
+              key={r.material_id}
+              onClick={() => navigate(`/inventory/materials/${r.material_id}`)}
+              overline={r.code}
+              title={r.name}
+              subtitle={r.last_movement_at ? `${formatDate(r.last_movement_at)} · ${tr('{0} kun oldin', daysSince(r.last_movement_at))}` : tr("Harakat yo'q")}
+              trailing={
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{num(r.closing)} {unit(r)}</Typography>
+                  <Typography variant="caption" color="text.secondary">{r.closing_value != null ? formatMoney(r.closing_value) : '—'}</Typography>
+                </Box>
+              }
+            />
+          ))}
+          {idle.length === 0 && <MobileListEmpty>{tr("Harakatsiz yotgan material yo'q")}</MobileListEmpty>}
+        </Card>
       ) : tab === 0 ? (
         <Card>
           <TableContainer>

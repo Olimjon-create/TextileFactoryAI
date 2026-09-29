@@ -37,7 +37,7 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader title={tr("Sozlamalar")} subtitle={tr("Profilingiz, zavod ma'lumotlari va hisob-kitob sozlamalari")} />
-      <Box sx={{ display: 'grid', gap: 2.5, maxWidth: 720 }}>
+      <Box sx={{ display: 'grid', gap: 2.5, maxWidth: 1400, alignItems: 'start', gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'repeat(2, minmax(0, 1fr))' } }}>
         <ProfileCard />
         <FactoryNameCard />
         {canTelegram && <TelegramCard />}

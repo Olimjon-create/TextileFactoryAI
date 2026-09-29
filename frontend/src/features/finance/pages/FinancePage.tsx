@@ -39,7 +39,7 @@ import { useToast } from '@/shared/components/Toast';
 import type { Factory } from '@/shared/types';
 import { downloadCsv, today } from '@/shared/utils/csv';
 import { formatDate } from '@/shared/utils/dates';
-import { formatMoney } from '@/shared/utils/money';
+import { formatMoney, formatMoneyShort } from '@/shared/utils/money';
 import { financeApi, type ExpenseCategory, type ProfitLoss } from '../api';
 import { tr } from '@/i18n';
 
@@ -217,11 +217,11 @@ export default function FinancePage() {
       )}
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, mb: 2 }}>
-        <StatCard label={tr('Tushum')} value={data ? formatMoney(data.revenue) : '…'} icon={<TrendingUpIcon />} color="success.main" hint={data ? tr('{0} ta buyurtma', data.orders) : undefined} />
-        <StatCard label={tr('Jami xarajatlar')} value={data ? formatMoney(data.total_costs) : '…'} icon={<TrendingDownIcon />} color="error.main" />
-        <StatCard label={tr('Sof foyda')} value={data ? formatMoney(data.profit) : '…'} icon={<AccountBalanceWalletOutlinedIcon />} color={data && data.profit < 0 ? 'error.main' : 'primary.main'}
+        <StatCard label={tr('Tushum')} value={data ? formatMoneyShort(data.revenue) : '…'} icon={<TrendingUpIcon />} color="success.main" hint={data ? tr('{0} ta buyurtma', data.orders) : undefined} />
+        <StatCard label={tr('Jami xarajatlar')} value={data ? formatMoneyShort(data.total_costs) : '…'} icon={<TrendingDownIcon />} color="error.main" />
+        <StatCard label={tr('Sof foyda')} value={data ? formatMoneyShort(data.profit) : '…'} icon={<AccountBalanceWalletOutlinedIcon />} color={data && data.profit < 0 ? 'error.main' : 'primary.main'}
           hint={data?.margin_pct != null ? tr('Rentabellik: {0}%', data.margin_pct) : undefined} />
-        <StatCard label={tr('Boshqa xarajatlar')} value={data ? formatMoney(data.expenses) : '…'} icon={<ReceiptLongOutlinedIcon />} color="warning.main" hint={data ? tr('{0} ta yozuv', data.items.length) : undefined} />
+        <StatCard label={tr('Boshqa xarajatlar')} value={data ? formatMoneyShort(data.expenses) : '…'} icon={<ReceiptLongOutlinedIcon />} color="warning.main" hint={data ? tr('{0} ta yozuv', data.items.length) : undefined} />
       </Box>
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: '1fr 1.3fr' }, alignItems: 'start' }}>
