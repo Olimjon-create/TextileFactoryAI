@@ -4,7 +4,7 @@ import { CUSTOMER_VIEW_ROLES } from '@/features/customers/permissions';
 import { GuestRoute, ProtectedRoute, RoleGuard } from '@/features/auth/guards';
 import { AUDIT_VIEW_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
 import { ORDER_VIEW_ROLES } from '@/features/orders/permissions';
-import { MACHINE_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
+import { MACHINE_VIEW_ROLES, PAY_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
 import { ATTENDANCE_VIEW_ROLES } from '@/features/attendance/permissions';
 import { KPI_VIEW_ROLES, PRODUCTION_VIEW_ROLES } from '@/features/production/permissions';
 import { PROCUREMENT_VIEW_ROLES } from '@/features/procurement/permissions';
@@ -37,6 +37,7 @@ const MaterialDetailPage = lazy(() => import('@/features/inventory/pages/Materia
 const MovementsPage = lazy(() => import('@/features/inventory/pages/MovementsPage'));
 const WarehouseOverviewPage = lazy(() => import('@/features/inventory/pages/WarehouseOverviewPage'));
 const WarehouseReportsPage = lazy(() => import('@/features/inventory/pages/WarehouseReportsPage'));
+const PayrollPage = lazy(() => import('@/features/payroll/pages/PayrollPage'));
 const LocationsPage = lazy(() => import('@/features/inventory/pages/LocationsPage'));
 const EmployeesPage = lazy(() => import('@/features/resources/pages/EmployeesPage'));
 const AttendancePage = lazy(() => import('@/features/attendance/pages/AttendancePage'));
@@ -175,6 +176,10 @@ export const router = createBrowserRouter([
           {
             element: <RoleGuard roles={ATTENDANCE_VIEW_ROLES} />,
             children: [{ path: '/attendance', element: <AttendancePage /> }],
+          },
+          {
+            element: <RoleGuard roles={PAY_VIEW_ROLES} />,
+            children: [{ path: '/payroll', element: <PayrollPage /> }],
           },
           {
             element: <RoleGuard roles={MACHINE_VIEW_ROLES} />,

@@ -27,10 +27,11 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import { ATTENDANCE_VIEW_ROLES } from '@/features/attendance/permissions';
 import { CUSTOMER_VIEW_ROLES } from '@/features/customers/permissions';
 import { AUDIT_VIEW_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
-import { MACHINE_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
+import { MACHINE_VIEW_ROLES, PAY_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
 import { KPI_VIEW_ROLES, PRODUCTION_VIEW_ROLES } from '@/features/production/permissions';
 import { ORDER_VIEW_ROLES } from '@/features/orders/permissions';
 import { PROCUREMENT_VIEW_ROLES } from '@/features/procurement/permissions';
@@ -96,6 +97,7 @@ export const NAVIGATION: NavSection[] = [
     items: [
       { label: tr("Xodimlar"), path: '/employees', icon: <BadgeOutlinedIcon />, roles: WORKFORCE_VIEW_ROLES },
       { label: tr("Davomat"), path: '/attendance', icon: <EventNoteOutlinedIcon />, roles: ATTENDANCE_VIEW_ROLES },
+      { label: tr("Ish haqi"), path: '/payroll', icon: <PaymentsOutlinedIcon />, roles: PAY_VIEW_ROLES },
       { label: tr("Liniyalar va smenalar"), path: '/lines', icon: <ViewTimelineOutlinedIcon />, roles: WORKFORCE_VIEW_ROLES },
       { label: tr("Mashinalar"), path: '/machines', icon: <PrecisionManufacturingOutlinedIcon />, roles: MACHINE_VIEW_ROLES },
     ],

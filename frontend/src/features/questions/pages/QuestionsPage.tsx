@@ -91,13 +91,13 @@ export default function QuestionsPage() {
         subtitle={data ? tr('{0} ta javob kutmoqda', data.new_count) : tr("Katalogdagi «Savol berish» orqali kelgan savollar")}
       />
       <Box sx={{ display: 'flex', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-        <TextField select size="small" label={tr('Holati')} value={status} onChange={(e) => { setStatus(e.target.value as QuestionStatus | ''); setPage(1); }} sx={{ minWidth: 180 }}>
+        <TextField select size="small" label={tr('Holati')} value={status} slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }} onChange={(e) => { setStatus(e.target.value as QuestionStatus | ''); setPage(1); }} sx={{ minWidth: 180 }}>
           <MenuItem value="">{tr('Barchasi')}</MenuItem>
           <MenuItem value="NEW">{tr('Yangi')}</MenuItem>
           <MenuItem value="ANSWERED">{tr('Javob berilgan')}</MenuItem>
         </TextField>
         {isSuper && (
-          <TextField select size="small" label={tr('Zavod')} value={factoryId} onChange={(e) => { setFactoryId(e.target.value === '' ? '' : Number(e.target.value)); setPage(1); }} sx={{ minWidth: 200 }}>
+          <TextField select size="small" label={tr('Zavod')} value={factoryId} slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }} onChange={(e) => { setFactoryId(e.target.value === '' ? '' : Number(e.target.value)); setPage(1); }} sx={{ minWidth: 200 }}>
             <MenuItem value="">{tr('Barchasi')}</MenuItem>
             {factories.map((f) => (
               <MenuItem key={f.id} value={f.id}>

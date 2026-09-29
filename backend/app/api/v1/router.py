@@ -12,6 +12,7 @@ from app.api.v1.endpoints import (
     inventory,
     logistics,
     orders,
+    payroll,
     procurement,
     production,
     products,
@@ -32,6 +33,7 @@ api_router.include_router(users.router)
 api_router.include_router(products.router)
 api_router.include_router(customers.router)
 api_router.include_router(orders.router)
+api_router.include_router(payroll.router)
 api_router.include_router(questions.router)
 api_router.include_router(inventory.router)
 api_router.include_router(resources.router)

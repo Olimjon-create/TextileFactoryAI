@@ -9,6 +9,7 @@ from app.models.inventory import Material, MovementType, StockMovement, Warehous
 from app.models.logistics import ProductMovementType, ProductStockMovement, Shipment, ShipmentItem, ShipmentStatus
 from app.models.order import Order, OrderItem
 from app.models.procurement import PurchaseOrder, PurchaseOrderItem, PurchaseStatus, Supplier
+from app.models.payroll import AdjustmentKind, PayrollAdjustment, PayrollPayment
 from app.models.product import BOMItem, Product
 from app.models.question import QuestionStatus, StoreQuestion
 from app.models.production import ProductionLog, TrackingUnit, WorkOrder
@@ -54,6 +55,9 @@ __all__ = [
     "PurchaseOrderItem",
     "PurchaseStatus",
     "PasswordResetToken",
+    "AdjustmentKind",
+    "PayrollAdjustment",
+    "PayrollPayment",
     "QuestionStatus",
     "StoreQuestion",
     "RateLimitHit",

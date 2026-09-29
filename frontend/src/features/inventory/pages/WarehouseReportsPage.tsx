@@ -145,16 +145,16 @@ export default function WarehouseReportsPage() {
 
       <Card sx={{ mb: 2 }}>
         <CardContent sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
-          <TextField select size="small" label={tr('Davr')} value={preset} onChange={(e) => choosePreset(e.target.value as Preset)} sx={{ minWidth: 170 }}>
+          <TextField select size="small" fullWidth={false} label={tr('Davr')} value={preset} onChange={(e) => choosePreset(e.target.value as Preset)} sx={{ minWidth: 170 }}>
             <MenuItem value="month">{tr('Shu oy')}</MenuItem>
             <MenuItem value="prev">{tr("O'tgan oy")}</MenuItem>
             <MenuItem value="quarter">{tr('Oxirgi 3 oy')}</MenuItem>
             <MenuItem value="year">{tr('Yil boshidan')}</MenuItem>
             <MenuItem value="custom">{tr('Boshqa davr')}</MenuItem>
           </TextField>
-          <TextField size="small" type="date" label={tr('Dan')} value={from} onChange={(e) => { setPreset('custom'); setRange([e.target.value, to]); }} slotProps={{ inputLabel: { shrink: true } }} />
-          <TextField size="small" type="date" label={tr('Gacha')} value={to} onChange={(e) => { setPreset('custom'); setRange([from, e.target.value]); }} slotProps={{ inputLabel: { shrink: true } }} />
-          <TextField select size="small" label={tr('Material turi')} value={type} onChange={(e) => setType(e.target.value as MaterialType | '')} sx={{ minWidth: 170 }}>
+          <TextField size="small" fullWidth={false} type="date" label={tr('Dan')} value={from} onChange={(e) => { setPreset('custom'); setRange([e.target.value, to]); }} slotProps={{ inputLabel: { shrink: true } }} />
+          <TextField size="small" fullWidth={false} type="date" label={tr('Gacha')} value={to} onChange={(e) => { setPreset('custom'); setRange([from, e.target.value]); }} slotProps={{ inputLabel: { shrink: true } }} />
+          <TextField select size="small" fullWidth={false} label={tr('Material turi')} value={type} slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }} onChange={(e) => setType(e.target.value as MaterialType | '')} sx={{ minWidth: 170 }}>
             <MenuItem value="">{tr('Barchasi')}</MenuItem>
             {(Object.keys(MATERIAL_TYPE_LABELS) as MaterialType[]).map((k) => (
               <MenuItem key={k} value={k}>
@@ -163,7 +163,7 @@ export default function WarehouseReportsPage() {
             ))}
           </TextField>
           {isSuper && (
-            <TextField select size="small" label={tr('Zavod')} value={factoryId} onChange={(e) => setFactoryId(e.target.value === '' ? '' : Number(e.target.value))} sx={{ minWidth: 190 }}>
+            <TextField select size="small" fullWidth={false} label={tr('Zavod')} value={factoryId} slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }} onChange={(e) => setFactoryId(e.target.value === '' ? '' : Number(e.target.value))} sx={{ minWidth: 190 }}>
               <MenuItem value="">{tr('Barchasi')}</MenuItem>
               {factories.map((f) => (
                 <MenuItem key={f.id} value={f.id}>
@@ -272,7 +272,7 @@ export default function WarehouseReportsPage() {
             <Typography variant="body2" sx={{ flex: 1, minWidth: 220 }}>
               {tr('{0} kundan beri ishlatilmagan materiallar: {1} ta, qiymati {2}', idleDays, idle.length, formatMoney(idleValue))}
             </Typography>
-            <TextField select size="small" label={tr('Harakatsiz')} value={idleDays} onChange={(e) => setIdleDays(Number(e.target.value))} sx={{ minWidth: 150 }}>
+            <TextField select size="small" fullWidth={false} label={tr('Harakatsiz')} value={idleDays} onChange={(e) => setIdleDays(Number(e.target.value))} sx={{ minWidth: 150 }}>
               {[30, 60, 90, 180, 365].map((d) => (
                 <MenuItem key={d} value={d}>
                   {tr('{0} kundan ko\'p', d)}
