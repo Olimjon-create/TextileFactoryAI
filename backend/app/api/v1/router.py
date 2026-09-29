@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     products,
     resources,
     store,
+    telegram,
     uploads,
     users,
     vision,
@@ -39,6 +40,7 @@ api_router.include_router(analytics.router)
 api_router.include_router(vision.router)
 api_router.include_router(audit.router)
 api_router.include_router(uploads.router)
+api_router.include_router(telegram.router)
 # Ochiq (login talab qilinmaydigan) katalog
 api_router.include_router(store.router)
 

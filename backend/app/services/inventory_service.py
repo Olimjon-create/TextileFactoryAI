@@ -38,6 +38,7 @@ from app.schemas.inventory import (
 )
 from app.services import audit_service
 from app.core.i18n import t
+from app.services import telegram_service
 
 # Ombor ma'lumotlarini ko'rish (ishchidan tashqari hamma rahbarlar)
 INVENTORY_VIEW_ROLES = (
@@ -356,6 +357,20 @@ def _movement_out(m: StockMovement, order_number: str | None = None) -> Movement
     )
 
 
+def notify_low_stock(db: Session, material: Material, delta: Decimal) -> None:
+    """Chiqimdan keyin qoldiq minimumdan pastga tushgan paytda (bir marta) Telegram xabari."""
+    if delta >= 0 or not material.min_stock:
+        return
+    total = Decimal(db.scalar(select(func.coalesce(func.sum(StockMovement.quantity), 0)).where(StockMovement.material_id == material.id)) or 0)
+    before = total - delta
+    if not (total <= material.min_stock < before or (total <= 0 < before)):
+        return
+    template = ("⛔ <b>{code}</b> {name} tugadi — omborda qolmadi" if total <= 0
+                else "⚠️ <b>{code}</b> {name} kam qoldi: {stock} {unit} (minimum {min})")
+    telegram_service.notify(db, material.factory_id, template, code=material.code, name=material.name,
+                            stock=f"{total.normalize():f}", unit=material.unit.value.lower(), min=f"{Decimal(material.min_stock).normalize():f}")
+
+
 def create_movement(
     db: Session, actor: User, data: MovementCreate, *, commit: bool = True, purchase_item_id: int | None = None
 ) -> list[MovementOut]:
@@ -437,6 +452,7 @@ def create_movement(
     if not commit:
         return []
     db.commit()
+    notify_low_stock(db, material, sum((r.quantity for r in rows), Decimal(0)))
     for row in rows:
         db.refresh(row)
     return [_movement_out(r, order.order_number if order else None) for r in rows]

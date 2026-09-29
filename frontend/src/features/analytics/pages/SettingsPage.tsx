@@ -6,6 +6,7 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { useColorMode } from '@/app/ColorModeContext';
 import { useAuth } from '@/features/auth/AuthContext';
 import ChangePasswordDialog from '@/features/auth/components/ChangePasswordDialog';
+import { telegramApi, type TelegramStatus } from '@/features/auth/api';
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import { FINANCE_ROLES } from '../permissions';
@@ -33,12 +34,14 @@ const FIELDS: { key: keyof Form; label: string; unit: string; hint: string; min:
 export default function SettingsPage() {
   const { hasRole } = useAuth();
   const canFinance = hasRole(...FINANCE_ROLES);
+  const canTelegram = hasRole('SUPER_ADMIN', 'FACTORY_OWNER', 'MANAGER');
   return (
     <>
       <PageHeader title={tr("Sozlamalar")} subtitle={tr("Profilingiz, zavod ma'lumotlari va hisob-kitob sozlamalari")} />
       <Box sx={{ display: 'grid', gap: 2.5, maxWidth: 720 }}>
         <ProfileCard />
         <FactoryNameCard />
+        {canTelegram && <TelegramCard />}
         {canFinance && <FinanceSettingsCard />}
       </Box>
     </>
@@ -164,6 +167,107 @@ function FactoryNameCard() {
           <Box>
             <SaveButton status={save.status} disabled={!valid} />
           </Box>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Telegram: zavod chatini botga ulash — yangi buyurtma, material tugashi, buzilish, javob so'rovi xabarlari */
+function TelegramCard() {
+  const { user } = useAuth();
+  const toast = useToast();
+  const isSuper = user?.role === 'SUPER_ADMIN';
+  const [factories, setFactories] = useState<Factory[]>([]);
+  const [factoryId, setFactoryId] = useState<number | ''>(user?.factory?.id ?? '');
+  const [st, setSt] = useState<TelegramStatus | null>(null);
+  const [busy, setBusy] = useState<'' | 'check' | 'test' | 'unlink'>('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isSuper) return;
+    factoriesApi
+      .list()
+      .then((f) => {
+        setFactories(f);
+        setFactoryId((cur) => (cur === '' ? f[0]?.id ?? '' : cur));
+      })
+      .catch(() => undefined);
+  }, [isSuper]);
+
+  useEffect(() => {
+    if (factoryId === '') return;
+    setSt(null);
+    setError('');
+    telegramApi.status(factoryId).then(setSt).catch((e) => setError(getErrorMessage(e)));
+  }, [factoryId]);
+
+  const run = async (kind: 'check' | 'test' | 'unlink') => {
+    setBusy(kind);
+    setError('');
+    try {
+      if (kind === 'check') {
+        setSt(await telegramApi.check(factoryId));
+        toast.success(tr('Telegram ulandi'));
+      } else if (kind === 'test') {
+        await telegramApi.test(factoryId);
+        toast.success(tr('Sinov xabari yuborildi'));
+      } else {
+        setSt(await telegramApi.unlink(factoryId));
+      }
+    } catch (e) {
+      setError(getErrorMessage(e));
+    } finally {
+      setBusy('');
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <SectionTitle title={tr('Telegram bildirishnomalar')} subtitle={tr("Yangi buyurtma, material tugashi, mashina buzilishi va javob so'rovlari — zavod chatiga")} />
+        <Stack spacing={2}>
+          {isSuper && (
+            <TextField select label={tr('Qaysi zavod')} value={factoryId} onChange={(e) => setFactoryId(Number(e.target.value))}>
+              {factories.map((f) => (
+                <MenuItem key={f.id} value={f.id}>
+                  {f.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+          {error && <Alert severity="error">{error}</Alert>}
+          {!st ? (
+            <Skeleton variant="rounded" height={56} />
+          ) : !st.enabled ? (
+            <Alert severity="info">{tr('Telegram bot hali sozlanmagan — administrator TELEGRAM_BOT_TOKEN ni kiritishi kerak.')}</Alert>
+          ) : st.linked ? (
+            <>
+              <Alert severity="success">{tr('Ulangan: xabarlar @{0} orqali zavod chatiga keladi.', st.bot_username)}</Alert>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Button variant="outlined" onClick={() => run('test')} disabled={!!busy}>
+                  {tr('Sinov xabari')}
+                </Button>
+                <Button color="error" onClick={() => run('unlink')} disabled={!!busy}>
+                  {tr('Uzish')}
+                </Button>
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography variant="body2" color="text.secondary">
+                {tr("1) «Botni ochish» ni bosing va Telegram'da Start tugmasini bosing. 2) Shu yerga qaytib «Tekshirish» ni bosing. Guruhga ulash uchun botni guruhga qo'shib, havoladagi /start buyrug'ini guruhda yuboring.")}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Button variant="contained" component="a" href={st.link_url ?? '#'} target="_blank" rel="noopener" disabled={!st.link_url}>
+                  {tr('Botni ochish')}
+                </Button>
+                <Button variant="outlined" onClick={() => run('check')} disabled={!!busy}>
+                  {busy === 'check' ? tr('Tekshirilmoqda...') : tr('Tekshirish')}
+                </Button>
+              </Box>
+            </>
+          )}
         </Stack>
       </CardContent>
     </Card>

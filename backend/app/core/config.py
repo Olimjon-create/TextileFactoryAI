@@ -38,6 +38,15 @@ class Settings(BaseSettings):
     SUPABASE_SECRET_KEY: str = ""
     SUPABASE_STORAGE_BUCKET: str = "media"
 
+    # Parolni tiklash xatlari (Resend). Bo'sh bo'lsa "Parolni unutdingizmi?" ko'rinmaydi
+    RESEND_API_KEY: str = ""
+    MAIL_FROM: str = "TextileCore <onboarding@resend.dev>"
+    # Xatdagi havola uchun sayt manzili (bo'sh bo'lsa so'rov manzilidan olinadi)
+    APP_URL: str = ""
+
+    # Telegram bildirishnomalar: @BotFather bergan token. Bo'sh bo'lsa o'chiq
+    TELEGRAM_BOT_TOKEN: str = ""
+
     # To'lov provayderi: hozircha faqat "demo" (test rejimi, haqiqiy pul yechilmaydi)
     PAYMENT_PROVIDER: str = "demo"
     # Productionda demo to'lov (xaridor buyurtmasini o'zi "to'langan" qila oladi) faqat ochiq ruxsat bilan
@@ -81,6 +90,14 @@ class Settings(BaseSettings):
             if v.startswith(prefix):
                 return "postgresql+psycopg://" + v[len(prefix):]
         return v
+
+    @property
+    def mail_enabled(self) -> bool:
+        return bool(self.RESEND_API_KEY.strip())
+
+    @property
+    def telegram_enabled(self) -> bool:
+        return bool(self.TELEGRAM_BOT_TOKEN.strip())
 
     @property
     def supabase_storage_enabled(self) -> bool:

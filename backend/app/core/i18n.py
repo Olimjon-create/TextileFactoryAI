@@ -21,7 +21,11 @@ def get_lang() -> str:
 
 
 def t(template: str, **kwargs) -> str:
-    lang = _lang.get()
+    return t_lang(_lang.get(), template, **kwargs)
+
+
+def t_lang(lang: str, template: str, **kwargs) -> str:
+    """Aniq tilda (so'rovdan tashqari — masalan, Telegram xabari zavod tanlagan tilda)"""
     text = template if lang == "uz" else MESSAGES.get(template, {}).get(lang, template)
     return text.format(**kwargs) if kwargs else text
 
@@ -141,4 +145,42 @@ MESSAGES: dict[str, dict[str, str]] = {
     "«{product}» uchun narx kiriting": _m("Укажите цену для «{product}»", "Enter a price for «{product}»"),
     "Rasm hajmi {mb} MB dan oshmasligi kerak": _m("Размер изображения не должен превышать {mb} МБ", "Image must not exceed {mb} MB"),
     "To'lov provayderi sozlanmagan: {provider}": _m("Платёжный провайдер не настроен: {provider}", "Payment provider is not configured: {provider}"),
+    # --- parolni tiklash ---
+    "Parolni tiklash sozlanmagan — administratorga murojaat qiling": _m("Восстановление пароля не настроено — обратитесь к администратору", "Password reset is not configured — contact the administrator"),
+    "Salom, {name}!": _m("Здравствуйте, {name}!", "Hello, {name}!"),
+    "TextileCore hisobingiz parolini tiklash so'raldi. Yangi parol o'rnatish uchun havolani bosing (1 soat amal qiladi):": _m(
+        "Запрошено восстановление пароля вашего аккаунта TextileCore. Чтобы задать новый пароль, перейдите по ссылке (действует 1 час):",
+        "A password reset was requested for your TextileCore account. Click the link to set a new password (valid for 1 hour):"),
+    "Yangi parol o'rnatish": _m("Задать новый пароль", "Set a new password"),
+    "Agar buni siz so'ramagan bo'lsangiz, xatga e'tibor bermang — parolingiz o'zgarmaydi.": _m(
+        "Если вы этого не запрашивали, просто проигнорируйте письмо — пароль не изменится.",
+        "If you didn't request this, ignore this email — your password won't change."),
+    "TextileCore: parolni tiklash": _m("TextileCore: восстановление пароля", "TextileCore: password reset"),
+    "Xatni yuborib bo'lmadi, keyinroq urinib ko'ring": _m("Не удалось отправить письмо, попробуйте позже", "Could not send the email, try again later"),
+    "Havola yaroqsiz yoki muddati o'tgan — qaytadan so'rang": _m("Ссылка недействительна или устарела — запросите новую", "The link is invalid or expired — request a new one"),
+    # --- Telegram ---
+    "Telegram bot sozlanmagan": _m("Telegram-бот не настроен", "Telegram bot is not configured"),
+    "Telegram bilan bog'lanib bo'lmadi, keyinroq urinib ko'ring": _m("Не удалось связаться с Telegram, попробуйте позже", "Could not reach Telegram, try again later"),
+    "Botda «Start» bosilmagan — havolani ochib, Start tugmasini bosing va qayta tekshiring": _m(
+        "В боте не нажат «Start» — откройте ссылку, нажмите Start и проверьте снова",
+        "«Start» wasn't pressed in the bot — open the link, press Start and check again"),
+    "Xabar yuborilmadi — Telegram ulanganini tekshiring": _m("Сообщение не отправлено — проверьте подключение Telegram", "Message not sent — check the Telegram connection"),
+    "TextileCore bildirishnomalari ulandi: {factory}": _m("Уведомления TextileCore подключены: {factory}", "TextileCore notifications connected: {factory}"),
+    "Sinov xabari: TextileCore → {factory} ✅": _m("Тестовое сообщение: TextileCore → {factory} ✅", "Test message: TextileCore → {factory} ✅"),
+    "🛒 Yangi buyurtma <b>{number}</b> (katalog, to'langan)\n{customer}, {phone}\n{amount}": _m(
+        "🛒 Новый заказ <b>{number}</b> (каталог, оплачен)\n{customer}, {phone}\n{amount}",
+        "🛒 New order <b>{number}</b> (catalog, paid)\n{customer}, {phone}\n{amount}"),
+    "📝 Yangi buyurtma <b>{number}</b> kiritildi\n{customer} · {amount}\nKiritdi: {user}": _m(
+        "📝 Введён новый заказ <b>{number}</b>\n{customer} · {amount}\nВвёл: {user}",
+        "📝 New order <b>{number}</b> entered\n{customer} · {amount}\nBy: {user}"),
+    "⛔ <b>{code}</b> {name} tugadi — omborda qolmadi": _m("⛔ <b>{code}</b> {name} закончился — на складе нет", "⛔ <b>{code}</b> {name} is out of stock"),
+    "⚠️ <b>{code}</b> {name} kam qoldi: {stock} {unit} (minimum {min})": _m(
+        "⚠️ <b>{code}</b> {name} заканчивается: {stock} {unit} (минимум {min})",
+        "⚠️ <b>{code}</b> {name} is running low: {stock} {unit} (minimum {min})"),
+    "🔧 Mashina <b>{code}</b> {name} buzildi\nSabab: {reason}\nBelgiladi: {user}": _m(
+        "🔧 Машина <b>{code}</b> {name} сломалась\nПричина: {reason}\nОтметил: {user}",
+        "🔧 Machine <b>{code}</b> {name} broke down\nReason: {reason}\nReported by: {user}"),
+    "🙋 Javob so'rovi: <b>{name}</b>, {period}\nSabab: {reason}\nTasdiqlash: Davomat → Javob so'rovlari": _m(
+        "🙋 Запрос на отгул: <b>{name}</b>, {period}\nПричина: {reason}\nПодтвердить: Посещаемость → Запросы на отгул",
+        "🙋 Leave request: <b>{name}</b>, {period}\nReason: {reason}\nApprove: Attendance → Leave requests"),
 }

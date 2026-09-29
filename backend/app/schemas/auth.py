@@ -19,6 +19,15 @@ class RegisterRequest(BaseModel):
     factory_address: str | None = Field(default=None, max_length=300)
 
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
 class ChangePasswordRequest(BaseModel):
     current_password: str = Field(max_length=128)
     new_password: str = Field(min_length=8, max_length=128)
@@ -32,6 +41,7 @@ class GoogleLoginRequest(BaseModel):
 class AuthConfig(BaseModel):
     google_client_id: str | None = None
     registration_enabled: bool = False
+    password_reset_enabled: bool = False
 
 
 class TokenResponse(BaseModel):

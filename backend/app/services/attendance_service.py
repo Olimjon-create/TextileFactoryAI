@@ -38,6 +38,7 @@ from app.schemas.attendance import (
 )
 from app.services import audit_service
 from app.core.i18n import t
+from app.services import telegram_service
 
 ATTENDANCE_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER, Role.QUALITY_MANAGER, Role.WAREHOUSE_MANAGER)
 # Kelish/ketishni belgilash, yozuvni tuzatish, javob so'rovini kiritish
@@ -503,6 +504,10 @@ def create_leave(db: Session, actor: User, data: LeaveCreate) -> LeaveOut:
         summary += " (darhol tasdiqlandi)"
     audit_service.record(db, actor, entity="leave_request", entity_id=lr.id, action=AuditAction.CREATE, summary=summary, factory_id=e.factory_id)
     db.commit()
+    if lr.status == LeaveStatus.PENDING:
+        period = data.start_date.strftime("%d.%m.%Y") + (f" — {data.end_date.strftime('%d.%m.%Y')}" if data.end_date != data.start_date else "")
+        telegram_service.notify(db, e.factory_id, "🙋 Javob so'rovi: <b>{name}</b>, {period}\nSabab: {reason}\nTasdiqlash: Davomat → Javob so'rovlari",
+                                name=e.full_name, period=period, reason=data.reason or "—")
     return _leave_out(_load_leave(db, actor, lr.id))
 
 

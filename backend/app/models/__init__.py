@@ -4,6 +4,7 @@
 from app.models.attendance import Attendance, AttendanceStatus, LeaveRequest, LeaveStatus, LeaveType
 from app.models.analytics import FactorySettings, NotificationRead
 from app.models.audit import AuditLog
+from app.models.password_reset import PasswordResetToken
 from app.models.rate_limit import RateLimitHit
 from app.models.customer import Customer
 from app.models.factory import Factory
@@ -54,6 +55,7 @@ __all__ = [
     "PurchaseOrder",
     "PurchaseOrderItem",
     "PurchaseStatus",
+    "PasswordResetToken",
     "RateLimitHit",
     "Shift",
     "Shipment",

@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react';
-import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Alert, Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { authApi } from '../api';
 import { getErrorMessage } from '@/shared/api/client';
 import PasswordField from '@/shared/components/PasswordField';
 import { useAuth } from '../AuthContext';
@@ -17,6 +18,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/';
+  // Pochta sozlangan bo'lsagina "Parolni unutdingizmi?" ko'rinadi
+  const [resetEnabled, setResetEnabled] = useState(false);
+  useEffect(() => {
+    authApi.config().then((c) => setResetEnabled(c.password_reset_enabled)).catch(() => undefined);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -55,6 +61,11 @@ export default function LoginPage() {
         {error && <Alert severity="error">{error}</Alert>}
         <TextField label={tr("Email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus size="medium" />
         <PasswordField label={tr("Parol")} value={password} onChange={(e) => setPassword(e.target.value)} required size="medium" />
+        {resetEnabled && (
+          <Link component={RouterLink} to="/forgot-password" variant="body2" sx={{ alignSelf: 'flex-end', mt: '-4px !important' }}>
+            {tr('Parolni unutdingizmi?')}
+          </Link>
+        )}
         <Button type="submit" variant="contained" size="large" disabled={loading || !email || !password}>
           {loading ? tr("Kirilmoqda...") : tr("Kirish")}
         </Button>

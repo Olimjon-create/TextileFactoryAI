@@ -26,5 +26,8 @@ class Factory(Base, TimestampMixin):
     cover_url: Mapped[str | None] = mapped_column(String(500))
     # Katalogda ko'rsatilsinmi
     is_public: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+    # Telegram bildirishnomalar: ulangan chat va xabarlar tili (uz/ru/en)
+    telegram_chat_id: Mapped[str | None] = mapped_column(String(32))
+    telegram_lang: Mapped[str | None] = mapped_column(String(2))
 
     users: Mapped[list["User"]] = relationship(back_populates="factory")

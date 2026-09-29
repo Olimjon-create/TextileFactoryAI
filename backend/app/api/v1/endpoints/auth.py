@@ -9,13 +9,15 @@ from app.models import User
 from app.schemas.auth import (
     AuthConfig,
     ChangePasswordRequest,
+    ForgotPasswordRequest,
     GoogleLoginRequest,
     LoginRequest,
     RegisterRequest,
+    ResetPasswordRequest,
     TokenResponse,
 )
 from app.schemas.user import UserOut
-from app.services import audit_service, auth_service, google_auth
+from app.services import audit_service, auth_service, google_auth, password_reset_service
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -23,7 +25,32 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 @router.get("/config", response_model=AuthConfig)
 def auth_config():
     """Frontend uchun ochiq sozlamalar (Google Client ID maxfiy emas)."""
-    return AuthConfig(google_client_id=settings.GOOGLE_CLIENT_ID or None, registration_enabled=settings.SELF_REGISTRATION_ENABLED)
+    return AuthConfig(
+        google_client_id=settings.GOOGLE_CLIENT_ID or None,
+        registration_enabled=settings.SELF_REGISTRATION_ENABLED,
+        password_reset_enabled=settings.mail_enabled,
+    )
+
+
+def _site_url(request: Request) -> str:
+    """Xatdagi havola manzili. Origin'ga faqat ruxsat etilgan ro'yxatda bo'lsa ishonamiz —
+    aks holda begona sayt havolani o'ziga yo'naltirib tokenni o'g'irlashi mumkin."""
+    origin = request.headers.get("origin", "")
+    if origin and origin in settings.cors_origins_list:
+        return origin
+    return str(request.base_url)
+
+
+@router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(rate_limit.by_ip("forgot", 5, 900))])
+def forgot_password(data: ForgotPasswordRequest, request: Request, db: Session = Depends(get_db)):
+    # Bir email'ga xat bombardimoni bo'lmasin
+    rate_limit.hit(f"forgot-email:{data.email.lower()}", 3, 3600)
+    password_reset_service.request_reset(db, data.email, _site_url(request))
+
+
+@router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(rate_limit.by_ip("reset", 10, 900))])
+def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    password_reset_service.reset_password(db, data.token, data.new_password)
 
 
 def _log_login(db: Session, user: User, request: Request, method: str) -> None:

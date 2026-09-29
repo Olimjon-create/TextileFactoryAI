@@ -22,6 +22,8 @@ import RouteErrorPage from '@/shared/pages/RouteErrorPage';
 // sahifa kodi yuklanayotganda layout ichidagi Suspense skeleton ko'rsatadi.
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/features/auth/pages/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/DashboardPage'));
 const FactoriesPage = lazy(() => import('@/features/factories/pages/FactoriesPage'));
 const UsersPage = lazy(() => import('@/features/users/pages/UsersPage'));
@@ -82,6 +84,8 @@ export const router = createBrowserRouter([
         children: [
           { path: '/login', element: <LoginPage /> },
           { path: '/register', element: <RegisterPage /> },
+          { path: '/forgot-password', element: <ForgotPasswordPage /> },
+          { path: '/reset-password', element: <ResetPasswordPage /> },
         ],
       },
     ],

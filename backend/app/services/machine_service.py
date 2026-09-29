@@ -32,6 +32,7 @@ from app.schemas.resources import (
 )
 from app.services import audit_service
 from app.core.i18n import t
+from app.services import telegram_service
 
 MACHINE_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER, Role.QUALITY_MANAGER)
 MACHINE_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
@@ -299,6 +300,9 @@ def change_status(db: Session, actor: User, machine_id: int, data: MachineStatus
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Buzilish sababini yozing")
     _apply_status(db, actor, m, data.status, data.reason, _now())
     db.commit()
+    if data.status == MachineStatus.BROKEN:
+        telegram_service.notify(db, m.factory_id, "🔧 Mashina <b>{code}</b> {name} buzildi\nSabab: {reason}\nBelgiladi: {user}",
+                                code=m.code, name=m.name, reason=data.reason or "—", user=actor.full_name)
     return get_machine(db, actor, m.id)
 
 
