@@ -23,11 +23,25 @@ from app.schemas.inventory import (
     MovementOut,
     MovementPage,
 )
+from app.schemas.inventory_report import TurnoverReport
+from app.services import inventory_report_service
 from app.services import inventory_service as svc
 
 router = APIRouter(prefix="/inventory", tags=["Warehouse / Inventory"])
 can_view = require_roles(*svc.INVENTORY_VIEW_ROLES)
 can_edit = require_roles(*svc.INVENTORY_EDITOR_ROLES)
+
+
+@router.get("/reports/turnover", response_model=TurnoverReport)
+def turnover_report(
+    date_from: date,
+    date_to: date,
+    factory_id: int | None = None,
+    material_type: MaterialType | None = None,
+    db: Session = Depends(get_db),
+    actor: User = Depends(can_view),
+):
+    return inventory_report_service.turnover(db, actor, date_from, date_to, factory_id, material_type)
 
 
 @router.get("/summary", response_model=InventorySummary)

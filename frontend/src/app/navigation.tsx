@@ -10,6 +10,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined';
+import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
@@ -107,6 +108,7 @@ export const NAVIGATION: NavSection[] = [
       { label: tr("Kirim-chiqim jurnali"), path: '/inventory/movements', icon: <SwapVertIcon />, roles: INVENTORY_VIEW_ROLES },
       { label: tr("Tayyor mahsulot"), path: '/finished-goods', icon: <AllInboxOutlinedIcon />, roles: LOGISTICS_VIEW_ROLES },
       { label: tr("Ombor joylari"), path: '/inventory/locations', icon: <WarehouseOutlinedIcon />, roles: INVENTORY_VIEW_ROLES },
+      { label: tr("Ombor hisobotlari"), path: '/warehouse/reports', icon: <SummarizeOutlinedIcon />, roles: INVENTORY_VIEW_ROLES },
     ],
   },
   {

@@ -36,6 +36,7 @@ const MaterialsPage = lazy(() => import('@/features/inventory/pages/MaterialsPag
 const MaterialDetailPage = lazy(() => import('@/features/inventory/pages/MaterialDetailPage'));
 const MovementsPage = lazy(() => import('@/features/inventory/pages/MovementsPage'));
 const WarehouseOverviewPage = lazy(() => import('@/features/inventory/pages/WarehouseOverviewPage'));
+const WarehouseReportsPage = lazy(() => import('@/features/inventory/pages/WarehouseReportsPage'));
 const LocationsPage = lazy(() => import('@/features/inventory/pages/LocationsPage'));
 const EmployeesPage = lazy(() => import('@/features/resources/pages/EmployeesPage'));
 const AttendancePage = lazy(() => import('@/features/attendance/pages/AttendancePage'));
@@ -123,6 +124,7 @@ export const router = createBrowserRouter([
             element: <RoleGuard roles={INVENTORY_VIEW_ROLES} />,
             children: [
               { path: '/warehouse', element: <WarehouseOverviewPage /> },
+              { path: '/warehouse/reports', element: <WarehouseReportsPage /> },
               { path: '/inventory/materials', element: <MaterialsPage /> },
               { path: '/inventory/materials/:id', element: <MaterialDetailPage /> },
               { path: '/inventory/movements', element: <MovementsPage /> },
