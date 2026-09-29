@@ -6,6 +6,8 @@
  * Lug'atlar: locales/ru.json, locales/en.json — ilova ishga tushishidan oldin (main.tsx) yuklanadi.
  */
 
+import { telegramLanguage } from '@/shared/telegram';
+
 export type Lang = 'uz' | 'ru' | 'en';
 
 export const LANGUAGES: { code: Lang; label: string; short: string }[] = [
@@ -23,7 +25,9 @@ function readLang(): Lang {
   } catch {
     /* saqlash yopiq (maxfiy oyna) — standart til */
   }
-  return 'uz';
+  // Telegram Mini App'da birinchi ochilganda — foydalanuvchining Telegram tili
+  const tg = telegramLanguage();
+  return tg?.startsWith('ru') ? 'ru' : tg?.startsWith('en') ? 'en' : 'uz';
 }
 
 let lang: Lang = readLang();

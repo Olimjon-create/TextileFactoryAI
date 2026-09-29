@@ -131,5 +131,5 @@ def test_telegram_link_and_notifications(client, bot):
 def test_telegram_disabled(client):
     owner, _ = register_owner(client, "owner@t.uz", "Tele")
     st = client.get(f"{API}/telegram/status", headers=owner).json()
-    assert st == {"enabled": False, "bot_username": None, "linked": False, "link_url": None}
+    assert st == {"enabled": False, "bot_username": None, "linked": False, "link_url": None, "shop_url": None}
     assert client.post(f"{API}/telegram/check", headers=owner).status_code == 503

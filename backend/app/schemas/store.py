@@ -89,6 +89,8 @@ class CheckoutRequest(BaseModel):
     customer_phone: str = Field(max_length=50)
     delivery_address: str | None = Field(default=None, max_length=300)
     comment: str | None = Field(default=None, max_length=2000)
+    # Telegram Mini App ichida ochilgan bo'lsa — Telegram.WebApp.initData (serverda imzosi tekshiriladi)
+    telegram_init_data: str | None = Field(default=None, max_length=4096)
 
     @field_validator("customer_name", mode="before")
     @classmethod

@@ -11,6 +11,9 @@ os.environ["MEDIA_DIR"] = os.path.join(tempfile.gettempdir(), "tfai_test_media")
 # .env da Supabase kalitlari bo'lsa ham testlar haqiqiy Storage'ga fayl yuklamasin
 os.environ["SUPABASE_URL"] = ""
 os.environ["SUPABASE_SECRET_KEY"] = ""
+os.environ["TELEGRAM_BOT_TOKEN"] = ""  # testlar haqiqiy botdan xabar yubormasin
+os.environ["RESEND_API_KEY"] = ""
+os.environ["APP_URL"] = ""
 os.environ["PAYMENT_PROVIDER"] = "demo"
 # Chastota cheklovi alohida testda yoqiladi (testlar bitta IP dan juda ko'p login qiladi)
 os.environ["RATE_LIMIT_ENABLED"] = "false"

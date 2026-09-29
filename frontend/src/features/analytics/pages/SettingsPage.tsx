@@ -268,6 +268,31 @@ function TelegramCard() {
               </Box>
             </>
           )}
+          {st?.shop_url && (
+            <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
+              <Typography variant="subtitle2">{tr("Mijozlar uchun do'kon havolasi")}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {tr("Bu havolani mijozlarga yuboring: bot zavodingiz katalogini Telegram ichida ochadi, buyurtma holati haqida mijozga xabar beradi.")}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all', flex: '1 1 220px' }}>
+                  {st.shop_url}
+                </Typography>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    navigator.clipboard
+                      .writeText(st.shop_url ?? '')
+                      .then(() => toast.success(tr('Havola nusxalandi')))
+                      .catch(() => undefined);
+                  }}
+                >
+                  {tr('Nusxalash')}
+                </Button>
+              </Box>
+            </Box>
+          )}
         </Stack>
       </CardContent>
     </Card>

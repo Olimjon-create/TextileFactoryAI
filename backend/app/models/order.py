@@ -78,6 +78,9 @@ class Order(Base, TimestampMixin):
     # Mijozga va'da qilingan topshirish sanasi — kechikayotgan buyurtmalar shu bo'yicha aniqlanadi
     due_date: Mapped[date | None] = mapped_column(Date, index=True)
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    # Telegram bot (Mini App) orqali berilgan bo'lsa — mijozga holat xabarlari shu chatga, shu tilda yuboriladi
+    customer_telegram_id: Mapped[str | None] = mapped_column(String(32), index=True)
+    customer_lang: Mapped[str | None] = mapped_column(String(2))
 
     factory: Mapped["Factory"] = relationship()
     customer: Mapped["Customer | None"] = relationship()

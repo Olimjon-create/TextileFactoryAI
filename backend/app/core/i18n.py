@@ -183,4 +183,37 @@ MESSAGES: dict[str, dict[str, str]] = {
     "🙋 Javob so'rovi: <b>{name}</b>, {period}\nSabab: {reason}\nTasdiqlash: Davomat → Javob so'rovlari": _m(
         "🙋 Запрос на отгул: <b>{name}</b>, {period}\nПричина: {reason}\nПодтвердить: Посещаемость → Запросы на отгул",
         "🙋 Leave request: <b>{name}</b>, {period}\nReason: {reason}\nApprove: Attendance → Leave requests"),
+    # --- Telegram bot (mijozlar) ---
+    "👋 Assalomu alaykum, {name}!\n\n<b>TextileCore</b> — tikuv fabrikalari katalogi. Kiyimlarni to'g'ridan-to'g'ri ishlab chiqaruvchidan buyurtma qiling.\n\n🛍 «Do'konni ochish» tugmasini bosing: mahsulotni tanlang, savatga qo'shing va to'lang.\n📦 Buyurtmangiz holati haqida shu yerga xabar beramiz.": _m(
+        "👋 Здравствуйте, {name}!\n\n<b>TextileCore</b> — каталог швейных фабрик. Заказывайте одежду напрямую у производителя.\n\n🛍 Нажмите «Открыть магазин»: выберите товар, добавьте в корзину и оплатите.\n📦 О статусе заказа мы сообщим сюда.",
+        "👋 Hello, {name}!\n\n<b>TextileCore</b> is a catalog of garment factories. Order clothing directly from the manufacturer.\n\n🛍 Tap “Open shop”: pick a product, add it to the cart and pay.\n📦 We will send your order status updates here."),
+    "👋 Assalomu alaykum, {name}!\n\n<b>{factory}</b> do'koniga xush kelibsiz.\n\n🛍 «Do'konni ochish» tugmasini bosing: mahsulotni tanlang, savatga qo'shing va to'lang.\n📦 Buyurtmangiz holati haqida shu yerga xabar beramiz.": _m(
+        "👋 Здравствуйте, {name}!\n\nДобро пожаловать в магазин <b>{factory}</b>.\n\n🛍 Нажмите «Открыть магазин»: выберите товар, добавьте в корзину и оплатите.\n📦 О статусе заказа мы сообщим сюда.",
+        "👋 Hello, {name}!\n\nWelcome to the <b>{factory}</b> shop.\n\n🛍 Tap “Open shop”: pick a product, add it to the cart and pay.\n📦 We will send your order status updates here."),
+    "🛍 Do'konni ochish": _m("🛍 Открыть магазин", "🛍 Open shop"),
+    "🏭 Barcha fabrikalar": _m("🏭 Все фабрики", "🏭 All factories"),
+    "📦 Buyurtmalarim": _m("📦 Мои заказы", "📦 My orders"),
+    "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇": _m("Чтобы сделать заказ, нажмите «Открыть магазин» 👇", "To place an order, tap “Open shop” 👇"),
+    "Hozircha buyurtmalaringiz yo'q. «Do'konni ochish» tugmasi orqali buyurtma bering.": _m(
+        "У вас пока нет заказов. Сделайте заказ через кнопку «Открыть магазин».",
+        "You have no orders yet. Place one with the “Open shop” button."),
+    "📦 <b>Buyurtmalaringiz</b>": _m("📦 <b>Ваши заказы</b>", "📦 <b>Your orders</b>"),
+    "Havola noto'g'ri yoki eskirgan. Saytda Sozlamalar → Telegram bo'limidan qayta oching.": _m(
+        "Ссылка неверна или устарела. Откройте её заново на сайте: Настройки → Telegram.",
+        "The link is invalid or outdated. Open it again on the website: Settings → Telegram."),
+    "✅ To'lov qabul qilindi!\nBuyurtma <b>{number}</b> · {factory}\n{amount}\n\nHolati o'zgarganda shu yerga xabar beramiz.": _m(
+        "✅ Оплата получена!\nЗаказ <b>{number}</b> · {factory}\n{amount}\n\nКогда статус изменится, мы сообщим сюда.",
+        "✅ Payment received!\nOrder <b>{number}</b> · {factory}\n{amount}\n\nWe will notify you here when the status changes."),
+    "📦 Buyurtma <b>{number}</b> ({factory}): {status}": _m("📦 Заказ <b>{number}</b> ({factory}): {status}", "📦 Order <b>{number}</b> ({factory}): {status}"),
+    "To'lov kutilmoqda": _m("Ожидает оплаты", "Awaiting payment"),
+    "Qabul qilindi": _m("Принят", "Received"),
+    "Tasdiqlandi": _m("Подтверждён", "Confirmed"),
+    "Tikilmoqda": _m("В производстве", "In production"),
+    "Tayyor": _m("Готов", "Ready"),
+    "Yo'lga chiqdi": _m("Отправлен", "Shipped"),
+    "Yetkazildi": _m("Доставлен", "Delivered"),
+    "Bekor qilindi": _m("Отменён", "Cancelled"),
+    "🛍 Do'kon": _m("🛍 Магазин", "🛍 Shop"),
+    "Botni ulash": _m("Подключить бота", "Start the bot"),
+    "Buyurtmalarim": _m("Мои заказы", "My orders"),
 }

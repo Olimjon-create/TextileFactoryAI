@@ -28,6 +28,7 @@ import PaymentForm from './PaymentForm';
 import QuantityStepper from './QuantityStepper';
 import StoreImage from './StoreImage';
 import { tr } from '@/i18n';
+import { inTelegram, telegramInitData } from '@/shared/telegram';
 
 type Step = 'cart' | 'checkout' | 'payment' | 'done';
 
@@ -97,6 +98,7 @@ export default function CartDrawer() {
         customer_phone: contact.phone.trim(),
         delivery_address: orNull(contact.address),
         comment: orNull(comment),
+        telegram_init_data: telegramInitData(),
       });
       // Haqiqiy provayder (Payme/Click) bo'lsa — uning to'lov sahifasiga o'tamiz
       if (res.payment.checkout_url) {
@@ -273,6 +275,11 @@ export default function CartDrawer() {
               {tr("Buyurtmangiz")}{' '}<b>{paidOrder.factory_name}</b> {tr("zavodiga yuborildi. Zavod siz bilan")}{' '}
               <b>{paidOrder.customer_phone}</b> {tr("raqami orqali bog'lanadi.")}
             </Typography>
+            {inTelegram() && (
+              <Typography color="text.secondary" sx={{ mt: 1 }}>
+                {tr("Buyurtma holati o'zgarganda Telegram botga xabar keladi.")}
+              </Typography>
+            )}
             <Box sx={{ mt: 3, p: 2, borderRadius: 2, bgcolor: 'action.hover', textAlign: 'left' }}>
               <Row label={tr("Buyurtma raqami")} value={paidOrder.order_number ?? '—'} />
               <Row label={tr("To'langan summa")} value={formatMoney(paidOrder.total_amount, paidOrder.currency)} />

@@ -27,7 +27,8 @@ from app.schemas.store import (
     StoreFeaturedProduct,
     StoreProduct,
 )
-from app.services import order_service, payments
+from app.core.i18n import get_lang
+from app.services import order_service, payments, telegram_service
 
 CURRENCY = "UZS"
 
@@ -230,6 +231,7 @@ def create_order(db: Session, data: CheckoutRequest) -> CheckoutResponse:
         _check_variant(products[product_id], size, color)
 
     provider = payments.get_provider()
+    tg_user = telegram_service.verify_init_data(data.telegram_init_data)  # soxta/eskirgan bo'lsa — oddiy buyurtma
     order = Order(
         factory_id=factory.id,
         public_token=secrets.token_urlsafe(32),
@@ -241,6 +243,8 @@ def create_order(db: Session, data: CheckoutRequest) -> CheckoutResponse:
         payment_provider=provider.name,
         currency=CURRENCY,
         total_amount=Decimal("0"),
+        customer_telegram_id=str(tg_user["id"]) if tg_user else None,
+        customer_lang=get_lang() if tg_user else None,
     )
     total = Decimal("0")
     for (product_id, size, color), qty in quantities.items():

@@ -26,6 +26,7 @@ export interface TelegramStatus {
   bot_username: string | null;
   linked: boolean;
   link_url: string | null;
+  shop_url: string | null;
 }
 
 const fid = (factoryId?: number | '') => ({ params: factoryId ? { factory_id: factoryId } : {} });

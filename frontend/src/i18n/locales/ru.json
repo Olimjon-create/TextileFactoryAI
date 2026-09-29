@@ -1762,5 +1762,10 @@
  "Ulangan: xabarlar @{0} orqali zavod chatiga keladi.": "Подключено: сообщения приходят в чат фабрики через @{0}.",
  "Uzish": "Отключить",
  "Yangi buyurtma, material tugashi, mashina buzilishi va javob so'rovlari — zavod chatiga": "Новые заказы, нехватка материалов, поломки машин и запросы на отгул — в чат фабрики",
- "Yangi havola so'rash": "Запросить новую ссылку"
+ "Yangi havola so'rash": "Запросить новую ссылку",
+ "Buyurtma holati o'zgarganda Telegram botga xabar keladi.": "Когда статус заказа изменится, придёт сообщение в Telegram-бот.",
+ "Mijozlar uchun do'kon havolasi": "Ссылка на магазин для клиентов",
+ "Bu havolani mijozlarga yuboring: bot zavodingiz katalogini Telegram ichida ochadi, buyurtma holati haqida mijozga xabar beradi.": "Отправьте эту ссылку клиентам: бот откроет каталог вашей фабрики прямо в Telegram и будет сообщать клиенту о статусе заказа.",
+ "Havola nusxalandi": "Ссылка скопирована",
+ "Nusxalash": "Копировать"
 }

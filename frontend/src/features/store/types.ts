@@ -56,6 +56,7 @@ export interface CheckoutPayload {
   customer_phone: string;
   delivery_address: string | null;
   comment: string | null;
+  telegram_init_data?: string | null;
 }
 
 export interface PublicOrder {

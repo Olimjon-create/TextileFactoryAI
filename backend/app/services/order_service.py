@@ -90,6 +90,7 @@ def mark_paid(db: Session, order: Order, *, reference: str, card_last4: str | No
     telegram_service.notify(db, order.factory_id, "🛒 Yangi buyurtma <b>{number}</b> (katalog, to'langan)\n{customer}, {phone}\n{amount}",
                             number=order.order_number, customer=order.customer_name, phone=order.customer_phone,
                             amount=f"{float(order.total_amount):,.0f} {order.currency}".replace(",", " "))
+    telegram_service.notify_customer_paid(order)
     return order
 
 
@@ -207,6 +208,7 @@ def change_status(db: Session, actor: User, order: Order, new: OrderStatus, why:
     audit_service.record(db, actor, entity="order", entity_id=order.id, action=AuditAction.STATUS,
                          summary=f"Buyurtma {order.order_number}: {order.status.value} → {new.value} ({why})",
                          factory_id=order.factory_id, changes={"status": [order.status.value, new.value]})
+    telegram_service.queue_customer_status(db, order, new)
     order.status = new
 
 
@@ -278,6 +280,7 @@ def update_status(db: Session, actor: User, order_id: int, new_status: OrderStat
         summary=f"Buyurtma {order.order_number}: {order.status.value} → {new_status.value}",
         factory_id=order.factory_id, changes={"status": [order.status.value, new_status.value]},
     )
+    telegram_service.queue_customer_status(db, order, new_status)
     order.status = new_status
     db.commit()
     return get_order(db, actor, order.id)

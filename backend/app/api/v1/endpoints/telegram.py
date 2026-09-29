@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+import hmac
+
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query, Request, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.deps import require_roles
 from app.core.i18n import t
@@ -18,6 +21,7 @@ class TelegramStatus(BaseModel):
     bot_username: str | None
     linked: bool
     link_url: str | None
+    shop_url: str | None = None  # mijozlarga tarqatiladigan do'kon havolasi
 
 
 def _factory(db: Session, actor: User, factory_id: int | None) -> Factory:
@@ -48,3 +52,27 @@ def telegram_test(factory_id: int | None = Query(default=None), db: Session = De
 @router.delete("", response_model=TelegramStatus)
 def telegram_unlink(factory_id: int | None = Query(default=None), db: Session = Depends(get_db), actor: User = Depends(can_manage)):
     return telegram_service.unlink(db, _factory(db, actor, factory_id))
+
+
+@router.post("/webhook", include_in_schema=False)
+def telegram_webhook(
+    request: Request,
+    update: dict = Body(default_factory=dict),
+    db: Session = Depends(get_db),
+    secret: str | None = Header(default=None, alias="X-Telegram-Bot-Api-Secret-Token"),
+):
+    """Telegram bot yangilanishlari. Imzo sarlavhasi mos kelmasa — rad etiladi."""
+    if not settings.telegram_enabled or not hmac.compare_digest(secret or "", telegram_service.webhook_secret()):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Forbidden")
+    try:
+        telegram_service.handle_update(db, update, str(request.base_url))
+    except Exception as exc:  # noqa: BLE001 — 200 qaytmasa Telegram shu xabarni qayta-qayta yuboradi
+        db.rollback()
+        print("telegram webhook:", exc)
+    return {"ok": True}
+
+
+@router.post("/setup")
+def telegram_setup(request: Request, actor: User = Depends(require_roles(Role.SUPER_ADMIN))):
+    """Webhook va "Do'kon" menyu tugmasini o'rnatish (deploy'dan keyin bir marta)."""
+    return telegram_service.setup_bot(str(request.base_url))
