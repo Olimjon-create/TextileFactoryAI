@@ -51,8 +51,9 @@ function HeroTile({ src, item, area }: { src: string; item?: StoreFeaturedProduc
         position: 'relative',
         display: 'block',
         overflow: 'hidden',
-        borderRadius: '24px',
-        boxShadow: '0 18px 44px rgba(43,33,28,0.18)',
+        borderRadius: '14px',
+        border: 1,
+        borderColor: 'divider',
         bgcolor: 'background.paper',
         '&:hover .hero-img': { transform: 'scale(1.05)' },
         '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main', outlineOffset: 3 },
@@ -245,10 +246,10 @@ export default function StoreHomePage() {
           />
           <Typography
             component="h1"
-            sx={{ fontFamily: SERIF, fontWeight: 600, fontSize: { xs: 36, sm: 46, md: 54 }, lineHeight: 1.08, letterSpacing: '-0.02em' }}
+            sx={{ fontWeight: 800, fontSize: { xs: 34, sm: 44, md: 52 }, lineHeight: 1.1, letterSpacing: '-0.02em' }}
           >
             {tr("Sifatli kiyim —")}{' '}
-            <Box component="span" sx={(t) => ({ color: t.palette.mode === 'dark' ? t.palette.primary.main : t.palette.primary.dark, fontStyle: 'italic' })}>
+            <Box component="span" sx={(t) => ({ color: t.palette.mode === 'dark' ? t.palette.primary.main : t.palette.primary.dark, })}>
               {tr("ishlab chiqaruvchidan")}
             </Box>
           </Typography>
@@ -263,7 +264,7 @@ export default function StoreHomePage() {
             fullWidth
             sx={(theme) => ({
               maxWidth: 520,
-              '& .MuiOutlinedInput-root': { ...glass(theme, 0.9), height: 56, pl: 1, borderRadius: 999, boxShadow: `0 10px 30px ${alpha('#2b211c', 0.08)}` },
+              '& .MuiOutlinedInput-root': { ...glass(theme, 0.9), height: 56, pl: 1, borderRadius: '12px' },
             })}
             slotProps={{
               input: {
@@ -283,10 +284,10 @@ export default function StoreHomePage() {
             }}
           />
           <Box sx={{ display: 'flex', gap: 1.5, mt: 2.5, flexWrap: 'wrap' }}>
-            <Button variant="contained" size="large" endIcon={<ArrowForwardIcon />} onClick={() => scrollTo('products')} sx={{ borderRadius: 999, px: 3 }}>
+            <Button variant="contained" size="large" endIcon={<ArrowForwardIcon />} onClick={() => scrollTo('products')} sx={{ px: 3 }}>
               {tr("Mahsulotlarni ko'rish")}
             </Button>
-            <Button variant="outlined" size="large" onClick={() => scrollTo('factories')} sx={(t) => ({ ...glass(t, 0.5), borderRadius: 999, px: 3 })}>
+            <Button variant="outlined" size="large" onClick={() => scrollTo('factories')} sx={(t) => ({ ...glass(t, 0.9), px: 3 })}>
               {tr("Zavodlar")}
             </Button>
           </Box>
@@ -370,7 +371,7 @@ export default function StoreHomePage() {
             </Box>
             {items && page && items.length < page.total && (
               <Box sx={{ textAlign: 'center', mt: 3 }}>
-                <Button variant="outlined" size="large" onClick={loadMore} disabled={loadingMore} sx={(t) => ({ ...glass(t, 0.6), borderRadius: 999, px: 4 })}>
+                <Button variant="outlined" size="large" onClick={loadMore} disabled={loadingMore} sx={(t) => ({ ...glass(t, 0.9), px: 4 })}>
                   {loadingMore ? tr("Yuklanmoqda...") : tr("Yana ko'rsatish ({0})", page.total - items.length)}
                 </Button>
               </Box>
