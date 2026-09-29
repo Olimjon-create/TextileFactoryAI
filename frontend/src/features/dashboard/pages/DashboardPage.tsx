@@ -14,6 +14,7 @@ import { dashboardApi, type DashboardStats } from '../api';
 import { WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
 import AttendanceTodayCard from '../components/AttendanceTodayCard';
 import EmployeesCard from '../components/EmployeesCard';
+import MonthSummaryRow from '../components/MonthSummaryRow';
 import RevenueCard from '../components/RevenueCard';
 import { tr } from '@/i18n';
 
@@ -88,6 +89,8 @@ export default function DashboardPage() {
       ) : (
         overview && <ManagementOverview data={overview} onRevenueClick={() => setRevenueOpen(true)} />
       )}
+
+      <MonthSummaryRow />
 
       {(sales || sideCard) && (
         <Row cols={sales && sideCard ? { lg: tr("2fr 1fr"), xl: tr("5fr 2fr") } : { lg: '1fr' }}>

@@ -1946,5 +1946,11 @@
  "Xodim telefon kamerasi bilan QR kodni skanerlaydi yoki havolani ochib Start bosadi. Shundan so'ng botda bugungi va oylik natijasini hamda taxminiy ish haqini ko'radi, har kuni kechqurun hisobot oladi.": "Сотрудник сканирует QR-код камерой телефона или открывает ссылку и нажимает Start. После этого в боте он видит результаты за день и месяц, примерную зарплату и каждый вечер получает отчёт.",
  "Material yorliqlari": "Этикетки материалов",
  "QR yorliqlar": "QR-этикетки",
- "Ombor joyi yorliqlari": "Этикетки мест склада"
+ "Ombor joyi yorliqlari": "Этикетки мест склада",
+ "Shu oy sof foyda": "Чистая прибыль за месяц",
+ "Tushum {0} · xarajat {1}": "Выручка {0} · расходы {1}",
+ "To'lanmagan ish haqi": "Невыплаченная зарплата",
+ "{0} xodim · to'langan {1}": "{0} сотр. · выплачено {1}",
+ "Javob kutayotgan savollar": "Вопросы без ответа",
+ "Katalogdagi «Savol berish» orqali": "Через «Задать вопрос» в каталоге"
 }

@@ -1,9 +1,16 @@
-TEXTILECORE - TEZKOR BOSHLASH (Windows)
-=======================================
+TEXTILECORE - TEZKOR BOSHLASH VA QO'LLANMA (Windows)
+====================================================
 
+Jonli sayt:        https://textile-factory-ai-six.vercel.app
+Mijozlar katalogi: https://textile-factory-ai-six.vercel.app/store
+Telegram bot:      @TextileCoreZaraBot
+
+----------------------------------------------------
+1. KOMPYUTERDA ISHGA TUSHIRISH
+----------------------------------------------------
 Kerak: Python 3.11+ va Node.js 20+ o'rnatilgan bo'lsin.
 
-1) Birinchi marta o'rnatish (PowerShell, loyiha papkasida):
+Birinchi marta o'rnatish (PowerShell, loyiha papkasida):
 
    cd backend
    python -m venv venv
@@ -11,8 +18,8 @@ Kerak: Python 3.11+ va Node.js 20+ o'rnatilgan bo'lsin.
    copy .env.example .env
 
    So'ng backend\.env faylini oching va yozing:
-     DATABASE_URL=<Supabase "Session pooler" manzili>   (README -> "Supabase (Free Plan)")
-     SUPABASE_URL / SUPABASE_SECRET_KEY                  (rasmlar uchun)
+     DATABASE_URL=<Supabase "Session pooler" manzili>
+     SUPABASE_URL / SUPABASE_SECRET_KEY                  (rasmlar va bulutdagi zaxira uchun)
      JWT_SECRET_KEY=<istalgan uzun tasodifiy matn, kamida 32 belgi>
      CORS_ORIGINS=http://localhost:5180
    Internetsiz lokal sinov uchun: DATABASE_URL=sqlite:///./textile_dev.db
@@ -20,15 +27,62 @@ Kerak: Python 3.11+ va Node.js 20+ o'rnatilgan bo'lsin.
    cd ..\frontend
    npm install
 
-2) Ishga tushirish:   ishga-tushirish.bat   (orqa fonda; brauzer o'zi ochiladi: http://localhost:5180)
-   yoki terminalda:   npm run dev           (loyiha papkasida; oyna yopilsa to'xtaydi)
-3) To'xtatish:        toxtatish.bat
-4) Kompyuter yoqilganda o'zi ishga tushsin:   avtostart-yoqish.bat
-   (o'chirish: avtostart-ochirish.bat)
-5) Zaxira nusxa:      zaxira-olish.bat      (butun baza -> backend\backups\*.db)
-   Muhim ma'lumot kiritgandan keyin vaqti-vaqti bilan bosing: Supabase Free'da avtomatik zaxira yo'q.
+Ishga tushirish:   ishga-tushirish.bat   (orqa fonda; brauzer o'zi ochiladi: http://localhost:5180)
+   yoki terminalda:   npm run dev        (loyiha papkasida; oyna yopilsa to'xtaydi)
+To'xtatish:        toxtatish.bat
+Avtostart:         avtostart-yoqish.bat  (o'chirish: avtostart-ochirish.bat)
+Muammo bo'lsa:     logs\ papkasidagi jurnallarga qarang.
 
-Ma'lumotlar bazasi: Supabase (backend\.env dagi DATABASE_URL). Jonli sayt ham shu bazani ishlatadi.
-Muammo bo'lsa: logs\ papkasidagi jurnallarga qarang.
+----------------------------------------------------
+2. ZAXIRA NUSXA
+----------------------------------------------------
+- Har kuni 19:00 da bazaning to'liq nusxasi Supabase'dagi yopiq "backups" bucket'iga
+  avtomatik yuklanadi (oxirgi 14 kuni saqlanadi). Supabase -> Storage -> backups.
+- Kompyuterda: zaxira-olish.bat  (backend\backups\*.db, oxirgi 14 tasi saqlanadi).
+- Tiklash: .db.gz faylni yuklab oching (7-Zip), keyin backend papkasida:
+     venv\Scripts\python -m scripts.migrate_to_supabase --source sqlite:///./backups/<fayl>.db --replace
 
-Eslatma: bu papkada .git tarixi yo'q - Git tarixi asl loyiha papkangizda saqlangan.
+----------------------------------------------------
+3. ASOSIY BO'LIMLAR
+----------------------------------------------------
+Dashboard           Asosiy ko'rsatkichlar, shu oy foyda, to'lanmagan ish haqi, mijoz savollari.
+Hisobotlar          Ishlab chiqarish, brak, KPI, savdo, tannarx, ombor, yetkazib beruvchilar (Excel).
+Foyda va xarajatlar Ijara, kommunal, soliq va h.k. kiritiladi; oylik sof foyda avtomatik hisoblanadi.
+Buyurtmalar         Katalog va qo'lda kiritilgan buyurtmalar, holati, jo'natmalar.
+Mijoz savollari     Katalogdagi "Savol berish" orqali kelgan savollar; qo'ng'iroq qilib javob bering.
+Ish buyurtmalari    Kesish -> Tikuv -> Pardoz -> Sifat -> Qadoqlash; QR skaner.
+Xodimlar            Xodim kartochkasi, stavka (oylik / soatbay / ishbay).
+                    Telegram belgisi -> xodimga shaxsiy QR/havola (bot orqali o'z natijasini ko'radi).
+Davomat             Kelish-ketish, kechikish, javob so'rovlari.
+Ish haqi            Oy bo'yicha avtomatik hisob; bonus, jarima, avans; "To'lash"; hisob varaqasi.
+Ombor               Materiallar, kirim-chiqim, ombor joylari, tayyor mahsulot.
+Omborchi rejimi     Telefonda: QR skanerlab kirim / chiqim / ko'chirish / sanash (Android Chrome).
+QR yorliqlar        Materiallar va Ombor joylari sahifalarida -> chop etib javonga yopishtiring.
+Ombor hisobotlari   Oylik aylanma, qiymat bo'yicha, harakatsiz qoldiqlar.
+Sozlamalar          Profil, parol, til (UZ/RU/EN), zavod nomi, Telegram, tannarx sozlamalari.
+
+----------------------------------------------------
+4. TELEGRAM BOT
+----------------------------------------------------
+Zavod egasi:  Sozlamalar -> Telegram -> "Botni ochish" -> Start. Keyin yangi buyurtma,
+              material tugashi, mashina buzilishi, javob so'rovlari va kunlik hisobot keladi.
+              Yangi buyurtma xabarida "Tasdiqlash" / "Bekor qilish" tugmalari bor.
+Mijoz:        /start -> "Do'konni ochish" (katalog Telegram ichida). Buyurtma holati botga keladi.
+              Zavodning do'kon havolasi: Sozlamalar -> Telegram -> "Mijozlar uchun do'kon havolasi".
+Xodim:        Xodimlar -> Telegram belgisi -> QR. /me - bugungi va oylik natija, ish haqi.
+Buyruqlar:    /start  /shop  /orders  /me  /help
+
+----------------------------------------------------
+5. XAVFSIZLIK
+----------------------------------------------------
+- Admin parolini o'zgartiring (Sozlamalar -> Parolni o'zgartirish). Zaif parol bo'lsa
+  dasturning tepasida ogohlantirish chiqadi.
+- backend\.env faylidagi kalitlarni hech kimga bermang va chatga yozmang.
+- Server xatosi bo'lsa administrator Telegram'iga "Server xatosi" xabari keladi.
+
+----------------------------------------------------
+6. IXTIYORIY SOZLAMALAR (backend\.env va Vercel -> Environment Variables)
+----------------------------------------------------
+RESEND_API_KEY      "Parolni unutdingizmi?" (email orqali tiklash) uchun.
+ANTHROPIC_API_KEY   Do'kondagi va Telegram'dagi AI yordamchi uchun (console.anthropic.com).
+TELEGRAM_BOT_TOKEN  Telegram bot (@BotFather).
