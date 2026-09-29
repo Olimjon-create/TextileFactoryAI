@@ -5,13 +5,13 @@ from tests.conftest import API, register_owner
 
 def setup_stock(client):
     owner, factory_id = register_owner(client, "owner@w.uz", "Ombor Tekstil")
-    post = lambda url, body: client.post(f"{API}{url}", headers=owner, json=body)  # noqa: E731
+    post = lambda url, body: client.post(f"{API}{url}", headers=owner, json=body)
     fab = post("/inventory/materials", {"code": "FAB", "name": "Pike", "material_type": "FABRIC", "unit": "METER"}).json()
     btn = post("/inventory/materials", {"code": "BTN", "name": "Tugma", "material_type": "BUTTON", "unit": "PIECE"}).json()
     idle = post("/inventory/materials", {"code": "OLD", "name": "Eski ip", "material_type": "THREAD", "unit": "SPOOL"}).json()
     a = post("/inventory/locations", {"code": "A-1", "name": "Mato"}).json()
     b = post("/inventory/locations", {"code": "B-1", "name": "Zaxira"}).json()
-    mv = lambda body: post("/inventory/movements", body)  # noqa: E731
+    mv = lambda body: post("/inventory/movements", body)
     assert mv({"movement_type": "RECEIPT", "material_id": fab["id"], "location_id": a["id"], "quantity": 100, "unit_cost": 20000}).status_code == 201
     assert mv({"movement_type": "ISSUE", "material_id": fab["id"], "location_id": a["id"], "quantity": 30}).status_code == 201
     assert mv({"movement_type": "WRITE_OFF", "material_id": fab["id"], "location_id": a["id"], "quantity": 5}).status_code == 201

@@ -40,7 +40,7 @@ def test_payroll_calculation(client, f):
 def test_adjustments_payment_and_locking(client, f):
     produce(client, f)
     o, emp = f["owner"], f["piece"]["id"]
-    add = lambda kind, amount: client.post(f"{API}/payroll/adjustments", headers=o,  # noqa: E731
+    add = lambda kind, amount: client.post(f"{API}/payroll/adjustments", headers=o,
                                            json={"employee_id": emp, "month": MONTH, "kind": kind, "amount": amount, "note": "test"})
     assert add("BONUS", 5000).status_code == 201
     assert add("DEDUCTION", 2000).status_code == 201

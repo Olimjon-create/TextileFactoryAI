@@ -22,7 +22,7 @@ from urllib.parse import parse_qsl
 
 import requests
 from fastapi import HTTPException, status
-from sqlalchemy import event, select
+from sqlalchemy import event, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import settings
@@ -365,6 +365,92 @@ def _public_factory(db: Session, factory_id: int) -> Factory | None:
     return factory if factory is not None and factory.is_active and factory.is_public else None
 
 
+def employee_link_code(employee_id: int) -> str:
+    return f"e{employee_id}-{_sign(f'tg-emp:{employee_id}')[:10]}"
+
+
+def employee_status(employee) -> dict:
+    username = bot_username()
+    return {
+        "enabled": settings.telegram_enabled,
+        "linked": bool(employee.telegram_chat_id),
+        "link_url": f"https://t.me/{username}?start={employee_link_code(employee.id)}" if username else None,
+    }
+
+
+ME_KEYBOARD_TEXT = "📊 Mening natijam"
+
+
+def _me_keyboard(lang: str) -> dict:
+    return {"inline_keyboard": [[{"text": t_lang(lang, ME_KEYBOARD_TEXT), "callback_data": "me"}]]}
+
+
+def _link_employee(db: Session, chat_id: int, arg: str, lang: str) -> None:
+    from app.models import Employee
+
+    try:
+        employee_id = int(arg[1:].split("-", 1)[0])
+    except ValueError:
+        employee_id = 0
+    employee = db.get(Employee, employee_id) if employee_id else None
+    if employee is None or not hmac.compare_digest(employee_link_code(employee_id), arg):
+        _send_chat(chat_id, lang, "Havola noto'g'ri yoki eskirgan. Rahbaringizdan yangi havola so'rang.")
+        return
+    for other in db.scalars(select(Employee).where(Employee.telegram_chat_id == str(chat_id), Employee.id != employee.id)):
+        other.telegram_chat_id = None
+    employee.telegram_chat_id, employee.telegram_lang = str(chat_id), lang
+    db.commit()
+    _send_chat(chat_id, lang,
+               "👋 {name}, siz TextileCore'ga ulandingiz.\n\nBu yerda bugungi va oylik natijangizni hamda taxminiy ish haqingizni ko'rasiz. Har kuni kechqurun qisqa hisobot keladi.",
+               reply_markup=_me_keyboard(lang), name=employee.full_name)
+    _send_raw(chat_id, employee_summary_text(db, employee, lang), _me_keyboard(lang))
+
+
+def _tashkent_today():
+    from datetime import datetime, timedelta, timezone
+
+    return datetime.now(timezone(timedelta(hours=5))).date()
+
+
+def _sum(value: float) -> str:
+    return f"{value:,.0f}".replace(",", " ")
+
+
+def employee_summary_text(db: Session, employee, lang: str) -> str:
+    from app.models import ProductionLog
+    from app.services import payroll_service
+
+    today = _tashkent_today()
+    month = today.strftime("%Y-%m")
+    row = payroll_service.build(db, [employee], month).rows[0]
+    today_pieces = int(db.scalar(
+        select(func.coalesce(func.sum(ProductionLog.quantity_good), 0))
+        .where(ProductionLog.employee_id == employee.id, ProductionLog.work_date == today)
+    ) or 0)
+    status_label = t_lang(lang, "to'langan ✅") if row.payment_id else t_lang(lang, "hali to'lanmagan")
+    return t_lang(
+        lang,
+        "📊 <b>{name}</b>\n\n📅 Bugun: {today} dona\n🗓 Shu oy: {pieces} dona · {hours} soat · {days} kun\n\n"
+        "💰 Hisoblangan: {accrued} so'm\n➖ Avans: {advance} so'm\n💵 Qo'lingizga: <b>{to_pay} so'm</b> ({status})",
+        name=html.escape(employee.full_name), today=today_pieces, pieces=row.pieces, hours=row.hours, days=row.present_days,
+        accrued=_sum(row.accrued), advance=_sum(row.advance), to_pay=_sum(row.to_pay), status=status_label,
+    )
+
+
+def _employee_by_chat(db: Session, chat_id) -> object | None:
+    from app.models import Employee
+
+    return db.scalar(select(Employee).where(Employee.telegram_chat_id == str(chat_id)).limit(1))
+
+
+def _send_me(db: Session, chat_id, lang: str) -> None:
+    employee = _employee_by_chat(db, chat_id)
+    if employee is None:
+        _send_chat(chat_id, lang, "Siz xodim sifatida ulanmagansiz. Rahbaringizdan shaxsiy havolani so'rang.")
+        return
+    _send_raw(chat_id, employee_summary_text(db, employee, employee.telegram_lang or lang), _me_keyboard(lang))
+
+
 def _handle_start(db: Session, chat: dict, user: dict, arg: str, lang: str, site: str) -> None:
     chat_id = chat["id"]
     name = user.get("first_name") or ""
@@ -380,6 +466,9 @@ def _handle_start(db: Session, chat: dict, user: dict, arg: str, lang: str, site
             _send_chat(chat_id, lang, "Havola noto'g'ri yoki eskirgan. Saytda Sozlamalar → Telegram bo'limidan qayta oching.")
         return
     if chat.get("type") != "private":
+        return
+    if arg.startswith("e") and "-" in arg:
+        _link_employee(db, chat_id, arg, lang)
         return
     factory = None
     if arg.startswith("shop"):
@@ -413,6 +502,8 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         chat_id = (cq.get("message") or {}).get("chat", {}).get("id") or user.get("id")
         if cq.get("data") == "orders" and chat_id:
             _send_raw(chat_id, _orders_text(db, str(user["id"]), lang), _shop_keyboard(lang, site))
+        elif cq.get("data") == "me" and chat_id:
+            _send_me(db, chat_id, lang)
         return
 
     msg = update.get("message")
@@ -428,6 +519,8 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         return
     elif command == "/orders":
         _send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
+    elif command == "/me":
+        _send_me(db, chat["id"], lang)
     elif command == "/help":
         text = t_lang(lang, HELP_TEXT) + (t_lang(lang, HELP_AI) if settings.assistant_enabled else "")
         _send_raw(chat["id"], text, _shop_keyboard(lang, site))
@@ -476,6 +569,7 @@ def setup_bot(base_url: str) -> dict:
         commands = [{"command": "start", "description": t_lang(lang, "Boshlash")},
                     {"command": "shop", "description": t_lang(lang, "Do'konni ochish")},
                     {"command": "orders", "description": t_lang(lang, "Buyurtmalarim")},
+                    {"command": "me", "description": t_lang(lang, "Mening natijam (xodimlar uchun)")},
                     {"command": "help", "description": t_lang(lang, "Yordam")}]
         _call("setMyCommands", commands=commands, **scope)
         _call("setMyDescription", description=t_lang(lang, BOT_DESCRIPTION), **scope)

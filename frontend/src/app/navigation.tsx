@@ -11,6 +11,7 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
+import QrCodeScannerOutlinedIcon from '@mui/icons-material/QrCodeScannerOutlined';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
@@ -28,9 +29,10 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { ATTENDANCE_VIEW_ROLES } from '@/features/attendance/permissions';
 import { CUSTOMER_VIEW_ROLES } from '@/features/customers/permissions';
-import { AUDIT_VIEW_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
+import { AUDIT_VIEW_ROLES, INVENTORY_EDITOR_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
 import { MACHINE_VIEW_ROLES, PAY_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
 import { KPI_VIEW_ROLES, PRODUCTION_VIEW_ROLES } from '@/features/production/permissions';
 import { ORDER_VIEW_ROLES } from '@/features/orders/permissions';
@@ -62,6 +64,7 @@ export const NAVIGATION: NavSection[] = [
     items: [
       { label: tr("Dashboard"), path: '/', icon: <DashboardOutlinedIcon /> },
       { label: tr("Hisobotlar"), path: '/reports', icon: <AssessmentOutlinedIcon />, roles: REPORT_VIEW_ROLES },
+      { label: tr("Foyda va xarajatlar"), path: '/finance', icon: <AccountBalanceWalletOutlinedIcon />, roles: PAY_VIEW_ROLES },
     ],
   },
   {
@@ -106,6 +109,7 @@ export const NAVIGATION: NavSection[] = [
     title: tr("Ombor"),
     items: [
       { label: tr("Umumiy ko'rinish"), path: '/warehouse', icon: <SpaceDashboardOutlinedIcon />, roles: INVENTORY_VIEW_ROLES },
+      { label: tr("Omborchi rejimi"), path: '/warehouse/mobile', icon: <QrCodeScannerOutlinedIcon />, roles: INVENTORY_EDITOR_ROLES },
       { label: tr("Materiallar"), path: '/inventory/materials', icon: <Inventory2OutlinedIcon />, roles: INVENTORY_VIEW_ROLES },
       { label: tr("Kirim-chiqim jurnali"), path: '/inventory/movements', icon: <SwapVertIcon />, roles: INVENTORY_VIEW_ROLES },
       { label: tr("Tayyor mahsulot"), path: '/finished-goods', icon: <AllInboxOutlinedIcon />, roles: LOGISTICS_VIEW_ROLES },

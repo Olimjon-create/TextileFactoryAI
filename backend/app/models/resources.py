@@ -147,6 +147,8 @@ class Employee(Base, TimestampMixin):
         Enum(EmployeeStatus, name="employee_status"), default=EmployeeStatus.ACTIVE, index=True
     )
     notes: Mapped[str | None] = mapped_column(String(500))
+    telegram_chat_id: Mapped[str | None] = mapped_column(String(32))
+    telegram_lang: Mapped[str | None] = mapped_column(String(2))
 
     line: Mapped[ProductionLine | None] = relationship()
     shift: Mapped[Shift | None] = relationship()

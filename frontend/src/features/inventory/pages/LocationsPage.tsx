@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
   Alert,
   Box,
@@ -27,6 +27,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import QrCode2Icon from '@mui/icons-material/QrCode2';
+import QrLabelsDialog from '../components/QrLabelsDialog';
 import { useAuth } from '@/features/auth/AuthContext';
 import { factoriesApi } from '@/features/factories/api';
 import { getErrorMessage } from '@/shared/api/client';
@@ -147,6 +149,11 @@ export default function LocationsPage() {
   const [error, setError] = useState('');
   const [dialog, setDialog] = useState<{ open: boolean; location: WarehouseLocation | null }>({ open: false, location: null });
   const [deleting, setDeleting] = useState<WarehouseLocation | null>(null);
+  const [labelsOpen, setLabelsOpen] = useState(false);
+  const locationLabels = useMemo(
+    () => items.filter((l) => l.is_active).map((l) => ({ key: String(l.id), qr: `TCL:${l.id}`, title: l.code, subtitle: l.name })),
+    [items],
+  );
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const load = useCallback(async () => {
@@ -203,12 +210,23 @@ export default function LocationsPage() {
         title={tr("Ombor joylari")}
         subtitle={tr("Bo'limlar, javonlar va sex yonidagi omborlar")}
         action={
-          canEdit && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialog({ open: true, location: null })}>
-              {tr("Yangi joy")}
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button variant="outlined" color="inherit" startIcon={<QrCode2Icon />} onClick={() => setLabelsOpen(true)} disabled={!items.length}>
+              {tr('QR yorliqlar')}
             </Button>
-          )
+            {canEdit && (
+              <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialog({ open: true, location: null })}>
+                {tr("Yangi joy")}
+              </Button>
+            )}
+          </Box>
         }
+      />
+      <QrLabelsDialog
+        open={labelsOpen}
+        title={tr('Ombor joyi yorliqlari')}
+        labels={locationLabels}
+        onClose={() => setLabelsOpen(false)}
       />
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>

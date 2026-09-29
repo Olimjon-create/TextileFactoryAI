@@ -28,6 +28,7 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import RemoveShoppingCartOutlinedIcon from '@mui/icons-material/RemoveShoppingCartOutlined';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import MoveToInboxOutlinedIcon from '@mui/icons-material/MoveToInboxOutlined';
+import QrCode2Icon from '@mui/icons-material/QrCode2';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { factoriesApi } from '@/features/factories/api';
@@ -47,6 +48,7 @@ import { formatMoney } from '@/shared/utils/money';
 import { inventoryApi } from '../api';
 import MaterialFormDialog from '../components/MaterialFormDialog';
 import MovementFormDialog from '../components/MovementFormDialog';
+import QrLabelsDialog, { type QrLabel } from '../components/QrLabelsDialog';
 import { formatQty, STOCK_STATE_LABELS } from '../constants';
 import { useCanEditInventory } from '../permissions';
 import type { InventorySummary, Material, StockState } from '../types';
@@ -88,6 +90,8 @@ export default function MaterialsPage() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [labelsOpen, setLabelsOpen] = useState(false);
+  const [labels, setLabels] = useState<QrLabel[] | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [movement, setMovement] = useState<{ open: boolean; material: Material | null }>({ open: false, material: null });
 
@@ -149,8 +153,20 @@ export default function MaterialsPage() {
       m.stock_value,
     ]);
 
+  const openLabels = () => {
+    setLabels(null);
+    setLabelsOpen(true);
+    fetchAll((offset, limit) => inventoryApi.materials({ offset, limit }))
+      .then((all) => setLabels(all.map((m) => ({ key: String(m.id), qr: `TCM:${m.id}`, title: m.code, subtitle: m.name }))))
+      .catch((e) => {
+        setLabelsOpen(false);
+        setError(getErrorMessage(e));
+      });
+  };
+
   return (
     <>
+      <QrLabelsDialog open={labelsOpen} title={tr('Material yorliqlari')} labels={labels} onClose={() => setLabelsOpen(false)} />
       <PageHeader
         title={tr("Materiallar")}
         subtitle={tr("Ombordagi materiallar katalogi va real qoldiq")}
@@ -161,6 +177,9 @@ export default function MaterialsPage() {
               headers={['Kod', 'Material', 'Turi', 'Rang', 'Fabrika', 'Qoldiq', "O'lchov", 'Minimal', 'Tannarx', 'Qiymati']}
               load={exportRows}
             />
+            <Button variant="outlined" color="inherit" startIcon={<QrCode2Icon />} onClick={openLabels}>
+              {tr('QR yorliqlar')}
+            </Button>
             {canEdit && (
               <>
                 <Button variant="outlined" startIcon={<SwapVertIcon />} onClick={() => openMovement(null)}>

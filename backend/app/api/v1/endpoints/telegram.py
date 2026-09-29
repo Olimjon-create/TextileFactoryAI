@@ -11,6 +11,7 @@ from app.core.i18n import t
 from app.core.roles import Role
 from app.models import Factory, User
 from app.services import telegram_service
+from app.services.workforce_service import WORKFORCE_EDITOR_ROLES
 
 router = APIRouter(prefix="/telegram", tags=["Telegram"])
 can_manage = require_roles(Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER)
@@ -76,3 +77,35 @@ def telegram_webhook(
 def telegram_setup(request: Request, actor: User = Depends(require_roles(Role.SUPER_ADMIN))):
     """Webhook va "Do'kon" menyu tugmasini o'rnatish (deploy'dan keyin bir marta)."""
     return telegram_service.setup_bot(str(request.base_url))
+
+
+class EmployeeTelegram(BaseModel):
+    enabled: bool
+    linked: bool
+    link_url: str | None
+
+
+def _employee(db: Session, actor: User, employee_id: int):
+    from app.core.scope import can_access
+    from app.models import Employee
+
+    employee = db.get(Employee, employee_id)
+    if employee is None or not can_access(actor, employee.factory_id):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, t("Xodim topilmadi"))
+    return employee
+
+
+can_manage_staff = require_roles(*WORKFORCE_EDITOR_ROLES)
+
+
+@router.get("/employees/{employee_id}", response_model=EmployeeTelegram)
+def employee_telegram(employee_id: int, db: Session = Depends(get_db), actor: User = Depends(can_manage_staff)):
+    return telegram_service.employee_status(_employee(db, actor, employee_id))
+
+
+@router.delete("/employees/{employee_id}", response_model=EmployeeTelegram)
+def employee_telegram_unlink(employee_id: int, db: Session = Depends(get_db), actor: User = Depends(can_manage_staff)):
+    employee = _employee(db, actor, employee_id)
+    employee.telegram_chat_id = None
+    db.commit()
+    return telegram_service.employee_status(employee)

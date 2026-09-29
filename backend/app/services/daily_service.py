@@ -113,9 +113,35 @@ def cleanup(db: Session) -> dict:
     return {"rate_limit_hits": hits or 0, "reset_tokens": tokens or 0}
 
 
+def send_employee_reports(db: Session, now: datetime | None = None) -> int:
+    from app.models import Attendance, Employee, ProductionLog
+    from app.models.resources import EmployeeStatus
+
+    if not telegram_service.settings.telegram_enabled:
+        return 0
+    today, _, _ = _today_window(now)
+    active_today = select(ProductionLog.employee_id).where(ProductionLog.work_date == today).union(
+        select(Attendance.employee_id).where(Attendance.work_date == today)
+    )
+    employees = db.scalars(select(Employee).where(
+        Employee.telegram_chat_id.is_not(None), Employee.status == EmployeeStatus.ACTIVE, Employee.id.in_(active_today)
+    ))
+    sent = 0
+    for employee in employees:
+        lang = employee.telegram_lang or "uz"
+        text = telegram_service.t_lang(lang, "🌙 Kunlik hisobot") + "\n\n" + telegram_service.employee_summary_text(db, employee, lang)
+        try:
+            telegram_service._call("sendMessage", timeout=5, chat_id=employee.telegram_chat_id, text=text, parse_mode="HTML")
+            sent += 1
+        except Exception as exc:
+            print("employee report:", exc)
+    return sent
+
+
 def run(db: Session) -> dict:
     result = {"cleanup": cleanup(db)}
     result["reports_sent"] = send_reports(db)
+    result["employee_reports"] = send_employee_reports(db)
     try:
         result["backup"] = backup_service.cloud_backup(db.get_bind())
     except Exception as exc:

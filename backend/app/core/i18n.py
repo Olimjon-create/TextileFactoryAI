@@ -304,3 +304,30 @@ MESSAGES.update({
         "\n\n💬 Type your product question as a normal message — the AI assistant will answer.",
     ),
 })
+MESSAGES.update({
+    "🌙 Kunlik hisobot": _m("🌙 Ежедневный отчёт", "🌙 Daily report"),
+    "Xarajat topilmadi": _m("Расход не найден", "Expense not found"),
+    "Boshlanish sanasi tugash sanasidan keyin bo'lmasligi kerak": _m("Дата начала не может быть позже даты окончания", "Start date must not be after end date"),
+    "Davr 3 yildan oshmasligi kerak": _m("Период не должен превышать 3 года", "The period must not exceed 3 years"),
+    "Xodim topilmadi": _m("Сотрудник не найден", "Employee not found"),
+    "Bu oy uchun ish haqi to'langan — avval to'lovni bekor qiling": _m("Зарплата за этот месяц выплачена — сначала отмените выплату", "Salary for this month is paid — cancel the payment first"),
+    "Yozuv topilmadi": _m("Запись не найдена", "Record not found"),
+    "To'lanadigan summa manfiy — avans hisoblangan ish haqidan ko'p": _m("Сумма к выплате отрицательная — аванс больше начисленной зарплаты", "Amount to pay is negative — the advance exceeds accrued pay"),
+    "To'lov topilmadi": _m("Выплата не найдена", "Payment not found"),
+    "Oy noto'g'ri formatda (YYYY-MM)": _m("Неверный формат месяца (YYYY-MM)", "Invalid month format (YYYY-MM)"),
+    "👋 {name}, siz TextileCore'ga ulandingiz.\n\nBu yerda bugungi va oylik natijangizni hamda taxminiy ish haqingizni ko'rasiz. Har kuni kechqurun qisqa hisobot keladi.": _m(
+        "👋 {name}, вы подключены к TextileCore.\n\nЗдесь вы видите свои результаты за день и месяц и примерную зарплату. Каждый вечер приходит короткий отчёт.",
+        "👋 {name}, you are connected to TextileCore.\n\nHere you can see your daily and monthly output and estimated pay. A short report arrives every evening.",
+    ),
+    "📊 <b>{name}</b>\n\n📅 Bugun: {today} dona\n🗓 Shu oy: {pieces} dona · {hours} soat · {days} kun\n\n💰 Hisoblangan: {accrued} so'm\n➖ Avans: {advance} so'm\n💵 Qo'lingizga: <b>{to_pay} so'm</b> ({status})": _m(
+        "📊 <b>{name}</b>\n\n📅 Сегодня: {today} шт.\n🗓 В этом месяце: {pieces} шт. · {hours} ч · {days} дн.\n\n💰 Начислено: {accrued} сум\n➖ Аванс: {advance} сум\n💵 К получению: <b>{to_pay} сум</b> ({status})",
+        "📊 <b>{name}</b>\n\n📅 Today: {today} pcs\n🗓 This month: {pieces} pcs · {hours} h · {days} days\n\n💰 Accrued: {accrued} so'm\n➖ Advance: {advance} so'm\n💵 To receive: <b>{to_pay} so'm</b> ({status})",
+    ),
+    "Havola noto'g'ri yoki eskirgan. Rahbaringizdan yangi havola so'rang.": _m("Ссылка неверна или устарела. Попросите у руководителя новую ссылку.", "The link is invalid or outdated. Ask your manager for a new link."),
+    "to'langan ✅": _m("выплачено ✅", "paid ✅"),
+    "hali to'lanmagan": _m("ещё не выплачено", "not paid yet"),
+    "Siz xodim sifatida ulanmagansiz. Rahbaringizdan shaxsiy havolani so'rang.": _m("Вы не подключены как сотрудник. Попросите у руководителя личную ссылку.", "You are not connected as an employee. Ask your manager for your personal link."),
+    "Mening natijam (xodimlar uchun)": _m("Мои результаты (для сотрудников)", "My results (for employees)"),
+    "📊 Mening natijam": _m("📊 Мои результаты", "📊 My results"),
+    "Fabrika topilmadi": _m("Фабрика не найдена", "Factory not found"),
+})

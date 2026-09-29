@@ -24,6 +24,8 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import EmployeeTelegramDialog from '../components/EmployeeTelegramDialog';
 import { getErrorMessage } from '@/shared/api/client';
 import ConfirmDialog from '@/shared/components/ConfirmDialog';
 import FilterBar from '@/shared/components/FilterBar';
@@ -61,6 +63,7 @@ export default function EmployeesPage() {
   const [dialog, setDialog] = useState<{ open: boolean; employee: Employee | null }>({ open: false, employee: null });
   const [deleting, setDeleting] = useState<Employee | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [telegramFor, setTelegramFor] = useState<Employee | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -104,6 +107,11 @@ export default function EmployeesPage() {
   const actions = (e: Employee) =>
     canEditWorkforce && (
       <>
+        <Tooltip title={tr('Telegram: shaxsiy kabinet')}>
+          <IconButton size="small" onClick={() => setTelegramFor(e)}>
+            <TelegramIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
         <Tooltip title={tr("Tahrirlash")}>
           <IconButton size="small" onClick={() => setDialog({ open: true, employee: e })}>
             <EditOutlinedIcon fontSize="small" />
@@ -287,6 +295,7 @@ export default function EmployeesPage() {
         onConfirm={handleDelete}
         onClose={() => setDeleting(null)}
       />
+      <EmployeeTelegramDialog employee={telegramFor} onClose={() => setTelegramFor(null)} />
     </>
   );
 }

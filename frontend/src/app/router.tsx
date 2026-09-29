@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { CUSTOMER_VIEW_ROLES } from '@/features/customers/permissions';
 import { GuestRoute, ProtectedRoute, RoleGuard } from '@/features/auth/guards';
-import { AUDIT_VIEW_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
+import { AUDIT_VIEW_ROLES, INVENTORY_EDITOR_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
 import { ORDER_VIEW_ROLES } from '@/features/orders/permissions';
 import { MACHINE_VIEW_ROLES, PAY_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
 import { ATTENDANCE_VIEW_ROLES } from '@/features/attendance/permissions';
@@ -38,6 +38,8 @@ const MovementsPage = lazy(() => import('@/features/inventory/pages/MovementsPag
 const WarehouseOverviewPage = lazy(() => import('@/features/inventory/pages/WarehouseOverviewPage'));
 const WarehouseReportsPage = lazy(() => import('@/features/inventory/pages/WarehouseReportsPage'));
 const PayrollPage = lazy(() => import('@/features/payroll/pages/PayrollPage'));
+const FinancePage = lazy(() => import('@/features/finance/pages/FinancePage'));
+const WarehouseMobilePage = lazy(() => import('@/features/inventory/pages/WarehouseMobilePage'));
 const LocationsPage = lazy(() => import('@/features/inventory/pages/LocationsPage'));
 const EmployeesPage = lazy(() => import('@/features/resources/pages/EmployeesPage'));
 const AttendancePage = lazy(() => import('@/features/attendance/pages/AttendancePage'));
@@ -152,6 +154,14 @@ export const router = createBrowserRouter([
           {
             element: <RoleGuard roles={REPORT_VIEW_ROLES} />,
             children: [{ path: '/reports', element: <ReportsPage /> }],
+          },
+          {
+            element: <RoleGuard roles={PAY_VIEW_ROLES} />,
+            children: [{ path: '/finance', element: <FinancePage /> }],
+          },
+          {
+            element: <RoleGuard roles={INVENTORY_EDITOR_ROLES} />,
+            children: [{ path: '/warehouse/mobile', element: <WarehouseMobilePage /> }],
           },
           { path: '/settings', element: <SettingsPage /> },
           {

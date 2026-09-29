@@ -37,7 +37,7 @@ def _grouped(db: Session, query) -> dict[int, tuple]:
 
 
 def report(db: Session, actor: User, month: str, factory_id: int | None = None, employee_id: int | None = None) -> PayrollReport:
-    start, end = _period(month)
+    start, _ = _period(month)
     adj = PayrollAdjustment
     pay = PayrollPayment
     touched = select(adj.employee_id).where(adj.period == start).union(select(pay.employee_id).where(pay.period == start))
@@ -47,6 +47,13 @@ def report(db: Session, actor: User, month: str, factory_id: int | None = None, 
     if employee_id is not None:
         query = query.where(Employee.id == employee_id)
     employees = list(db.scalars(query.order_by(Employee.department, Employee.full_name)))
+    return build(db, employees, month)
+
+
+def build(db: Session, employees: list[Employee], month: str) -> PayrollReport:
+    start, end = _period(month)
+    adj = PayrollAdjustment
+    pay = PayrollPayment
     ids = [e.id for e in employees]
     if not ids:
         return PayrollReport(month=month, rows=[], totals=PayrollTotals(employees=0, base=0, bonus=0, deduction=0, advance=0, to_pay=0, paid=0, unpaid=0, missing_rate=0))
