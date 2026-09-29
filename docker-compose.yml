@@ -1,0 +1,18 @@
+# Ixtiyoriy: PostgreSQL'ni o'rnatmasdan Docker orqali ishga tushirish uchun.
+#   docker compose up -d
+services:
+  postgres:
+    image: postgres:16
+    container_name: textile_factory_ai_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: textile_factory_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

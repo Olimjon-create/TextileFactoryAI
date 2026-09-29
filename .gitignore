@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+backend/venv/
+backend/.env
+*.db
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# IDE / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Yuklangan rasmlar va baza zaxiralari
+backend/media/
+backend/*.backup-*.db
+
+# TypeScript build keshi
+*.tsbuildinfo
+# Vercel CLI
+.vercel/
+
+.vercel
+.env*
+
+# Lokal ishga tushirish jurnallari va test keshi
+logs/
+.pytest_cache/
+
+# Baza zaxira nusxalari (zaxira-olish.bat)
+backend/backups/
+
+# Namuna sozlamalar (maxfiy qiymatsiz) repozitoriyda qoladi
+!**/.env.example

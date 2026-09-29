@@ -1,0 +1,34 @@
+TEXTILECORE - TEZKOR BOSHLASH (Windows)
+=======================================
+
+Kerak: Python 3.11+ va Node.js 20+ o'rnatilgan bo'lsin.
+
+1) Birinchi marta o'rnatish (PowerShell, loyiha papkasida):
+
+   cd backend
+   python -m venv venv
+   venv\Scripts\pip install -r requirements.txt
+   copy .env.example .env
+
+   So'ng backend\.env faylini oching va yozing:
+     DATABASE_URL=<Supabase "Session pooler" manzili>   (README -> "Supabase (Free Plan)")
+     SUPABASE_URL / SUPABASE_SECRET_KEY                  (rasmlar uchun)
+     JWT_SECRET_KEY=<istalgan uzun tasodifiy matn, kamida 32 belgi>
+     CORS_ORIGINS=http://localhost:5180
+   Internetsiz lokal sinov uchun: DATABASE_URL=sqlite:///./textile_dev.db
+
+   cd ..\frontend
+   npm install
+
+2) Ishga tushirish:   ishga-tushirish.bat   (orqa fonda; brauzer o'zi ochiladi: http://localhost:5180)
+   yoki terminalda:   npm run dev           (loyiha papkasida; oyna yopilsa to'xtaydi)
+3) To'xtatish:        toxtatish.bat
+4) Kompyuter yoqilganda o'zi ishga tushsin:   avtostart-yoqish.bat
+   (o'chirish: avtostart-ochirish.bat)
+5) Zaxira nusxa:      zaxira-olish.bat      (butun baza -> backend\backups\*.db)
+   Muhim ma'lumot kiritgandan keyin vaqti-vaqti bilan bosing: Supabase Free'da avtomatik zaxira yo'q.
+
+Ma'lumotlar bazasi: Supabase (backend\.env dagi DATABASE_URL). Jonli sayt ham shu bazani ishlatadi.
+Muammo bo'lsa: logs\ papkasidagi jurnallarga qarang.
+
+Eslatma: bu papkada .git tarixi yo'q - Git tarixi asl loyiha papkangizda saqlangan.

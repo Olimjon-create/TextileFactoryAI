@@ -1,0 +1,20 @@
+# Vercel'ga hech qachon yuklanmasin: maxfiy sozlamalar, lokal baza va zaxiralar, virtual muhit
+backend/.env
+backend/venv/
+backend/*.db
+backend/media/
+backend/tests/
+backend/requirements-dev.txt
+**/__pycache__/
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Vercel CLI tokenlari
+.env*.local
+.vercel/
+
+# Lokal ishga tushirish jurnallari va lokal skriptlar
+logs/
+
+backend/backups/

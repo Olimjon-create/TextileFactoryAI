@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Telefonga ilova sifatida o'rnatish (PWA) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0f5c4d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="TextileCore" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>TextileCore</title>
+    <script>
+      // Splash tanlangan rejim (Light/Dark) rangida chiqishi uchun — React yuklanishidan OLDIN.
+      // Kalit src/app/ColorModeContext.tsx dagi COLOR_MODE_KEY bilan bir xil.
+      (function () {
+        var mode;
+        try {
+          mode = localStorage.getItem('tfai_color_mode');
+        } catch (e) {}
+        if (mode !== 'light' && mode !== 'dark') {
+          mode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-mode', mode);
+        document.documentElement.style.colorScheme = mode;
+      })();
+    </script>
+    <style>
+      html { background: #f3f0ea; }
+      html[data-mode='dark'] { background: #0f110f; }
+      #splash {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+        background: #f3f0ea; color: #1d1c19;
+        font-family: Manrope, Inter, Roboto, Helvetica, Arial, sans-serif;
+        transition: opacity .35s ease, visibility .35s ease;
+      }
+      html[data-mode='dark'] #splash { background: #0f110f; color: #ece9e2; }
+      #splash.hidden { opacity: 0; visibility: hidden; }
+      #splash .logo {
+        width: 64px; height: 64px; border-radius: 16px;
+        display: grid; place-items: center;
+        background: linear-gradient(135deg, #0a4237, #0f5c4d);
+        color: #fff; font-size: 30px; font-weight: 700;
+        box-shadow: 0 12px 32px rgba(15, 92, 77, .35);
+        animation: tfai-pulse 1.6s ease-in-out infinite;
+      }
+      #splash .name { font-size: 18px; font-weight: 700; letter-spacing: .2px; }
+      #splash .sub { font-size: 13px; opacity: .6; margin-top: -12px; }
+      #splash .bar { width: 160px; height: 4px; border-radius: 4px; overflow: hidden; background: rgba(120, 110, 90, .2); }
+      #splash .bar::after {
+        content: ''; display: block; width: 40%; height: 100%; border-radius: 4px;
+        background: #d0643a; animation: tfai-slide 1.1s ease-in-out infinite;
+      }
+      @keyframes tfai-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+      @keyframes tfai-slide { 0% { transform: translateX(-110%); } 100% { transform: translateX(260%); } }
+      @media (prefers-reduced-motion: reduce) { #splash .logo, #splash .bar::after { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <!-- Sayt ochilayotganda ko'rinadigan loading; React tayyor bo'lgach src/app/splash.ts uni yashiradi -->
+    <div id="splash" role="status" aria-live="polite">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" aria-hidden="true">
+          <rect x="3.5" y="3.2" width="12" height="2.6" rx="1.2" fill="#fff"/>
+          <rect x="3.5" y="18.2" width="12" height="2.6" rx="1.2" fill="#fff"/>
+          <rect x="5.5" y="5.8" width="8" height="12.4" fill="#fff" fill-opacity=".88"/>
+          <path d="M5.5 8.4l8 2.1M5.5 11.4l8 2.1M5.5 14.4l8 2.1" stroke="#0f5c4d" stroke-width=".95" stroke-opacity=".55"/>
+          <path d="M13.5 8.6c3.4.3 5.4 2.6 4.6 6.4" stroke="#fff" stroke-linecap="round"/>
+          <path d="M20.6 3.4 17.5 20.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          <ellipse cx="20.25" cy="5.4" rx=".42" ry="1.05" transform="rotate(10 20.25 5.4)" fill="#0f5c4d"/>
+        </svg>
+      </div>
+      <div class="name">TextileCore</div>
+      <div class="sub">Yuklanmoqda...</div>
+      <div class="bar"></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "textile-factory-ai",
+  "private": true,
+  "description": "Ildiz papkadan buyruqlar: npm run dev (backend + frontend), dev:frontend, build, preview, typecheck",
+  "scripts": {
+    "postinstall": "npm --prefix frontend install",
+    "dev": "node dev.mjs",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "typecheck": "npm --prefix frontend run typecheck"
+  }
+}
