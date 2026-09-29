@@ -161,3 +161,21 @@ def test_setup_requires_superadmin(client, bot):
     calls = dict(bot["calls"])
     assert calls["setWebhook"]["secret_token"] == telegram_service.webhook_secret()
     assert calls["setChatMenuButton"]["menu_button"]["web_app"]["url"] == "https://shop.example.uz/store"
+
+
+def test_help_and_shop_commands(client, bot):
+    hook(client, message("/help", lang="en"))
+    sent = bot["sent"][-1]
+    assert "/shop" in sent["text"] and "/orders" in sent["text"] and "Factory owners" in sent["text"]
+    assert sent["reply_markup"]["inline_keyboard"][0][0]["web_app"]["url"].endswith("/store")
+    hook(client, message("/shop"))
+    assert bot["sent"][-1]["reply_markup"]["inline_keyboard"][0][0]["web_app"]["url"].endswith("/store")
+
+
+def test_setup_sets_descriptions_in_three_languages(client, bot):
+    admin = auth(client, ADMIN_EMAIL)
+    client.post(f"{API}/telegram/setup", headers=admin)
+    descriptions = [p for m, p in bot["calls"] if m == "setMyDescription"]
+    assert len(descriptions) == 3 and {p.get("language_code") for p in descriptions} == {None, "ru", "en"}
+    commands = [p for m, p in bot["calls"] if m == "setMyCommands"][0]["commands"]
+    assert [c["command"] for c in commands] == ["start", "shop", "orders", "help"]

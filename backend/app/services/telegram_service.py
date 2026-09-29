@@ -428,6 +428,11 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         return
     elif command == "/orders":
         _send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
+    elif command == "/help":
+        text = t_lang(lang, HELP_TEXT) + (t_lang(lang, HELP_AI) if settings.assistant_enabled else "")
+        _send_raw(chat["id"], text, _shop_keyboard(lang, site))
+    elif command == "/shop":
+        _send_chat(chat["id"], lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇", reply_markup=_shop_keyboard(lang, site))
     elif not command and msg.get("text") and settings.assistant_enabled:
         _answer_with_assistant(db, chat["id"], user, msg["text"], lang, site)
     else:
@@ -467,10 +472,32 @@ def setup_bot(base_url: str) -> dict:
           allowed_updates=["message", "callback_query"], drop_pending_updates=True)
     _call("setChatMenuButton", menu_button={"type": "web_app", "text": t_lang("uz", "🛍 Do'kon"), "web_app": {"url": f"{site}/store"}})
     for lang in ("uz", "ru", "en"):
-        commands = [{"command": "start", "description": t_lang(lang, "Botni ulash")},
-                    {"command": "orders", "description": t_lang(lang, "Buyurtmalarim")}]
-        _call("setMyCommands", commands=commands, **({"language_code": lang} if lang != "uz" else {}))
+        scope = {"language_code": lang} if lang != "uz" else {}
+        commands = [{"command": "start", "description": t_lang(lang, "Boshlash")},
+                    {"command": "shop", "description": t_lang(lang, "Do'konni ochish")},
+                    {"command": "orders", "description": t_lang(lang, "Buyurtmalarim")},
+                    {"command": "help", "description": t_lang(lang, "Yordam")}]
+        _call("setMyCommands", commands=commands, **scope)
+        _call("setMyDescription", description=t_lang(lang, BOT_DESCRIPTION), **scope)
+        _call("setMyShortDescription", short_description=t_lang(lang, BOT_SHORT_DESCRIPTION), **scope)
     return {"webhook": webhook, "shop": f"{site}/store"}
+
+
+BOT_DESCRIPTION = (
+    "🧵 TextileCore — tikuv fabrikalari katalogi.\n\n"
+    "🛍 Kiyimlarni to'g'ridan-to'g'ri ishlab chiqaruvchidan buyurtma qiling: o'lcham va rangni tanlang, karta orqali to'lang.\n"
+    "📦 Buyurtmangiz holati haqida shu yerga xabar keladi.\n\n"
+    "🏭 Zavodlar uchun: yangi buyurtmalar, ombor va dastgohlar haqida bildirishnomalar."
+)
+BOT_SHORT_DESCRIPTION = "Kiyimni zavoddan to'g'ridan-to'g'ri buyurtma qiling. Buyurtma holati va zavod bildirishnomalari."
+HELP_TEXT = (
+    "ℹ️ <b>TextileCore bot</b>\n\n"
+    "🛍 /shop — do'konni ochish va buyurtma berish\n"
+    "📦 /orders — buyurtmalaringiz holati\n"
+    "🔄 /start — bosh menyu\n\n"
+    "🏭 Zavod egalari: saytda Sozlamalar → Telegram bo'limidan bildirishnomalarni ulang."
+)
+HELP_AI = "\n\n💬 Mahsulot haqidagi savolingizni shu yerga oddiy matn bilan yozing — AI yordamchi javob beradi."
 
 
 _ALERT_COOLDOWN = 600

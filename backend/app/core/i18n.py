@@ -258,3 +258,49 @@ MESSAGES.update({
     "✅ Tasdiqlandi": _m("✅ Подтверждён", "✅ Confirmed"),
     "❌ Bekor qilindi": _m("❌ Отменён", "❌ Cancelled"),
 })
+MESSAGES.update({
+    "Boshlash": _m("Начать", "Start"),
+    "Do'konni ochish": _m("Открыть магазин", "Open shop"),
+    "Yordam": _m("Помощь", "Help"),
+    (
+        "🧵 TextileCore — tikuv fabrikalari katalogi.\n\n"
+        "🛍 Kiyimlarni to'g'ridan-to'g'ri ishlab chiqaruvchidan buyurtma qiling: o'lcham va rangni tanlang, karta orqali to'lang.\n"
+        "📦 Buyurtmangiz holati haqida shu yerga xabar keladi.\n\n"
+        "🏭 Zavodlar uchun: yangi buyurtmalar, ombor va dastgohlar haqida bildirishnomalar."
+    ): _m(
+        "🧵 TextileCore — каталог швейных фабрик.\n\n"
+        "🛍 Заказывайте одежду напрямую у производителя: выберите размер и цвет, оплатите картой.\n"
+        "📦 О статусе заказа мы сообщим сюда.\n\n"
+        "🏭 Для фабрик: уведомления о новых заказах, складе и оборудовании.",
+        "🧵 TextileCore — a catalog of garment factories.\n\n"
+        "🛍 Order clothing directly from the manufacturer: pick a size and color, pay by card.\n"
+        "📦 Order status updates arrive right here.\n\n"
+        "🏭 For factories: alerts about new orders, stock and machines.",
+    ),
+    "Kiyimni zavoddan to'g'ridan-to'g'ri buyurtma qiling. Buyurtma holati va zavod bildirishnomalari.": _m(
+        "Заказывайте одежду напрямую у фабрик. Статус заказов и уведомления фабрик.",
+        "Order clothing straight from factories. Order status and factory alerts.",
+    ),
+    (
+        "ℹ️ <b>TextileCore bot</b>\n\n"
+        "🛍 /shop — do'konni ochish va buyurtma berish\n"
+        "📦 /orders — buyurtmalaringiz holati\n"
+        "🔄 /start — bosh menyu\n\n"
+        "🏭 Zavod egalari: saytda Sozlamalar → Telegram bo'limidan bildirishnomalarni ulang."
+    ): _m(
+        "ℹ️ <b>TextileCore bot</b>\n\n"
+        "🛍 /shop — открыть магазин и сделать заказ\n"
+        "📦 /orders — статус ваших заказов\n"
+        "🔄 /start — главное меню\n\n"
+        "🏭 Владельцам фабрик: подключите уведомления на сайте в разделе Настройки → Telegram.",
+        "ℹ️ <b>TextileCore bot</b>\n\n"
+        "🛍 /shop — open the shop and place an order\n"
+        "📦 /orders — your order status\n"
+        "🔄 /start — main menu\n\n"
+        "🏭 Factory owners: connect notifications on the website under Settings → Telegram.",
+    ),
+    "\n\n💬 Mahsulot haqidagi savolingizni shu yerga oddiy matn bilan yozing — AI yordamchi javob beradi.": _m(
+        "\n\n💬 Напишите вопрос о товаре обычным сообщением — ответит ИИ-помощник.",
+        "\n\n💬 Type your product question as a normal message — the AI assistant will answer.",
+    ),
+})
