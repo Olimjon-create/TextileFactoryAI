@@ -46,6 +46,10 @@ class Settings(BaseSettings):
 
     # Telegram bildirishnomalar: @BotFather bergan token. Bo'sh bo'lsa o'chiq
     TELEGRAM_BOT_TOKEN: str = ""
+    # Server xatolari haqida xabar boradigan chat (administrator). Bo'sh bo'lsa xabar yuborilmaydi
+    TELEGRAM_ADMIN_CHAT_ID: str = ""
+    # Kunlik vazifa (/api/v1/cron/daily): Vercel Cron "Authorization: Bearer <CRON_SECRET>" yuboradi
+    CRON_SECRET: str = ""
 
     # To'lov provayderi: hozircha faqat "demo" (test rejimi, haqiqiy pul yechilmaydi)
     PAYMENT_PROVIDER: str = "demo"

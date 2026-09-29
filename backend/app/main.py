@@ -3,12 +3,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
 import app.models  # noqa: F401  (modellarni metadata'ga ro'yxatdan o'tkazish)
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.i18n import set_lang
 from app.core.migrations import run_migrations
+from app.services import telegram_service
 from app.services.bootstrap import ensure_superadmin
 from app.services.upload_service import media_dir
 
@@ -68,7 +70,12 @@ app.add_middleware(
 async def request_language(request: Request, call_next):
     # Frontend tanlangan tilni yuboradi: xabarlar shu tilda (app.core.i18n.t)
     set_lang(request.headers.get("accept-language"))
-    return await call_next(request)
+    try:
+        return await call_next(request)
+    except Exception as exc:
+        # Kutilmagan xato: administratorga Telegram xabari, so'ng odatiy 500 javobi
+        await run_in_threadpool(telegram_service.alert_admin, request.method, request.url.path, exc)
+        raise
 
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)

@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     attendance,
     audit,
     auth,
+    cron,
     customers,
     dashboard,
     factories,
@@ -41,6 +42,7 @@ api_router.include_router(vision.router)
 api_router.include_router(audit.router)
 api_router.include_router(uploads.router)
 api_router.include_router(telegram.router)
+api_router.include_router(cron.router)
 # Ochiq (login talab qilinmaydigan) katalog
 api_router.include_router(store.router)
 

@@ -217,3 +217,27 @@ MESSAGES: dict[str, dict[str, str]] = {
     "Botni ulash": _m("Подключить бота", "Start the bot"),
     "Buyurtmalarim": _m("Мои заказы", "My orders"),
 }
+MESSAGES[
+    "📊 <b>Kunlik hisobot</b> · {factory}\n{day}\n\n"
+    "🛒 Bugungi buyurtmalar: {orders} ta · {amount}\n"
+    "📋 Ochiq buyurtmalar: {open} ta (muddati o'tgan: {overdue})\n"
+    "🏭 Bugun tugallangan ish buyurtmalari: {wo_done} ta · {wo_qty} dona\n"
+    "⚠️ Kam qolgan materiallar: {low}\n"
+    "🔧 Buzilgan dastgohlar: {broken}\n"
+    "🙋 Ko'rib chiqilmagan javob so'rovlari: {leaves}"
+] = _m(
+    "📊 <b>Ежедневный отчёт</b> · {factory}\n{day}\n\n"
+    "🛒 Заказы за сегодня: {orders} шт · {amount}\n"
+    "📋 Открытые заказы: {open} шт (просрочено: {overdue})\n"
+    "🏭 Завершено наряд-заказов сегодня: {wo_done} шт · {wo_qty} ед.\n"
+    "⚠️ Материалы ниже минимума: {low}\n"
+    "🔧 Сломанное оборудование: {broken}\n"
+    "🙋 Нерассмотренные запросы на отгул: {leaves}",
+    "📊 <b>Daily report</b> · {factory}\n{day}\n\n"
+    "🛒 Today's orders: {orders} · {amount}\n"
+    "📋 Open orders: {open} (overdue: {overdue})\n"
+    "🏭 Work orders completed today: {wo_done} · {wo_qty} pcs\n"
+    "⚠️ Materials below minimum: {low}\n"
+    "🔧 Broken machines: {broken}\n"
+    "🙋 Pending leave requests: {leaves}",
+)

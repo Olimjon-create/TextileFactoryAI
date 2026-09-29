@@ -14,6 +14,8 @@ os.environ["SUPABASE_SECRET_KEY"] = ""
 os.environ["TELEGRAM_BOT_TOKEN"] = ""  # testlar haqiqiy botdan xabar yubormasin
 os.environ["RESEND_API_KEY"] = ""
 os.environ["APP_URL"] = ""
+os.environ["TELEGRAM_ADMIN_CHAT_ID"] = ""
+os.environ["CRON_SECRET"] = ""
 os.environ["PAYMENT_PROVIDER"] = "demo"
 # Chastota cheklovi alohida testda yoqiladi (testlar bitta IP dan juda ko'p login qiladi)
 os.environ["RATE_LIMIT_ENABLED"] = "false"

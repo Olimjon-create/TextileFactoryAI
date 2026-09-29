@@ -352,3 +352,24 @@ def setup_bot(base_url: str) -> dict:
                     {"command": "orders", "description": t_lang(lang, "Buyurtmalarim")}]
         _call("setMyCommands", commands=commands, **({"language_code": lang} if lang != "uz" else {}))
     return {"webhook": webhook, "shop": f"{site}/store"}
+
+
+# ---------- administrator uchun: server xatolari ----------
+
+_ALERT_COOLDOWN = 600  # bir xil xato har 10 daqiqada ko'pi bilan bir marta
+_last_alert: dict[str, float] = {}
+
+
+def alert_admin(method: str, path: str, exc: BaseException) -> bool:
+    """Kutilmagan server xatosi (500) haqida TELEGRAM_ADMIN_CHAT_ID ga qisqa xabar. So'rov tanasi yuborilmaydi."""
+    chat_id = settings.TELEGRAM_ADMIN_CHAT_ID.strip()
+    if not chat_id or not settings.telegram_enabled:
+        return False
+    key = f"{method} {path} {type(exc).__name__}"
+    now = time.monotonic()
+    if now - _last_alert.get(key, -_ALERT_COOLDOWN) < _ALERT_COOLDOWN:
+        return False
+    _last_alert[key] = now
+    error = f"{type(exc).__name__}: {exc}"[:500]
+    return _send_chat(chat_id, "uz", "🚨 <b>Server xatosi</b>\n{method} {path}\n<code>{error}</code>",
+                      method=method, path=path, error=error)
