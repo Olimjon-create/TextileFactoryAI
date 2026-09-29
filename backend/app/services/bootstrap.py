@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.core.config import settings
 from app.core.database import SessionLocal
 from app.core.roles import Role
-from app.core.security import hash_password
+from app.core.security import hash_password, is_weak_password
 from app.models import User
 
 
@@ -23,6 +23,7 @@ def ensure_superadmin() -> bool:
                 email=email,
                 full_name=settings.SUPERADMIN_FULL_NAME,
                 hashed_password=hash_password(settings.SUPERADMIN_PASSWORD),
+                password_weak=is_weak_password(settings.SUPERADMIN_PASSWORD, settings.SUPERADMIN_EMAIL),
                 role=Role.SUPER_ADMIN,
             )
         )

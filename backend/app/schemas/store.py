@@ -45,6 +45,7 @@ class StoreProduct(BaseModel):
     price: float
     image_url: str | None
     model_image_url: str | None = None
+    in_stock: int = 0
 
 
 class StoreCatalogProduct(StoreProduct):

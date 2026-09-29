@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.i18n import t
-from app.core.security import hash_password
+from app.core.security import set_password
 from app.models import PasswordResetToken, User
 from app.services import audit_service, mail_service
 
@@ -66,7 +66,7 @@ def reset_password(db: Session, token: str, new_password: str) -> None:
     user = db.get(User, row.user_id)
     if user is None or not user.is_active:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, t("Havola yaroqsiz yoki muddati o'tgan — qaytadan so'rang"))
-    user.hashed_password = hash_password(new_password)
+    set_password(user, new_password)
     row.used_at = _now()
     audit_service.record(
         db, user, entity="session", entity_id=user.id, action="PASSWORD",

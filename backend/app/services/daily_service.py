@@ -18,7 +18,7 @@ from app.models.attendance import LeaveStatus
 from app.models.order import OrderStatus
 from app.models.production import WorkOrderStatus
 from app.models.resources import MachineStatus
-from app.services import telegram_service
+from app.services import backup_service, telegram_service
 
 TASHKENT = timezone(timedelta(hours=5))
 OPEN_ORDER = (OrderStatus.NEW, OrderStatus.CONFIRMED, OrderStatus.IN_PRODUCTION, OrderStatus.READY)
@@ -116,4 +116,9 @@ def cleanup(db: Session) -> dict:
 def run(db: Session) -> dict:
     result = {"cleanup": cleanup(db)}
     result["reports_sent"] = send_reports(db)
+    try:
+        result["backup"] = backup_service.cloud_backup(db.get_bind())
+    except Exception as exc:
+        result["backup"] = {"error": str(exc)[:300]}
+        telegram_service.alert_admin("CRON", "daily backup", exc)
     return result

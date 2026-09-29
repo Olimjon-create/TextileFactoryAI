@@ -1822,5 +1822,15 @@
  "{0} ta javob kutmoqda": "{0} ожидают ответа",
  "Katalogdagi «Savol berish» orqali kelgan savollar": "Вопросы, пришедшие через «Задать вопрос» в каталоге",
  "Hozircha savollar yo'q": "Пока вопросов нет",
- "Savol berish": "Задать вопрос"
+ "Savol berish": "Задать вопрос",
+ "Havolani nusxalang": "Скопируйте ссылку",
+ "Ulashish": "Поделиться",
+ "Omborda: {0} dona": "На складе: {0} шт.",
+ "Buyurtma asosida": "Под заказ",
+ "Buyurtma asosida tikiladi": "Шьётся под заказ",
+ "Chek": "Чек",
+ "Narxi": "Цена",
+ "Xaridingiz uchun rahmat!": "Спасибо за покупку!",
+ "Chekni chop etish": "Распечатать чек",
+ "Parolingiz oson topiladi (standart yoki juda oddiy). Hisobingiz xavfsizligi uchun uni kamida 10 belgili murakkab parolga almashtiring.": "Ваш пароль легко подобрать (стандартный или слишком простой). Для безопасности смените его на сложный — не менее 10 символов."
 }

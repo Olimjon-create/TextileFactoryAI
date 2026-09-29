@@ -11,39 +11,18 @@ Rasmlar Supabase Storage'da qoladi (bazada faqat ularning manzillari saqlanadi).
 from datetime import datetime
 from pathlib import Path
 
-from sqlalchemy import create_engine, inspect, select, text
-
 import app.models
-from app.core.database import Base, engine
+from app.core.database import engine
+from app.services.backup_service import KEEP, snapshot
 
 BACKUP_DIR = Path(__file__).resolve().parents[1] / "backups"
-BATCH = 500
-KEEP = 14
 
 
 def main() -> None:
     BACKUP_DIR.mkdir(exist_ok=True)
     path = BACKUP_DIR / f"textilecore-{datetime.now():%Y%m%d-%H%M}.db"
-    target = create_engine(f"sqlite:///{path}")
-    Base.metadata.create_all(target)
     print(f"Manba: {engine.url.render_as_string(hide_password=True)}")
-
-    total = 0
-    with engine.connect() as src, target.begin() as dst:
-        existing = set(inspect(src).get_table_names())
-        for table in Base.metadata.sorted_tables:
-            if table.name not in existing or table.name == "rate_limit_hits":
-                continue
-            rows = [dict(r._mapping) for r in src.execute(select(table))]
-            for i in range(0, len(rows), BATCH):
-                dst.execute(table.insert(), rows[i : i + BATCH])
-            total += len(rows)
-            if rows:
-                print(f"  {table.name}: {len(rows)}")
-        version = src.execute(text("SELECT version_num FROM alembic_version")).scalar()
-        dst.execute(text("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL PRIMARY KEY)"))
-        dst.execute(text("INSERT INTO alembic_version VALUES (:v)"), {"v": version})
-    target.dispose()
+    total = snapshot(engine, path)
     print(f"Tayyor: {total} ta qator → {path} ({path.stat().st_size / 1024:.0f} KB)")
     old = sorted(BACKUP_DIR.glob("textilecore-*.db"))[:-KEEP]
     for f in old:

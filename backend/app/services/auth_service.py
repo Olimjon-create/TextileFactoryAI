@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.roles import Role
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import create_access_token, hash_password, is_weak_password, set_password, verify_password
 from app.models import Factory, User
 from app.schemas.auth import RegisterRequest, TokenResponse
 from app.schemas.user import UserOut
@@ -31,7 +31,7 @@ def change_password(user: User, current_password: str, new_password: str) -> Non
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Joriy parol noto'g'ri")
     if current_password == new_password:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Yangi parol joriy paroldan farq qilishi kerak")
-    user.hashed_password = hash_password(new_password)
+    set_password(user, new_password)
 
 
 def authenticate(db: Session, email: str, password: str) -> User:
@@ -39,6 +39,10 @@ def authenticate(db: Session, email: str, password: str) -> User:
     if user is None or not verify_password(password, user.hashed_password):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Email yoki parol noto'g'ri")
     _ensure_can_login(user)
+    weak = is_weak_password(password, user.email)
+    if user.password_weak != weak:
+        user.password_weak = weak
+        db.commit()
     return user
 
 
@@ -82,6 +86,7 @@ def register_owner(db: Session, data: RegisterRequest) -> User:
         full_name=data.full_name,
         phone=data.phone,
         hashed_password=hash_password(data.password),
+        password_weak=is_weak_password(data.password, data.email),
         role=Role.FACTORY_OWNER,
         factory=factory,
     )

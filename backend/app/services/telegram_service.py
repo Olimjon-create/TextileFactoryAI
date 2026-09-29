@@ -164,6 +164,105 @@ def notify(db: Session, factory_id: int | None, template: str, /, **kwargs) -> N
     send(db.get(Factory, factory_id), template, **kwargs)
 
 
+def _order_link(order_id: int) -> list[dict]:
+    site = (settings.APP_URL or "").rstrip("/")
+    return [{"text": "🔗 TextileCore", "url": f"{site}/orders/{order_id}"}] if site.startswith("https://") else []
+
+
+def order_keyboard(order_id: int, lang: str) -> dict:
+    rows = [[{"text": t_lang(lang, "✅ Tasdiqlash"), "callback_data": f"o:c:{order_id}"},
+             {"text": t_lang(lang, "❌ Bekor qilish"), "callback_data": f"o:x:{order_id}"}]]
+    if link := _order_link(order_id):
+        rows.append(link)
+    return {"inline_keyboard": rows}
+
+
+def _result_keyboard(order_id: int, label: str) -> dict:
+    rows = [[{"text": label, "callback_data": "o:done"}]]
+    if link := _order_link(order_id):
+        rows.append(link)
+    return {"inline_keyboard": rows}
+
+
+def notify_new_order(db: Session, order: Order, template: str, /, **kwargs) -> None:
+    if not settings.telegram_enabled:
+        return
+    factory = db.get(Factory, order.factory_id)
+    if factory is None or not factory.telegram_chat_id:
+        return
+    lang = factory.telegram_lang or "uz"
+    markup = order_keyboard(order.id, lang) if order.status == OrderStatus.NEW else None
+    _send_chat(factory.telegram_chat_id, lang, template, reply_markup=markup, **kwargs)
+
+
+def _order_actor(db: Session, factory_id: int):
+    from app.core.roles import Role
+    from app.models import User
+
+    return db.scalar(
+        select(User)
+        .where(User.factory_id == factory_id, User.is_active.is_(True), User.role.in_((Role.FACTORY_OWNER, Role.MANAGER)))
+        .order_by(User.role != Role.FACTORY_OWNER, User.id)
+        .limit(1)
+    )
+
+
+def _answer(cq: dict, text: str = "", alert: bool = False) -> None:
+    try:
+        _call("answerCallbackQuery", timeout=5, callback_query_id=cq["id"], text=text[:190], show_alert=alert)
+    except Exception as exc:
+        print(exc)
+
+
+def _edit_markup(cq: dict, markup: dict) -> None:
+    msg = cq.get("message") or {}
+    try:
+        _call("editMessageReplyMarkup", timeout=5, chat_id=msg["chat"]["id"], message_id=msg["message_id"], reply_markup=markup)
+    except Exception as exc:
+        print(exc)
+
+
+def _handle_order_action(db: Session, cq: dict) -> None:
+    from app.services import order_service
+
+    parts = (cq.get("data") or "").split(":")
+    if len(parts) != 3 or not parts[2].isdigit():
+        _answer(cq)
+        return
+    action, order_id = parts[1], int(parts[2])
+    chat_id = str(((cq.get("message") or {}).get("chat") or {}).get("id", ""))
+    order = db.get(Order, order_id)
+    factory = db.get(Factory, order.factory_id) if order else None
+    if factory is None or not factory.telegram_chat_id or factory.telegram_chat_id != chat_id:
+        _answer(cq, t_lang("uz", "Ruxsat yo'q"), alert=True)
+        return
+    lang = factory.telegram_lang or "uz"
+    if action == "x":
+        _edit_markup(cq, {"inline_keyboard": [
+            [{"text": t_lang(lang, "Ha, bekor qilinsin"), "callback_data": f"o:xx:{order_id}"},
+             {"text": t_lang(lang, "Yo'q"), "callback_data": f"o:k:{order_id}"}]]})
+        _answer(cq, t_lang(lang, "Buyurtma {number} bekor qilinsinmi?", number=order.order_number))
+        return
+    if action == "k":
+        _edit_markup(cq, order_keyboard(order_id, lang) if order.status == OrderStatus.NEW else _result_keyboard(order_id, t_lang(lang, STATUS_LABELS[order.status])))
+        _answer(cq)
+        return
+    target = {"c": OrderStatus.CONFIRMED, "xx": OrderStatus.CANCELLED}.get(action)
+    actor = _order_actor(db, factory.id)
+    if target is None or actor is None:
+        _answer(cq, t_lang(lang, "Amalni bajarib bo'lmadi"), alert=True)
+        return
+    try:
+        order_service.update_status(db, actor, order_id, target)
+    except HTTPException as exc:
+        db.rollback()
+        _answer(cq, t_lang(lang, str(exc.detail)), alert=True)
+        return
+    label = t_lang(lang, "✅ Tasdiqlandi") if target == OrderStatus.CONFIRMED else t_lang(lang, "❌ Bekor qilindi")
+    _edit_markup(cq, _result_keyboard(order_id, label))
+    _answer(cq, label)
+
+
 def verify_init_data(init_data: str | None) -> dict | None:
     """Mini App'ning initData'si: imzo bot tokeni bilan tekshiriladi (core.telegram.org/bots/webapps).
     To'g'ri bo'lsa — Telegram foydalanuvchisi (id, language_code, …), aks holda None."""
@@ -304,6 +403,9 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
     if (cq := update.get("callback_query")) is not None:
         user = cq.get("from") or {}
         lang = _lang(user.get("language_code"))
+        if (cq.get("data") or "").startswith("o:"):
+            _handle_order_action(db, cq)
+            return
         try:
             _call("answerCallbackQuery", timeout=5, callback_query_id=cq["id"])
         except Exception as exc:

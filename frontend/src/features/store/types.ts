@@ -33,6 +33,7 @@ export interface StoreProduct {
   price: number;
   image_url: string | null;
   model_image_url: string | null;
+  in_stock: number;
 }
 
 export interface StoreCatalogProduct extends StoreProduct {

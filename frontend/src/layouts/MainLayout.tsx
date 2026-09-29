@@ -2,6 +2,7 @@ import { Suspense, useState } from 'react';
 import { PageSkeleton } from '@/shared/components/skeletons';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
+import WeakPasswordBanner from '@/features/auth/components/WeakPasswordBanner';
 import { NewOrdersProvider } from '@/features/orders/NewOrdersContext';
 import { SHELL_GAP } from '@/app/theme';
 import Sidebar from './Sidebar';
@@ -27,6 +28,7 @@ export default function MainLayout() {
           }}
         >
           <Box sx={{ maxWidth: 2400, mx: 'auto' }}>
+            <WeakPasswordBanner />
             <Suspense fallback={<PageSkeleton />}>
               <Outlet />
             </Suspense>

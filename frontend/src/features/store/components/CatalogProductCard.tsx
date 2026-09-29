@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { formatMoney } from '@/shared/utils/money';
 import { SERIF } from '../storeTheme';
 import type { StoreCatalogProduct } from '../types';
+import StockBadge from './StockBadge';
 import StoreImage from './StoreImage';
 import { tr } from '@/i18n';
 
@@ -53,6 +54,7 @@ export default function CatalogProductCard({ product }: { product: StoreCatalogP
           <Typography variant="body2" color="text.secondary" noWrap>
             {product.factory_name}
           </Typography>
+          <StockBadge inStock={product.in_stock} compact />
           <Box sx={{ mt: 'auto', pt: 1, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 1 }}>
             <Typography sx={{ fontFamily: SERIF, fontWeight: 700, fontSize: { xs: 15, sm: 18 }, color: 'primary.dark', whiteSpace: 'nowrap' }}>{formatMoney(product.price)}</Typography>
             {variants.length > 0 && (

@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Enum, ForeignKey, String
+from sqlalchemy import false, Boolean, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base, TimestampMixin
@@ -20,6 +20,7 @@ class User(Base, TimestampMixin):
     hashed_password: Mapped[str] = mapped_column(String(255))
     role: Mapped[Role] = mapped_column(Enum(Role, name="user_role"), default=Role.WORKER)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    password_weak: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
     factory_id: Mapped[int | None] = mapped_column(
         ForeignKey("factories.id", ondelete="SET NULL"), index=True

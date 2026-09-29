@@ -13,7 +13,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models import Factory, Order, OrderItem, Product
+from app.models import Factory, Order, OrderItem, Product, ProductStockMovement
 from app.models.order import OrderStatus, PaymentStatus
 from app.models.product import ProductStatus
 from app.schemas.store import (
@@ -46,6 +46,21 @@ def _storefront_products():
         Product.price.is_not(None),
         Product.price > 0,
     )
+
+
+def _stock(db: Session, product_ids: list[int]) -> dict[int, int]:
+    if not product_ids:
+        return {}
+    rows = db.execute(
+        select(ProductStockMovement.product_id, func.coalesce(func.sum(ProductStockMovement.quantity), 0))
+        .where(ProductStockMovement.product_id.in_(product_ids))
+        .group_by(ProductStockMovement.product_id)
+    )
+    return {pid: max(int(qty), 0) for pid, qty in rows}
+
+
+def _store_product(product: Product, stock: dict[int, int]) -> StoreProduct:
+    return StoreProduct.model_validate(product).model_copy(update={"in_stock": stock.get(product.id, 0)})
 
 
 def _get_public_factory(db: Session, factory_id: int) -> Factory:
@@ -143,9 +158,10 @@ def list_products(
     rows = db.execute(
         base.add_columns(Factory.name).order_by(*PRODUCT_SORTS.get(sort, PRODUCT_SORTS["new"])).limit(limit).offset(offset)
     ).all()
+    stock = _stock(db, [product.id for product, _ in rows])
     items = [
         StoreCatalogProduct(
-            **StoreProduct.model_validate(product).model_dump(), factory_id=product.factory_id, factory_name=factory_name
+            **_store_product(product, stock).model_dump(), factory_id=product.factory_id, factory_name=factory_name
         )
         for product, factory_name in rows
     ]
@@ -190,11 +206,12 @@ def featured_products(db: Session, limit: int = 3) -> list[StoreFeaturedProduct]
 
 def get_factory(db: Session, factory_id: int) -> StoreFactoryDetail:
     factory = _get_public_factory(db, factory_id)
-    products = db.scalars(
+    products = list(db.scalars(
         _storefront_products()
         .where(Product.factory_id == factory.id)
         .order_by(Product.category, Product.name)
-    )
+    ))
+    stock = _stock(db, [p.id for p in products])
     return StoreFactoryDetail(
         id=factory.id,
         name=factory.name,
@@ -205,7 +222,7 @@ def get_factory(db: Session, factory_id: int) -> StoreFactoryDetail:
         description=factory.description,
         logo_url=factory.logo_url,
         cover_url=factory.cover_url,
-        products=[StoreProduct.model_validate(p) for p in products],
+        products=[_store_product(p, stock) for p in products],
     )
 
 

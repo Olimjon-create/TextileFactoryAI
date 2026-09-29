@@ -25,6 +25,7 @@ import {
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import { Link as RouterLink } from 'react-router-dom';
 import { getErrorMessage } from '@/shared/api/client';
 import { formatMoney } from '@/shared/utils/money';
@@ -33,6 +34,7 @@ import { storeApi } from '../api';
 import { variantLabel } from '../CartContext';
 import StoreError from '../components/StoreError';
 import { useMyOrders } from '../MyOrdersContext';
+import { printReceipt } from '../receipt';
 import type { PublicOrder } from '../types';
 import { formatDateTime } from '@/shared/utils/dates';
 import { tr } from '@/i18n';
@@ -122,7 +124,12 @@ function OrderCard({ order }: { order: PublicOrder }) {
             {tr("To'langan")}{order.card_last4 ? tr(" · karta •••• {0}", order.card_last4) : ''}
             {order.delivery_address ? ` · ${order.delivery_address}` : ''}
           </Typography>
-          <Typography variant="h6">{formatMoney(order.total_amount, order.currency)}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Button size="small" variant="outlined" startIcon={<PrintOutlinedIcon />} onClick={() => printReceipt(order)}>
+              {tr('Chek')}
+            </Button>
+            <Typography variant="h6">{formatMoney(order.total_amount, order.currency)}</Typography>
+          </Box>
         </Box>
       </CardContent>
     </Card>

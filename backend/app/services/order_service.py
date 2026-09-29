@@ -81,7 +81,7 @@ def mark_paid(db: Session, order: Order, *, reference: str, card_last4: str | No
     _link_customer(db, order)
     db.commit()
     db.refresh(order)
-    telegram_service.notify(db, order.factory_id, "🛒 Yangi buyurtma <b>{number}</b> (katalog, to'langan)\n{customer}, {phone}\n{amount}",
+    telegram_service.notify_new_order(db, order, "🛒 Yangi buyurtma <b>{number}</b> (katalog, to'langan)\n{customer}, {phone}\n{amount}",
                             number=order.order_number, customer=order.customer_name, phone=order.customer_phone,
                             amount=f"{float(order.total_amount):,.0f} {order.currency}".replace(",", " "))
     telegram_service.notify_customer_paid(order)
@@ -348,7 +348,7 @@ def create_manual_order(db: Session, actor: User, data: ManualOrderCreate) -> Or
         factory_id=order.factory_id,
     )
     db.commit()
-    telegram_service.notify(db, order.factory_id, "📝 Yangi buyurtma <b>{number}</b> kiritildi\n{customer} · {amount}\nKiritdi: {user}",
+    telegram_service.notify_new_order(db, order, "📝 Yangi buyurtma <b>{number}</b> kiritildi\n{customer} · {amount}\nKiritdi: {user}",
                             number=order.order_number, customer=customer.name, user=actor.full_name,
                             amount=f"{float(order.total_amount):,.0f} {order.currency}".replace(",", " "))
     return get_order(db, actor, order.id)

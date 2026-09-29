@@ -3,7 +3,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.roles import Role, can_manage_role
-from app.core.security import hash_password
+from app.core.security import hash_password, is_weak_password, set_password
 from app.models import Factory, User
 from app.schemas.user import UserCreate, UserUpdate
 
@@ -90,6 +90,7 @@ def create_user(db: Session, actor: User, data: UserCreate) -> User:
         full_name=data.full_name,
         phone=data.phone,
         hashed_password=hash_password(data.password),
+        password_weak=is_weak_password(data.password, data.email),
         role=data.role,
         factory_id=factory_id,
         is_active=data.is_active,
@@ -117,7 +118,7 @@ def update_user(db: Session, actor: User, user_id: int, data: UserUpdate) -> Use
         changes["email"] = changes["email"].lower()
         _ensure_email_free(db, changes["email"], exclude_id=user.id)
     if changes.get("password"):
-        user.hashed_password = hash_password(changes.pop("password"))
+        set_password(user, changes.pop("password"))
     changes.pop("password", None)
 
     for field in ("email", "full_name", "phone", "is_active"):

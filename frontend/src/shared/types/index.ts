@@ -35,6 +35,7 @@ export interface User {
   phone: string | null;
   role: Role;
   is_active: boolean;
+  password_weak?: boolean;
   factory_id: number | null;
   factory: FactoryBrief | null;
   created_at: string;

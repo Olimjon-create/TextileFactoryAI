@@ -36,6 +36,7 @@ class UserOut(UserBase):
     id: int
     role: Role
     is_active: bool
+    password_weak: bool = False
     factory_id: int | None
     factory: FactoryBrief | None = None
     created_at: datetime

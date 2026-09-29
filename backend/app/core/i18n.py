@@ -247,3 +247,14 @@ MESSAGES.update({
         "Извините, не удалось подготовить ответ. Попробуйте сформулировать вопрос иначе.",
         "Sorry, I couldn't prepare an answer. Try rephrasing your question."),
 })
+MESSAGES.update({
+    "✅ Tasdiqlash": _m("✅ Подтвердить", "✅ Confirm"),
+    "❌ Bekor qilish": _m("❌ Отменить", "❌ Cancel"),
+    "Ha, bekor qilinsin": _m("Да, отменить", "Yes, cancel it"),
+    "Yo'q": _m("Нет", "No"),
+    "Buyurtma {number} bekor qilinsinmi?": _m("Отменить заказ {number}?", "Cancel order {number}?"),
+    "Amalni bajarib bo'lmadi": _m("Не удалось выполнить действие", "Could not perform the action"),
+    "Ruxsat yo'q": _m("Нет доступа", "Not allowed"),
+    "✅ Tasdiqlandi": _m("✅ Подтверждён", "✅ Confirmed"),
+    "❌ Bekor qilindi": _m("❌ Отменён", "❌ Cancelled"),
+})

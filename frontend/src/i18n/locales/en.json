@@ -1822,5 +1822,15 @@
  "{0} ta javob kutmoqda": "{0} awaiting reply",
  "Katalogdagi «Savol berish» orqali kelgan savollar": "Questions sent via “Ask a question” in the catalog",
  "Hozircha savollar yo'q": "No questions yet",
- "Savol berish": "Ask a question"
+ "Savol berish": "Ask a question",
+ "Havolani nusxalang": "Copy the link",
+ "Ulashish": "Share",
+ "Omborda: {0} dona": "In stock: {0} pcs",
+ "Buyurtma asosida": "Made to order",
+ "Buyurtma asosida tikiladi": "Sewn to order",
+ "Chek": "Receipt",
+ "Narxi": "Price",
+ "Xaridingiz uchun rahmat!": "Thank you for your purchase!",
+ "Chekni chop etish": "Print receipt",
+ "Parolingiz oson topiladi (standart yoki juda oddiy). Hisobingiz xavfsizligi uchun uni kamida 10 belgili murakkab parolga almashtiring.": "Your password is easy to guess (default or too simple). For security, change it to a strong one of at least 10 characters."
 }

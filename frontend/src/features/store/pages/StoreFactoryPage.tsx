@@ -19,6 +19,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { ProductRowSkeleton } from '@/shared/components/skeletons';
+import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { storeApi } from '../api';
 import { useCart, type Variant } from '../CartContext';
@@ -72,6 +73,7 @@ export default function StoreFactoryPage() {
   const focusId = Number(searchParams.get('product')) || null;
   const [highlighted, setHighlighted] = useState<number | null>(null);
   const [asking, setAsking] = useState(false);
+  useDocumentTitle(factory?.name);
   useEffect(() => {
     if (!factory || !focusId) return;
     const el = document.getElementById(`product-${focusId}`);

@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { useAuth } from '@/features/auth/AuthContext';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
 import { getErrorMessage } from '@/shared/api/client';
 import PasswordField from '@/shared/components/PasswordField';
@@ -18,6 +19,7 @@ export default function ChangePasswordDialog({ open, onClose }: { open: boolean;
   const [error, setError] = useState('');
   const save = useSaveAction();
   const toast = useToast();
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
     if (!open) return;
@@ -40,6 +42,7 @@ export default function ChangePasswordDialog({ open, onClose }: { open: boolean;
     try {
       await save.run(() => authApi.changePassword(current, next));
       toast.success(tr("Parol o'zgartirildi"));
+      refreshUser().catch(() => undefined);
       onClose();
     } catch (err) {
       setError(getErrorMessage(err));

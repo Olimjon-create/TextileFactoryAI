@@ -7,6 +7,8 @@ import { formatMoney } from '@/shared/utils/money';
 import { useCart, variantLabel, type Variant } from '../CartContext';
 import type { StoreProduct } from '../types';
 import ProductGallery from './ProductGallery';
+import ShareProductButton from './ShareProductButton';
+import StockBadge from './StockBadge';
 import QuantityStepper from './QuantityStepper';
 import { tr } from '@/i18n';
 
@@ -122,9 +124,13 @@ export default function ProductRow({ product, onChange, highlighted = false }: P
           <Typography variant="caption" color="text.secondary">
             {product.category} · {product.code}
           </Typography>
-          <Typography variant="h6" sx={{ fontSize: 18 }}>
-            {product.name}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography variant="h6" sx={{ fontSize: 18, flex: 1, minWidth: 0 }}>
+              {product.name}
+            </Typography>
+            <ShareProductButton name={product.name} url={`${window.location.origin}${window.location.pathname}?product=${product.id}`} />
+          </Box>
+          <StockBadge inStock={product.in_stock} />
           {product.description && (
             <Typography
               variant="body2"

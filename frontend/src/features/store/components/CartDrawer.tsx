@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { PRODUCTION_UNIT_LABELS } from '@/features/products/constants';
@@ -27,6 +28,7 @@ import type { CheckoutResponse, PublicOrder } from '../types';
 import PaymentForm from './PaymentForm';
 import QuantityStepper from './QuantityStepper';
 import StoreImage from './StoreImage';
+import { printReceipt } from '../receipt';
 import { tr } from '@/i18n';
 import { inTelegram, telegramInitData } from '@/shared/telegram';
 
@@ -286,6 +288,9 @@ export default function CartDrawer() {
                 />
               ))}
             </Box>
+            <Button sx={{ mt: 2 }} variant="outlined" startIcon={<PrintOutlinedIcon />} onClick={() => printReceipt(paidOrder)}>
+              {tr('Chekni chop etish')}
+            </Button>
           </Box>
         )}
       </Box>
