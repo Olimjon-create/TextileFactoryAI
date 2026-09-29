@@ -22,10 +22,13 @@ from app.schemas.store import (
     PaymentInfo,
     PublicOrder,
     PublicOrderItem,
+    StoreCatalogProduct,
+    StoreCategoryCount,
     StoreFactoryCard,
     StoreFactoryDetail,
     StoreFeaturedProduct,
     StoreProduct,
+    StoreProductPage,
 )
 from app.core.i18n import get_lang
 from app.services import order_service, payments, telegram_service
@@ -100,6 +103,53 @@ def list_factories(db: Session, search: str | None = None) -> list[StoreFactoryC
         )
         for f, count, min_price in rows
     ]
+
+
+PRODUCT_SORTS = {
+    "new": (Product.id.desc(),),
+    "price_asc": (Product.price.asc(), Product.id.desc()),
+    "price_desc": (Product.price.desc(), Product.id.desc()),
+}
+
+
+def list_products(
+    db: Session, search: str | None = None, category: str | None = None,
+    sort: str = "new", limit: int = 12, offset: int = 0,
+) -> StoreProductPage:
+    base = (
+        _storefront_products()
+        .join(Factory, Factory.id == Product.factory_id)
+        .where(Factory.is_active.is_(True), Factory.is_public.is_(True))
+    )
+    if search and search.strip():
+        pattern = f"%{search.strip()}%"
+        base = base.where(
+            Product.name.ilike(pattern) | Product.category.ilike(pattern)
+            | Product.description.ilike(pattern) | Factory.name.ilike(pattern)
+        )
+    ids = base.with_only_columns(Product.id).subquery()
+    categories = [
+        StoreCategoryCount(name=name, count=count)
+        for name, count in db.execute(
+            select(Product.category, func.count())
+            .where(Product.id.in_(select(ids.c.id)))
+            .group_by(Product.category)
+            .order_by(func.count().desc(), Product.category)
+        )
+    ]
+    if category:
+        base = base.where(Product.category == category)
+    total = db.scalar(select(func.count()).select_from(base.with_only_columns(Product.id).subquery())) or 0
+    rows = db.execute(
+        base.add_columns(Factory.name).order_by(*PRODUCT_SORTS.get(sort, PRODUCT_SORTS["new"])).limit(limit).offset(offset)
+    ).all()
+    items = [
+        StoreCatalogProduct(
+            **StoreProduct.model_validate(product).model_dump(), factory_id=product.factory_id, factory_name=factory_name
+        )
+        for product, factory_name in rows
+    ]
+    return StoreProductPage(items=items, total=total, categories=categories)
 
 
 def featured_products(db: Session, limit: int = 3) -> list[StoreFeaturedProduct]:

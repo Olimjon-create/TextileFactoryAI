@@ -1,7 +1,6 @@
 import { keyframes } from '@emotion/react';
 import { Box, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { tr } from '@/i18n';
 
 const BACKGROUND = '/brand/bg-knitwear.jpg';
 
@@ -15,15 +14,13 @@ function wavePath({ base, amp, waves, phase = 0, closed = true }: { base: number
     pts.push(`${x} ${y.toFixed(1)}`);
   }
   const line = `M${pts.join(' L')}`;
-  return closed ? tr("{0} L{1} {2} L0 {3} Z", line, PERIOD * 2, HEIGHT, HEIGHT) : line;
+  return closed ? `${line} L${PERIOD * 2} ${HEIGHT} L0 ${HEIGHT} Z` : line;
 }
 
 const WAVES = {
   back: wavePath({ base: 120, amp: 34, waves: 1 }),
   middle: wavePath({ base: 165, amp: 26, waves: 2, phase: 1.2 }),
   front: wavePath({ base: 215, amp: 20, waves: 1, phase: 2.6 }),
-  silkA: wavePath({ base: 160, amp: 60, waves: 1, phase: 0.4, closed: false }),
-  silkB: wavePath({ base: 150, amp: 48, waves: 1, phase: 2.2, closed: false }),
 };
 
 const drift = keyframes`from { transform: translateX(0); } to { transform: translateX(-50%); }`;
@@ -129,9 +126,6 @@ export default function StoreBackdrop() {
           animation: `${glow} 22s ease-in-out infinite reverse`,
         }}
       />
-
-      <WaveLayer d={WAVES.silkA} stroke={alpha(primary, dark ? 0.35 : 0.45)} duration={40} bobDuration={11} sx={{ top: '26%', height: { xs: 160, md: 220 } }} />
-      <WaveLayer d={WAVES.silkB} stroke={alpha(secondary, dark ? 0.3 : 0.4)} duration={52} bobDuration={14} reverse sx={{ top: '30%', height: { xs: 160, md: 220 } }} />
 
       <WaveLayer d={WAVES.back} fill={alpha(primary, dark ? 0.16 : 0.2)} duration={34} bobDuration={9} sx={{ bottom: -10, height: { xs: '30vh', md: '38vh' } }} />
       <WaveLayer d={WAVES.middle} fill={alpha(secondary, dark ? 0.14 : 0.18)} duration={24} bobDuration={7} reverse sx={{ bottom: -10, height: { xs: '26vh', md: '32vh' } }} />

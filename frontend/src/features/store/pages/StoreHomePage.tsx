@@ -1,22 +1,27 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Card, Chip, InputAdornment, TextField, Typography } from '@mui/material';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Box, Button, Card, Chip, IconButton, InputAdornment, MenuItem, TextField, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import StraightenOutlinedIcon from '@mui/icons-material/StraightenOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
-import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
+import CheckroomOutlinedIcon from '@mui/icons-material/CheckroomOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Link as RouterLink } from 'react-router-dom';
 import { FactoryCardSkeleton } from '@/shared/components/skeletons';
+import { formatMoney } from '@/shared/utils/money';
 import { storeApi } from '../api';
+import CatalogProductCard, { CatalogProductSkeleton } from '../components/CatalogProductCard';
 import FactoryCard from '../components/FactoryCard';
 import StoreError from '../components/StoreError';
 import { glass, SERIF } from '../storeTheme';
-import type { StoreFactoryCard, StoreFeaturedProduct } from '../types';
+import type { ProductSort, StoreCatalogProduct, StoreFactoryCard, StoreFeaturedProduct, StoreProductPage } from '../types';
 import { tr } from '@/i18n';
+
+const PAGE = 12;
 
 const STEPS = [
   { icon: <StorefrontOutlinedIcon />, title: tr("Zavodni tanlang"), text: tr("Ishlab chiqaruvchilar, ularning mahsulotlari va narxlari bir joyda.") },
@@ -24,19 +29,17 @@ const STEPS = [
   { icon: <LockOutlinedIcon />, title: tr("Karta orqali to'lang"), text: tr("To'lovdan so'ng buyurtma zavodga darhol yetib boradi.") },
 ];
 
+const SORTS: { value: ProductSort; label: string }[] = [
+  { value: 'new', label: tr('Avval yangilari') },
+  { value: 'price_asc', label: tr('Avval arzonlari') },
+  { value: 'price_desc', label: tr('Avval qimmatlari') },
+];
+
 const FALLBACK_PHOTOS = ['/brand/hero-coat.jpg', '/brand/hero-knit.jpg', '/brand/hero-dress.jpg'];
 
-type HeroSlot = { src: string; item?: StoreFeaturedProduct };
+const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
-function heroSlots(featured: StoreFeaturedProduct[] | null): HeroSlot[] {
-  return FALLBACK_PHOTOS.map((src, i) => {
-    const item = featured?.[i];
-    return item ? { src: item.image_url, item } : { src };
-  });
-}
-
-function HeroPhoto({ slot, radius, sx, compact = false }: { slot: HeroSlot; radius: string; sx: object; compact?: boolean }) {
-  const { item } = slot;
+function HeroTile({ src, item, area }: { src: string; item?: StoreFeaturedProduct; area: string }) {
   const link = item
     ? { component: RouterLink, to: `/store/factories/${item.factory_id}?product=${item.product_id}`, 'aria-label': `${item.factory_name}: ${item.product_name}` }
     : { 'aria-hidden': true };
@@ -44,164 +47,182 @@ function HeroPhoto({ slot, radius, sx, compact = false }: { slot: HeroSlot; radi
     <Box
       {...link}
       sx={{
+        gridArea: area,
+        position: 'relative',
         display: 'block',
         overflow: 'hidden',
-        borderRadius: radius,
-        boxShadow: '0 24px 60px rgba(43,33,28,0.28)',
-        transition: 'transform 0.35s ease, box-shadow 0.35s ease',
-        ...(item && {
-          cursor: 'pointer',
-          '&:hover, &:focus-visible': {
-            boxShadow: '0 30px 70px rgba(43,33,28,0.38)',
-            zIndex: 2,
-            '& .hero-img': { transform: 'scale(1.06)' },
-            '& .hero-label': { opacity: 1, transform: 'translateY(0)' },
-          },
-          '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main', outlineOffset: 3 },
-        }),
-        ...sx,
+        borderRadius: '24px',
+        boxShadow: '0 18px 44px rgba(43,33,28,0.18)',
+        bgcolor: 'background.paper',
+        '&:hover .hero-img': { transform: 'scale(1.05)' },
+        '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main', outlineOffset: 3 },
       }}
     >
       <Box
         className="hero-img"
         sx={{
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${slot.src})`,
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${src})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center top',
+          backgroundPosition: 'center 20%',
           transition: 'transform 0.6s ease',
         }}
       />
       {item && (
         <Box
-          className="hero-label"
           sx={(theme) => ({
-            ...glass(theme, 0.85),
+            ...glass(theme, 0.86),
             position: 'absolute',
-            left: compact ? 6 : 12,
-            right: compact ? 6 : 12,
-            bottom: compact ? 6 : 12,
-            px: compact ? 1 : 1.5,
-            py: compact ? 0.5 : 1,
-            borderRadius: compact ? '12px' : '16px',
+            left: 10,
+            right: 10,
+            bottom: 10,
+            px: 1.5,
+            py: 1,
+            borderRadius: '14px',
             display: 'flex',
             alignItems: 'center',
             gap: 1,
             color: 'text.primary',
-            opacity: compact ? 1 : 0,
-            transform: compact ? 'none' : 'translateY(8px)',
-            transition: 'opacity 0.3s ease, transform 0.3s ease',
           })}
         >
           <Box sx={{ minWidth: 0, flex: 1 }}>
-            <Typography noWrap sx={{ fontFamily: SERIF, fontWeight: 600, fontSize: compact ? 12 : 16, lineHeight: 1.2 }}>
+            <Typography noWrap sx={{ fontWeight: 600, fontSize: 14, lineHeight: 1.25 }}>
+              {item.product_name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap component="div">
               {item.factory_name}
             </Typography>
-            {!compact && (
-              <Typography variant="caption" color="text.secondary" noWrap component="div">
-                {item.product_name}
-              </Typography>
-            )}
           </Box>
-          {!compact && <ArrowForwardIcon fontSize="small" color="primary" />}
+          <Typography sx={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: 'primary.dark', whiteSpace: 'nowrap' }}>
+            {formatMoney(item.price)}
+          </Typography>
         </Box>
       )}
     </Box>
   );
 }
 
-function HeroCollage({ featured }: { featured: StoreFeaturedProduct[] | null }) {
-  const [a, b, c] = heroSlots(featured);
-  const frame = { position: 'absolute', border: '6px solid', borderColor: 'background.paper' };
+function HeroGallery({ featured }: { featured: StoreFeaturedProduct[] | null }) {
+  const areas = ['a', 'b', 'c'];
   return (
-    <Box sx={{ position: 'relative', height: { md: 440, lg: 480 }, display: { xs: 'none', md: 'block' } }}>
-      <HeroPhoto slot={a} radius="28px" sx={{ ...frame, width: '52%', height: '78%', left: '4%', top: '6%', transform: 'rotate(-3deg)' }} />
-      <HeroPhoto slot={b} radius="28px" sx={{ ...frame, width: '44%', height: '46%', right: '2%', top: 0, transform: 'rotate(3deg)' }} />
-      <HeroPhoto slot={c} radius="28px" sx={{ ...frame, width: '40%', height: '50%', right: '8%', bottom: 0, transform: 'rotate(-1.5deg)' }} />
-      <Box
-        component="button"
-        type="button"
-        onClick={() => document.getElementById('factories')?.scrollIntoView({ behavior: 'smooth' })}
-        sx={(theme) => ({
-          ...glass(theme, 0.85),
-          position: 'absolute',
-          left: '30%',
-          bottom: '4%',
-          zIndex: 3,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.25,
-          px: 2,
-          py: 1.25,
-          borderRadius: 999,
-          boxShadow: '0 12px 30px rgba(43,33,28,0.2)',
-          cursor: 'pointer',
-          font: 'inherit',
-          color: 'text.primary',
-          transition: 'transform 0.25s ease',
-          '&:hover': { transform: 'translateY(-2px)' },
-        })}
-      >
-        <AutoAwesomeOutlinedIcon color="primary" fontSize="small" />
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          {tr("Yangi mavsum kolleksiyalari")}
-        </Typography>
-      </Box>
+    <Box
+      sx={{
+        display: { xs: 'none', md: 'grid' },
+        gridTemplateColumns: '1.15fr 1fr',
+        gridTemplateRows: '1fr 1fr',
+        gridTemplateAreas: '"a b" "a c"',
+        gap: 2,
+        height: { md: 440, lg: 480 },
+      }}
+    >
+      {FALLBACK_PHOTOS.map((fallback, i) => {
+        const item = featured?.[i];
+        return <HeroTile key={i} src={item ? item.image_url : fallback} item={item} area={areas[i]} />;
+      })}
     </Box>
   );
 }
 
-function MobileHeroStrip({ featured }: { featured: StoreFeaturedProduct[] | null }) {
+function SectionHeader({ id, title, count, action }: { id: string; title: string; count?: number | null; action?: ReactNode }) {
   return (
-    <Box sx={{ display: { xs: 'grid', md: 'none' }, gridTemplateColumns: '1.2fr 1fr 1fr', gap: 1, mb: 2.5, height: 150 }}>
-      {heroSlots(featured).map((slot, i) => (
-        <HeroPhoto
-          key={i}
-          slot={slot}
-          radius="20px"
-          compact
-          sx={{ position: 'relative', boxShadow: '0 12px 28px rgba(43,33,28,0.2)', mt: i === 1 ? 2 : 0, mb: i === 1 ? 0 : 2 }}
-        />
-      ))}
+    <Box id={id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 2, scrollMarginTop: 96, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+        <Typography variant="h4" sx={{ fontSize: { xs: 26, md: 32 } }}>
+          {title}
+        </Typography>
+        {count != null && (
+          <Typography variant="body2" color="text.secondary">
+            {count} {tr("ta")}
+          </Typography>
+        )}
+      </Box>
+      {action}
     </Box>
   );
 }
 
 export default function StoreHomePage() {
-  const [factories, setFactories] = useState<StoreFactoryCard[] | null>(null);
   const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string | null>(null);
-  const [error, setError] = useState<unknown>(null);
+  const [sort, setSort] = useState<ProductSort>('new');
   const [featured, setFeatured] = useState<StoreFeaturedProduct[] | null>(null);
+  const [factories, setFactories] = useState<StoreFactoryCard[] | null>(null);
+  const [factoriesError, setFactoriesError] = useState<unknown>(null);
+  const [page, setPage] = useState<StoreProductPage | null>(null);
+  const [items, setItems] = useState<StoreCatalogProduct[] | null>(null);
+  const [productsError, setProductsError] = useState<unknown>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totals, setTotals] = useState<{ products: number; categories: number } | null>(null);
 
   useEffect(() => {
     storeApi.featured(3).then(setFeatured).catch(() => setFeatured([]));
+    storeApi
+      .products({ limit: 1 })
+      .then((p) => setTotals({ products: p.total, categories: p.categories.length }))
+      .catch(() => undefined);
   }, []);
 
-  const load = useCallback(() => {
-    storeApi
-      .factories(search.trim())
-      .then((data) => {
-        setFactories(data);
-        setError(null);
-      })
-      .catch(setError);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const next = search.trim();
+      setQuery((prev) => {
+        if (prev !== next) setCategory(null);
+        return next;
+      });
+    }, 300);
+    return () => clearTimeout(t);
   }, [search]);
 
-  useEffect(() => {
-    const t = setTimeout(load, 300);
-    return () => clearTimeout(t);
-  }, [load]);
+  const loadFactories = useCallback(() => {
+    setFactoriesError(null);
+    storeApi.factories(query).then(setFactories).catch(setFactoriesError);
+  }, [query]);
 
-  const categories = useMemo(() => {
-    const count = new Map<string, number>();
-    factories?.forEach((f) => f.categories.forEach((c) => count.set(c, (count.get(c) ?? 0) + 1)));
-    return [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([c]) => c);
-  }, [factories]);
+  const request = useRef(0);
 
-  const visible = factories?.filter((f) => !category || f.categories.includes(category)) ?? null;
-  const totalProducts = factories?.reduce((s, f) => s + f.product_count, 0) ?? 0;
+  const loadProducts = useCallback(() => {
+    const id = ++request.current;
+    setProductsError(null);
+    setItems(null);
+    storeApi
+      .products({ search: query, category, sort, limit: PAGE })
+      .then((p) => {
+        if (id !== request.current) return;
+        setPage(p);
+        setItems(p.items);
+      })
+      .catch(setProductsError);
+  }, [query, category, sort]);
+
+  useEffect(loadFactories, [loadFactories]);
+  useEffect(loadProducts, [loadProducts]);
+
+  const loadMore = () => {
+    if (!items) return;
+    const id = request.current;
+    setLoadingMore(true);
+    storeApi
+      .products({ search: query, category, sort, limit: PAGE, offset: items.length })
+      .then((p) => {
+        if (id !== request.current) return;
+        setPage(p);
+        setItems((prev) => [...(prev ?? []), ...p.items]);
+      })
+      .catch(setProductsError)
+      .finally(() => setLoadingMore(false));
+  };
+
+  const categories = page?.categories ?? [];
+  const stats = useMemo(
+    () => [
+      { value: factories && !query ? factories.length : '—', label: tr('zavod') },
+      { value: totals?.products ?? '—', label: tr('mahsulot') },
+      { value: totals?.categories ?? '—', label: tr('kategoriya') },
+    ],
+    [factories, query, totals],
+  );
 
   return (
     <>
@@ -217,7 +238,6 @@ export default function StoreHomePage() {
         }}
       >
         <Box>
-          <MobileHeroStrip featured={featured} />
           <Chip
             icon={<VerifiedOutlinedIcon />}
             label={tr("Zavoddan to'g'ridan-to'g'ri · vositachisiz")}
@@ -225,13 +245,7 @@ export default function StoreHomePage() {
           />
           <Typography
             component="h1"
-            sx={{
-              fontFamily: SERIF,
-              fontWeight: 600,
-              fontSize: { xs: 36, sm: 46, md: 56 },
-              lineHeight: 1.05,
-              letterSpacing: '-0.02em',
-            }}
+            sx={{ fontFamily: SERIF, fontWeight: 600, fontSize: { xs: 36, sm: 46, md: 54 }, lineHeight: 1.08, letterSpacing: '-0.02em' }}
           >
             {tr("Sifatli kiyim —")}{' '}
             <Box component="span" sx={(t) => ({ color: t.palette.mode === 'dark' ? t.palette.primary.main : t.palette.primary.dark, fontStyle: 'italic' })}>
@@ -242,13 +256,14 @@ export default function StoreHomePage() {
             {tr("To'qimachilik zavodlarining mahsulotlarini ko'ring, o'lcham va rangni tanlang hamda buyurtmani bir necha daqiqada rasmiylashtiring.")}
           </Typography>
           <TextField
-            placeholder={tr("Zavod nomi yoki mahsulot turi...")}
+            placeholder={tr("Mahsulot, kategoriya yoki zavod nomi...")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            size="medium"
+            onKeyDown={(e) => e.key === 'Enter' && scrollTo('products')}
+            fullWidth
             sx={(theme) => ({
               maxWidth: 520,
-              '& .MuiOutlinedInput-root': { ...glass(theme, 0.85), height: 56, pl: 1, boxShadow: `0 10px 30px ${alpha('#2b211c', 0.08)}` },
+              '& .MuiOutlinedInput-root': { ...glass(theme, 0.9), height: 56, pl: 1, borderRadius: 999, boxShadow: `0 10px 30px ${alpha('#2b211c', 0.08)}` },
             })}
             slotProps={{
               input: {
@@ -257,15 +272,26 @@ export default function StoreHomePage() {
                     <SearchIcon color="primary" />
                   </InputAdornment>
                 ),
+                endAdornment: search ? (
+                  <InputAdornment position="end">
+                    <IconButton size="small" aria-label={tr("Tozalash")} onClick={() => setSearch('')}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ) : undefined,
               },
             }}
           />
-          <Box sx={{ display: 'flex', gap: { xs: 2.5, sm: 4 }, mt: 3.5, flexWrap: 'wrap' }}>
-            {[
-              { value: factories?.length ?? '—', label: tr('zavod') },
-              { value: totalProducts || '—', label: tr('mahsulot') },
-              { value: '100%', label: tr("xavfsiz to'lov") },
-            ].map((s) => (
+          <Box sx={{ display: 'flex', gap: 1.5, mt: 2.5, flexWrap: 'wrap' }}>
+            <Button variant="contained" size="large" endIcon={<ArrowForwardIcon />} onClick={() => scrollTo('products')} sx={{ borderRadius: 999, px: 3 }}>
+              {tr("Mahsulotlarni ko'rish")}
+            </Button>
+            <Button variant="outlined" size="large" onClick={() => scrollTo('factories')} sx={(t) => ({ ...glass(t, 0.5), borderRadius: 999, px: 3 })}>
+              {tr("Zavodlar")}
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', gap: { xs: 3, sm: 5 }, mt: 4, flexWrap: 'wrap' }}>
+            {stats.map((s) => (
               <Box key={s.label}>
                 <Typography sx={{ fontFamily: SERIF, fontWeight: 600, fontSize: { xs: 26, md: 30 }, lineHeight: 1 }}>{s.value}</Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -275,61 +301,101 @@ export default function StoreHomePage() {
             ))}
           </Box>
         </Box>
-        <HeroCollage featured={featured} />
+        <HeroGallery featured={featured} />
       </Box>
 
-      {categories.length > 1 && (
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 1,
-            mb: 3,
-            flexWrap: { xs: 'nowrap', md: 'wrap' },
-            overflowX: { xs: 'auto', md: 'visible' },
-            mx: { xs: -1.5, sm: 0 },
-            px: { xs: 1.5, sm: 0 },
-            pb: 0.5,
-            scrollbarWidth: 'none',
-            '&::-webkit-scrollbar': { display: 'none' },
-            '& .MuiChip-root': { flexShrink: 0 },
-          }}
-        >
-          <Chip label={tr("Barchasi")} color={category === null ? 'primary' : 'default'} onClick={() => setCategory(null)} sx={(t) => (category === null ? {} : glass(t, 0.7))} />
-          {categories.map((c) => (
-            <Chip key={c} label={c} color={category === c ? 'primary' : 'default'} onClick={() => setCategory(c)} sx={(t) => (category === c ? {} : glass(t, 0.7))} />
-          ))}
-        </Box>
-      )}
+      <Box component="section" sx={{ mb: { xs: 6, md: 8 } }}>
+        <SectionHeader
+          id="products"
+          title={query ? tr("Qidiruv natijalari") : tr("Mahsulotlar")}
+          count={page?.total ?? null}
+          action={
+            <TextField select size="small" fullWidth={false} value={sort} onChange={(e) => setSort(e.target.value as ProductSort)} sx={(t) => ({ width: 210, '& .MuiOutlinedInput-root': glass(t, 0.8) })}>
+              {SORTS.map((s) => (
+                <MenuItem key={s.value} value={s.value}>
+                  {s.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          }
+        />
 
-      <Box id="factories" sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 2, scrollMarginTop: 96 }}>
-        <Typography variant="h4" sx={{ fontSize: { xs: 26, md: 32 } }}>
-          {tr("Zavodlar")}
-        </Typography>
-        {visible && (
-          <Typography variant="body2" color="text.secondary">
-            {visible.length} {tr("ta")}
-          </Typography>
+        {categories.length > 1 && (
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              mb: 2.5,
+              flexWrap: { xs: 'nowrap', md: 'wrap' },
+              overflowX: { xs: 'auto', md: 'visible' },
+              mx: { xs: -1.5, sm: 0 },
+              px: { xs: 1.5, sm: 0 },
+              pb: 0.5,
+              scrollbarWidth: 'none',
+              '&::-webkit-scrollbar': { display: 'none' },
+              '& .MuiChip-root': { flexShrink: 0 },
+            }}
+          >
+            <Chip label={tr("Barchasi")} color={category === null ? 'primary' : 'default'} onClick={() => setCategory(null)} sx={(t) => (category === null ? {} : glass(t, 0.7))} />
+            {categories.map((c) => (
+              <Chip
+                key={c.name}
+                label={`${c.name} · ${c.count}`}
+                color={category === c.name ? 'primary' : 'default'}
+                onClick={() => setCategory(c.name)}
+                sx={(t) => (category === c.name ? {} : glass(t, 0.7))}
+              />
+            ))}
+          </Box>
+        )}
+
+        {productsError ? (
+          <StoreError error={productsError} onRetry={loadProducts} />
+        ) : items?.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}>
+            <CheckroomOutlinedIcon sx={{ fontSize: 64, opacity: 0.4 }} />
+            <Typography sx={{ mt: 1 }}>{query ? tr("Qidiruv bo'yicha mahsulot topilmadi") : tr("Hozircha katalogda mahsulotlar yo'q")}</Typography>
+            {query && (
+              <Button sx={{ mt: 1 }} onClick={() => setSearch('')}>
+                {tr("Qidiruvni tozalash")}
+              </Button>
+            )}
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ display: 'grid', gap: { xs: 1.5, md: 2.5 }, gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(3, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' } }}>
+              {items === null
+                ? Array.from({ length: 8 }).map((_, i) => <CatalogProductSkeleton key={i} />)
+                : items.map((p) => <CatalogProductCard key={p.id} product={p} />)}
+            </Box>
+            {items && page && items.length < page.total && (
+              <Box sx={{ textAlign: 'center', mt: 3 }}>
+                <Button variant="outlined" size="large" onClick={loadMore} disabled={loadingMore} sx={(t) => ({ ...glass(t, 0.6), borderRadius: 999, px: 4 })}>
+                  {loadingMore ? tr("Yuklanmoqda...") : tr("Yana ko'rsatish ({0})", page.total - items.length)}
+                </Button>
+              </Box>
+            )}
+          </>
         )}
       </Box>
 
-      {error ? (
-        <StoreError error={error} onRetry={load} />
-      ) : (
-        <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)' } }}>
-          {visible === null
-            ? Array.from({ length: 6 }).map((_, i) => <FactoryCardSkeleton key={i} />)
-            : visible.map((f) => <FactoryCard key={f.id} factory={f} />)}
-        </Box>
-      )}
-
-      {!error && visible?.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}>
-          <StorefrontOutlinedIcon sx={{ fontSize: 64, opacity: 0.4 }} />
-          <Typography sx={{ mt: 1 }}>
-            {search || category ? tr("Qidiruv bo'yicha zavod topilmadi") : tr("Hozircha katalogda zavodlar yo'q")}
-          </Typography>
-        </Box>
-      )}
+      <Box component="section">
+        <SectionHeader id="factories" title={tr("Zavodlar")} count={factories?.length ?? null} />
+        {factoriesError ? (
+          <StoreError error={factoriesError} onRetry={loadFactories} />
+        ) : factories?.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}>
+            <StorefrontOutlinedIcon sx={{ fontSize: 64, opacity: 0.4 }} />
+            <Typography sx={{ mt: 1 }}>{query ? tr("Qidiruv bo'yicha zavod topilmadi") : tr("Hozircha katalogda zavodlar yo'q")}</Typography>
+          </Box>
+        ) : (
+          <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)' } }}>
+            {factories === null
+              ? Array.from({ length: 3 }).map((_, i) => <FactoryCardSkeleton key={i} />)
+              : factories.map((f) => <FactoryCard key={f.id} factory={f} />)}
+          </Box>
+        )}
+      </Box>
 
       <Box component="section" sx={{ mt: { xs: 6, md: 9 } }}>
         <Typography variant="h4" sx={{ fontSize: { xs: 26, md: 32 }, mb: 1 }}>

@@ -404,3 +404,34 @@ def test_upload_requires_role(client, shop):
 def test_media_url_validation(client, shop):
     r = client.patch(f"{API}/factories/{shop['factory_id']}", headers=shop["owner"], json={"logo_url": "javascript:alert(1)"})
     assert r.status_code == 422
+
+
+def test_catalog_products_search_filter_sort(client, shop):
+    other, other_id = register_owner(client, "owner@b.uz", "Beta Jinsi")
+    product(client, other, "JN-1", price=120000, category="Jinsi", description="Klassik ko'k jinsi")
+
+    r = client.get(f"{API}/store/products").json()
+    assert r["total"] == 3
+    assert {c["name"]: c["count"] for c in r["categories"]} == {"Futbolka": 1, "Ko'ylak": 1, "Jinsi": 1}
+    assert {p["code"] for p in r["items"]} == {"PL-1", "TS-1", "JN-1"}
+    assert all(p["factory_name"] for p in r["items"])
+
+    prices = [p["price"] for p in client.get(f"{API}/store/products", params={"sort": "price_asc"}).json()["items"]]
+    assert prices == sorted(prices)
+    prices = [p["price"] for p in client.get(f"{API}/store/products", params={"sort": "price_desc"}).json()["items"]]
+    assert prices == sorted(prices, reverse=True)
+
+    found = client.get(f"{API}/store/products", params={"search": "ko'k"}).json()
+    assert [p["code"] for p in found["items"]] == ["JN-1"]
+    by_factory = client.get(f"{API}/store/products", params={"search": "Alpha"}).json()
+    assert by_factory["total"] == 2 and len(by_factory["categories"]) == 2
+
+    only = client.get(f"{API}/store/products", params={"category": "Jinsi"}).json()
+    assert only["total"] == 1 and len(only["categories"]) == 3
+
+    page = client.get(f"{API}/store/products", params={"limit": 2, "offset": 2}).json()
+    assert page["total"] == 3 and len(page["items"]) == 1
+    assert client.get(f"{API}/store/products", params={"sort": "bad"}).status_code == 422
+
+    client.patch(f"{API}/factories/{other_id}", headers=auth(client, ADMIN_EMAIL), json={"is_public": False})
+    assert client.get(f"{API}/store/products").json()["total"] == 2

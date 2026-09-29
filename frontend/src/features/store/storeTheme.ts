@@ -1,5 +1,4 @@
 import { alpha, createTheme, type PaletteMode, type Theme } from '@mui/material/styles';
-import { tr } from '@/i18n';
 
 const palettes = {
   light: {
@@ -18,7 +17,7 @@ const palettes = {
   },
 } as const;
 
-export const SERIF = tr("\"Playfair Display\", Georgia, \"Times New Roman\", serif");
+export const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
 export const glass = (theme: Theme, opacity = 0.72) => ({
   backgroundColor: alpha(theme.palette.background.paper, opacity),

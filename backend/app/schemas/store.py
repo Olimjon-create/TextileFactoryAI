@@ -45,6 +45,22 @@ class StoreProduct(BaseModel):
     model_image_url: str | None = None
 
 
+class StoreCatalogProduct(StoreProduct):
+    factory_id: int
+    factory_name: str
+
+
+class StoreCategoryCount(BaseModel):
+    name: str
+    count: int
+
+
+class StoreProductPage(BaseModel):
+    items: list[StoreCatalogProduct]
+    total: int
+    categories: list[StoreCategoryCount]
+
+
 class StoreFeaturedProduct(BaseModel):
     """Bosh sahifa kollaji uchun: surat bosilganda shu zavod va mahsulotga o'tiladi."""
 

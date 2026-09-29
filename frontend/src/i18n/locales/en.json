@@ -1767,5 +1767,18 @@
  "Mijozlar uchun do'kon havolasi": "Shop link for customers",
  "Bu havolani mijozlarga yuboring: bot zavodingiz katalogini Telegram ichida ochadi, buyurtma holati haqida mijozga xabar beradi.": "Send this link to customers: the bot opens your factory catalog inside Telegram and notifies the customer about the order status.",
  "Havola nusxalandi": "Link copied",
- "Nusxalash": "Copy"
+ "Nusxalash": "Copy",
+ "Avval yangilari": "Newest first",
+ "Avval arzonlari": "Price: low to high",
+ "Avval qimmatlari": "Price: high to low",
+ "Mahsulot, kategoriya yoki zavod nomi...": "Product, category or factory...",
+ "Mahsulotlarni ko'rish": "Browse products",
+ "kategoriya": "categories",
+ "Qidiruv natijalari": "Search results",
+ "Qidiruv bo'yicha mahsulot topilmadi": "No products match your search",
+ "Hozircha katalogda mahsulotlar yo'q": "No products in the catalog yet",
+ "Qidiruvni tozalash": "Clear search",
+ "Yana ko'rsatish ({0})": "Show more ({0})",
+ "{0} o'lcham": "{0} sizes",
+ "{0} rang": "{0} colors"
 }

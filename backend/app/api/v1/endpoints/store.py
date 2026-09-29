@@ -15,6 +15,7 @@ from app.schemas.store import (
     StoreFactoryCard,
     StoreFactoryDetail,
     StoreFeaturedProduct,
+    StoreProductPage,
 )
 from app.services import store_service
 
@@ -24,6 +25,18 @@ router = APIRouter(prefix="/store", tags=["Store (public)"])
 @router.get("/factories", response_model=list[StoreFactoryCard])
 def list_factories(search: str | None = Query(default=None, max_length=100), db: Session = Depends(get_db)):
     return store_service.list_factories(db, search)
+
+
+@router.get("/products", response_model=StoreProductPage)
+def list_products(
+    search: str | None = Query(default=None, max_length=100),
+    category: str | None = Query(default=None, max_length=100),
+    sort: str = Query(default="new", pattern="^(new|price_asc|price_desc)$"),
+    limit: int = Query(default=12, ge=1, le=48),
+    offset: int = Query(default=0, ge=0, le=10_000),
+    db: Session = Depends(get_db),
+):
+    return store_service.list_products(db, search, category, sort, limit, offset)
 
 
 @router.get("/featured", response_model=list[StoreFeaturedProduct])

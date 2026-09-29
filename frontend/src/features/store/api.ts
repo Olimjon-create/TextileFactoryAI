@@ -5,12 +5,20 @@ import type {
   PublicOrder,
   StoreFactoryCard,
   StoreFactoryDetail,
+  ProductSort,
   StoreFeaturedProduct,
+  StoreProductPage,
 } from './types';
 
 export const storeApi = {
   factories: (search?: string) =>
     api.get<StoreFactoryCard[]>('/store/factories', { params: { search: search || undefined } }).then((r) => r.data),
+  products: (params: { search?: string; category?: string | null; sort?: ProductSort; limit?: number; offset?: number }) =>
+    api
+      .get<StoreProductPage>('/store/products', {
+        params: { ...params, search: params.search || undefined, category: params.category || undefined },
+      })
+      .then((r) => r.data),
   featured: (limit = 3) =>
     api.get<StoreFeaturedProduct[]>('/store/featured', { params: { limit } }).then((r) => r.data),
   factory: (id: number) => api.get<StoreFactoryDetail>(`/store/factories/${id}`).then((r) => r.data),

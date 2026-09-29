@@ -35,6 +35,19 @@ export interface StoreProduct {
   model_image_url: string | null;
 }
 
+export interface StoreCatalogProduct extends StoreProduct {
+  factory_id: number;
+  factory_name: string;
+}
+
+export type ProductSort = 'new' | 'price_asc' | 'price_desc';
+
+export interface StoreProductPage {
+  items: StoreCatalogProduct[];
+  total: number;
+  categories: { name: string; count: number }[];
+}
+
 export interface StoreFactoryDetail {
   id: number;
   name: string;
