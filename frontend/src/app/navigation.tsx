@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
 import FactoryOutlinedIcon from '@mui/icons-material/FactoryOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import CheckroomOutlinedIcon from '@mui/icons-material/CheckroomOutlined';
@@ -119,6 +120,7 @@ export const NAVIGATION: NavSection[] = [
     title: tr("Savdo"),
     items: [
       { label: tr("Buyurtmalar"), path: '/orders', icon: <ReceiptLongOutlinedIcon />, roles: ORDER_VIEW_ROLES, badge: 'newOrders' },
+      { label: tr("Mijoz savollari"), path: '/questions', icon: <QuestionAnswerOutlinedIcon />, roles: ORDER_VIEW_ROLES },
       { label: tr("Jo'natmalar"), path: '/shipments', icon: <LocalShippingOutlinedIcon />, roles: LOGISTICS_VIEW_ROLES },
       { label: tr("Mijozlar"), path: '/customers', icon: <HandshakeOutlinedIcon />, roles: CUSTOMER_VIEW_ROLES },
       { label: tr("Mijozlar katalogi"), path: '/store', icon: <StorefrontOutlinedIcon />, external: true },

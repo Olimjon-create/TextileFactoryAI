@@ -12,8 +12,9 @@ from sqlalchemy.orm import Session
 
 from app.core.i18n import t
 from app.core.scope import scoped
-from app.models import Device, DeviceEvent, Machine, NotificationRead, Order, ProductionLog, PurchaseOrder, Shipment, ShipmentStatus, User, VisionRule, WorkOrder
+from app.models import StoreQuestion, Device, DeviceEvent, Machine, NotificationRead, Order, ProductionLog, PurchaseOrder, Shipment, ShipmentStatus, User, VisionRule, WorkOrder
 from app.models.order import OrderStatus
+from app.models.question import QuestionStatus
 from app.models.resources import MachineStatus
 from app.models.vision import EventStatus
 from app.schemas.analytics import Notification, NotificationList
@@ -44,6 +45,14 @@ def _orders(db: Session, actor: User, today: date) -> list[Notification]:
         out.append(Notification(key=f"new-order:{o.id}", type="order", severity="info", title=t("Yangi buyurtma {number}", number=o.order_number),
                                 message=f"{o.customer_name} · {float(o.total_amount):,.0f} {o.currency}".replace(",", " "), path=f"/orders/{o.id}", at=o.created_at))
     return out
+
+
+def _questions(db: Session, actor: User) -> list[Notification]:
+    rows = db.scalars(scoped(select(StoreQuestion), actor, StoreQuestion.factory_id)
+                      .where(StoreQuestion.status == QuestionStatus.NEW).order_by(StoreQuestion.created_at.desc()).limit(PER_TYPE))
+    return [Notification(key=f"question:{q.id}", type="question", severity="info",
+                         title=t("Mijoz savoli: {name}", name=q.customer_name),
+                         message=q.question[:140], path="/questions", at=q.created_at) for q in rows]
 
 
 def _low_margin(db: Session, actor: User) -> list[Notification]:
@@ -170,6 +179,7 @@ def collect(db: Session, actor: User) -> list[Notification]:
     items: list[Notification] = []
     if role in order_service.ORDER_VIEW_ROLES:
         items += _orders(db, actor, today)
+        items += _questions(db, actor)
     if role in costing_service.FINANCE_ROLES:
         items += _low_margin(db, actor)
     if role in production_service.PRODUCTION_VIEW_ROLES:

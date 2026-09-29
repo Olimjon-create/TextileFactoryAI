@@ -48,6 +48,11 @@ export interface StoreProductPage {
   categories: { name: string; count: number }[];
 }
 
+export interface AssistantReply {
+  reply: string;
+  products: StoreCatalogProduct[];
+}
+
 export interface StoreFactoryDetail {
   id: number;
   name: string;

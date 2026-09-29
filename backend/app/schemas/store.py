@@ -6,7 +6,9 @@ Bu yerda faqat ommaga ko'rsatish mumkin bo'lgan maydonlar bor — ichki ma'lumot
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models.order import OrderStatus, PaymentStatus
 from app.models.product import ProductionUnit
@@ -188,3 +190,27 @@ class PublicOrder(BaseModel):
 class CheckoutResponse(BaseModel):
     order: PublicOrder
     payment: PaymentInfo
+
+
+class AssistantStatus(BaseModel):
+    enabled: bool
+
+
+class AssistantMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=2000)
+
+
+class AssistantRequest(BaseModel):
+    messages: list[AssistantMessage] = Field(min_length=1, max_length=20)
+
+    @model_validator(mode="after")
+    def _shape(self):
+        if self.messages[-1].role != "user":
+            raise ValueError("Oxirgi xabar mijozdan bo'lishi kerak")
+        return self
+
+
+class AssistantReply(BaseModel):
+    reply: str
+    products: list[StoreCatalogProduct]

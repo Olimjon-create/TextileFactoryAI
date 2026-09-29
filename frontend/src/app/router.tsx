@@ -30,6 +30,7 @@ const ProductDetailPage = lazy(() => import('@/features/products/pages/ProductDe
 const CustomersPage = lazy(() => import('@/features/customers/pages/CustomersPage'));
 const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/OrdersPage'));
+const QuestionsPage = lazy(() => import('@/features/questions/pages/QuestionsPage'));
 const OrderDetailPage = lazy(() => import('@/features/orders/pages/OrderDetailPage'));
 const MaterialsPage = lazy(() => import('@/features/inventory/pages/MaterialsPage'));
 const MaterialDetailPage = lazy(() => import('@/features/inventory/pages/MaterialDetailPage'));
@@ -115,6 +116,7 @@ export const router = createBrowserRouter([
             children: [
               { path: '/orders', element: <OrdersPage /> },
               { path: '/orders/:id', element: <OrderDetailPage /> },
+              { path: '/questions', element: <QuestionsPage /> },
             ],
           },
           {

@@ -5,7 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.core import rate_limit
 from app.core.database import get_db
+from app.core.i18n import get_lang
 from app.schemas.store import (
+    AssistantReply,
+    AssistantRequest,
+    AssistantStatus,
     CheckoutRequest,
     CheckoutResponse,
     DemoPaymentRequest,
@@ -17,7 +21,8 @@ from app.schemas.store import (
     StoreFeaturedProduct,
     StoreProductPage,
 )
-from app.services import store_service
+from app.schemas.question import QuestionCreate
+from app.services import assistant_service, question_service, store_service
 
 router = APIRouter(prefix="/store", tags=["Store (public)"])
 
@@ -48,6 +53,25 @@ def featured(limit: int = Query(default=3, ge=1, le=12), db: Session = Depends(g
 @router.get("/factories/{factory_id}", response_model=StoreFactoryDetail)
 def get_factory(factory_id: int, db: Session = Depends(get_db)):
     return store_service.get_factory(db, factory_id)
+
+
+@router.post("/factories/{factory_id}/questions", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(rate_limit.by_ip("store-question", 5, 3600))])
+def ask_question(factory_id: int, data: QuestionCreate, db: Session = Depends(get_db)):
+    question_service.create(db, factory_id, data)
+
+
+@router.get("/assistant", response_model=AssistantStatus)
+def assistant_status():
+    return AssistantStatus(enabled=assistant_service.enabled())
+
+
+@router.post("/assistant", response_model=AssistantReply, dependencies=[Depends(rate_limit.by_ip("assistant", 30, 3600))])
+def assistant(data: AssistantRequest, db: Session = Depends(get_db)):
+    messages = [m.model_dump() for m in data.messages][-12:]
+    while messages and messages[0]["role"] != "user":
+        messages.pop(0)
+    reply, products = assistant_service.ask(db, messages, get_lang())
+    return AssistantReply(reply=reply, products=products)
 
 
 @router.post("/orders", response_model=CheckoutResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(rate_limit.by_ip("checkout", 20, 3600))])

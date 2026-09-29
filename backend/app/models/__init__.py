@@ -10,6 +10,7 @@ from app.models.logistics import ProductMovementType, ProductStockMovement, Ship
 from app.models.order import Order, OrderItem
 from app.models.procurement import PurchaseOrder, PurchaseOrderItem, PurchaseStatus, Supplier
 from app.models.product import BOMItem, Product
+from app.models.question import QuestionStatus, StoreQuestion
 from app.models.production import ProductionLog, TrackingUnit, WorkOrder
 from app.models.resources import (
     Employee,
@@ -53,6 +54,8 @@ __all__ = [
     "PurchaseOrderItem",
     "PurchaseStatus",
     "PasswordResetToken",
+    "QuestionStatus",
+    "StoreQuestion",
     "RateLimitHit",
     "Shift",
     "Shipment",

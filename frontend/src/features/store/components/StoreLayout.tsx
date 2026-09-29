@@ -29,6 +29,7 @@ import { formatMoney } from '@/shared/utils/money';
 import { CartProvider, useCart } from '../CartContext';
 import { MyOrdersProvider, useMyOrders } from '../MyOrdersContext';
 import { createStoreTheme, glass, SERIF } from '../storeTheme';
+import AssistantWidget from './AssistantWidget';
 import CartDrawer from './CartDrawer';
 import StoreBackdrop from './StoreBackdrop';
 import BrandLogo from '@/shared/components/BrandLogo';
@@ -211,6 +212,7 @@ function StoreShell() {
           </Container>
           {isMobile ? <CartBar /> : <CartFab />}
           <CartDrawer />
+          <AssistantWidget />
         </Box>
       </CartProvider>
     </MyOrdersProvider>

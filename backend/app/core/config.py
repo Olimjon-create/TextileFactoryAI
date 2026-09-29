@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_ADMIN_CHAT_ID: str = ""
     CRON_SECRET: str = ""
+    ANTHROPIC_API_KEY: str = ""
+    ASSISTANT_MODEL: str = "claude-opus-5-5"
 
     PAYMENT_PROVIDER: str = "demo"
     ALLOW_DEMO_PAYMENTS: bool = False
@@ -73,6 +75,10 @@ class Settings(BaseSettings):
     @property
     def mail_enabled(self) -> bool:
         return bool(self.RESEND_API_KEY.strip())
+
+    @property
+    def assistant_enabled(self) -> bool:
+        return bool(self.ANTHROPIC_API_KEY.strip())
 
     @property
     def telegram_enabled(self) -> bool:

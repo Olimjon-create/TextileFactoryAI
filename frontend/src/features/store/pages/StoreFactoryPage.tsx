@@ -15,12 +15,14 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { ProductRowSkeleton } from '@/shared/components/skeletons';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { storeApi } from '../api';
 import { useCart, type Variant } from '../CartContext';
+import AskQuestionDialog from '../components/AskQuestionDialog';
 import ProductRow from '../components/ProductRow';
 import StoreError from '../components/StoreError';
 import StoreImage from '../components/StoreImage';
@@ -69,6 +71,7 @@ export default function StoreFactoryPage() {
   const [searchParams] = useSearchParams();
   const focusId = Number(searchParams.get('product')) || null;
   const [highlighted, setHighlighted] = useState<number | null>(null);
+  const [asking, setAsking] = useState(false);
   useEffect(() => {
     if (!factory || !focusId) return;
     const el = document.getElementById(`product-${focusId}`);
@@ -149,7 +152,10 @@ export default function StoreFactoryPage() {
             </Box>
           </Box>
           {factory.description && <ExpandableText text={factory.description} />}
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+            <Button variant="contained" size="small" startIcon={<HelpOutlineIcon />} onClick={() => setAsking(true)}>
+              {tr('Savol berish')}
+            </Button>
             {(factory.city || factory.address) && (
               <Chip icon={<PlaceOutlinedIcon />} label={[factory.city, factory.address].filter(Boolean).join(', ')} variant="outlined" />
             )}
@@ -166,6 +172,15 @@ export default function StoreFactoryPage() {
           </Box>
         </Box>
       </Card>
+
+      <AskQuestionDialog
+        open={asking}
+        onClose={() => setAsking(false)}
+        factoryId={factory.id}
+        factoryName={factory.name}
+        products={factory.products}
+        productId={highlighted}
+      />
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 2 }}>
         <Typography variant="h5" sx={{ mr: 2 }}>

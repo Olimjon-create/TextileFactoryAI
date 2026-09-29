@@ -326,9 +326,33 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         return
     elif command == "/orders":
         _send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
+    elif not command and msg.get("text") and settings.assistant_enabled:
+        _answer_with_assistant(db, chat["id"], user, msg["text"], lang, site)
     else:
         _send_chat(chat["id"], lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇",
                    reply_markup=_shop_keyboard(lang, site))
+
+
+def _answer_with_assistant(db: Session, chat_id: int, user: dict, text: str, lang: str, site: str) -> None:
+    from app.core import rate_limit
+    from app.services import assistant_service
+
+    try:
+        rate_limit.hit(f"tg-assistant:{user.get('id')}", 20, 3600)
+        _call("sendChatAction", timeout=5, chat_id=chat_id, action="typing")
+        reply, products = assistant_service.ask(db, [{"role": "user", "content": text[:2000]}], lang)
+    except HTTPException as exc:
+        _send_raw(chat_id, html.escape(str(exc.detail)), _shop_keyboard(lang, site))
+        return
+    except Exception as exc:
+        print("tg assistant:", exc)
+        _send_chat(chat_id, lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇", reply_markup=_shop_keyboard(lang, site))
+        return
+    rows = [[{"text": f"{p.name} · {p.price:,.0f} so'm".replace(",", " "),
+              "web_app": {"url": f"{site}/store/factories/{p.factory_id}?product={p.id}"}}] for p in products]
+    keyboard = _shop_keyboard(lang, site)
+    keyboard["inline_keyboard"] = rows + keyboard["inline_keyboard"]
+    _send_raw(chat_id, html.escape(reply), keyboard)
 
 
 def setup_bot(base_url: str) -> dict:

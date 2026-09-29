@@ -229,3 +229,21 @@ MESSAGES[
     "🔧 Broken machines: {broken}\n"
     "🙋 Pending leave requests: {leaves}",
 )
+MESSAGES.update({
+    "Mahsulot topilmadi": _m("Товар не найден", "Product not found"),
+    "Savol topilmadi": _m("Вопрос не найден", "Question not found"),
+    "Mijoz savoli: {name}": _m("Вопрос клиента: {name}", "Customer question: {name}"),
+    "❓ <b>Mijoz savoli</b> · {product}\n{name}, {phone}\n\n{question}": _m(
+        "❓ <b>Вопрос клиента</b> · {product}\n{name}, {phone}\n\n{question}",
+        "❓ <b>Customer question</b> · {product}\n{name}, {phone}\n\n{question}"),
+    "Yordamchi hozircha o'chirilgan": _m("Помощник пока отключён", "The assistant is currently disabled"),
+    "Yordamchi hozir javob bera olmadi, birozdan keyin urinib ko'ring": _m(
+        "Помощник сейчас не смог ответить, попробуйте чуть позже",
+        "The assistant could not answer right now, please try again shortly"),
+    "Kechirasiz, bu savolga javob bera olmayman. Mahsulotlar haqida so'rang.": _m(
+        "Извините, на этот вопрос я ответить не могу. Спросите о товарах.",
+        "Sorry, I can't answer that. Please ask about our products."),
+    "Kechirasiz, javob tayyorlay olmadim. Savolni boshqacha yozib ko'ring.": _m(
+        "Извините, не удалось подготовить ответ. Попробуйте сформулировать вопрос иначе.",
+        "Sorry, I couldn't prepare an answer. Try rephrasing your question."),
+})

@@ -17,6 +17,7 @@ import { storeApi } from '../api';
 import CatalogProductCard, { CatalogProductSkeleton } from '../components/CatalogProductCard';
 import FactoryCard from '../components/FactoryCard';
 import StoreError from '../components/StoreError';
+import StoreFaq from '../components/StoreFaq';
 import { glass, SERIF } from '../storeTheme';
 import type { ProductSort, StoreCatalogProduct, StoreFactoryCard, StoreFeaturedProduct, StoreProductPage } from '../types';
 import { tr } from '@/i18n';
@@ -442,6 +443,8 @@ export default function StoreHomePage() {
           <Typography variant="body2">{tr("Yetkazib berish shartlari va muddatlarini zavod siz bilan telefon orqali kelishadi.")}</Typography>
         </Box>
       </Box>
+
+      <StoreFaq />
     </>
   );
 }
