@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.roles import Role
@@ -71,7 +71,16 @@ def _link_customer(db: Session, order: Order) -> None:
 
 def mark_paid(db: Session, order: Order, *, reference: str, card_last4: str | None) -> Order:
     """To'lov muvaffaqiyatli bo'lganda chaqiriladi (demo yoki haqiqiy provayder webhook'i)."""
-    if order.payment_status == PaymentStatus.PAID:
+    # Shartli UPDATE: bir vaqtda kelgan ikki to'lov so'rovidan faqat bittasi o'tadi
+    # (oddiy tekshiruvda ikkalasi ham "to'lanmagan" deb ko'rib, ikki marta qayd etardi).
+    claimed = db.execute(
+        update(Order)
+        .where(Order.id == order.id, Order.payment_status != PaymentStatus.PAID)
+        .values(payment_status=PaymentStatus.PAID)
+        .execution_options(synchronize_session=False)
+    ).rowcount
+    if not claimed:
+        db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "Buyurtma allaqachon to'langan")
     order.payment_status = PaymentStatus.PAID
     order.status = OrderStatus.NEW

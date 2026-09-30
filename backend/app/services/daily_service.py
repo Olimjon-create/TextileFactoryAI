@@ -15,13 +15,14 @@ from sqlalchemy.orm import Session
 from app.core.i18n import MONTHS_FULL
 from app.models import Factory, LeaveRequest, Machine, Material, Order, PasswordResetToken, RateLimitHit, StockMovement, WorkOrder
 from app.models.attendance import LeaveStatus
-from app.models.order import OrderStatus
+from app.models.order import OrderStatus, PaymentStatus
 from app.models.production import WorkOrderStatus
 from app.models.resources import MachineStatus
 from app.services import backup_service, telegram_service
 
 TASHKENT = timezone(timedelta(hours=5))
 OPEN_ORDER = (OrderStatus.NEW, OrderStatus.CONFIRMED, OrderStatus.IN_PRODUCTION, OrderStatus.READY)
+UNPAID_ORDER_TTL_DAYS = 7
 
 REPORT = (
     "📊 <b>Kunlik hisobot</b> · {factory}\n{day}\n\n"
@@ -109,8 +110,14 @@ def cleanup(db: Session) -> dict:
     now = datetime.now(timezone.utc)
     hits = db.execute(delete(RateLimitHit).where(RateLimitHit.window_start < int(time.time()) - 2 * 86400)).rowcount
     tokens = db.execute(delete(PasswordResetToken).where(PasswordResetToken.expires_at < now - timedelta(days=7))).rowcount
+    # Katalogda "Buyurtma berish" bosilib, to'lanmay qolganlar (qatorlari CASCADE bilan o'chadi).
+    unpaid = db.execute(delete(Order).where(
+        Order.status == OrderStatus.PENDING_PAYMENT,
+        Order.payment_status != PaymentStatus.PAID,
+        Order.created_at < now - timedelta(days=UNPAID_ORDER_TTL_DAYS),
+    ).execution_options(synchronize_session=False)).rowcount
     db.commit()
-    return {"rate_limit_hits": hits or 0, "reset_tokens": tokens or 0}
+    return {"rate_limit_hits": hits or 0, "reset_tokens": tokens or 0, "unpaid_orders": unpaid or 0}
 
 
 def send_employee_reports(db: Session, now: datetime | None = None) -> int:

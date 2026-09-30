@@ -435,3 +435,20 @@ def test_catalog_products_search_filter_sort(client, shop):
 
     client.patch(f"{API}/factories/{other_id}", headers=auth(client, ADMIN_EMAIL), json={"is_public": False})
     assert client.get(f"{API}/store/products").json()["total"] == 2
+
+
+def test_concurrent_payment_recorded_once(client, shop):
+    """Ikkinchi so'rov buyurtmani eski (to'lanmagan) holatda o'qigan bo'lsa ham — 409, qayta qayd etilmaydi."""
+    from fastapi import HTTPException
+
+    from app.core.database import SessionLocal
+    from app.services import order_service, store_service
+
+    token = checkout(client, shop).json()["order"]["public_token"]
+    with SessionLocal() as db:
+        stale = store_service._get_order_by_token(db, token)
+        assert pay(client, token).status_code == 200
+        with pytest.raises(HTTPException) as exc:
+            order_service.mark_paid(db, stale, reference="DEMO-2", card_last4="1111")
+        assert exc.value.status_code == 409
+    assert client.get(f"{API}/store/orders/{token}").json()["card_last4"] == "4242"

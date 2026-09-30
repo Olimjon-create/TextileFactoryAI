@@ -34,6 +34,9 @@ env.setdefault("MEDIA_DIR", "/tmp/media")
 env.setdefault("SEED_PUBLIC_DEMO", "true")
 env.setdefault("BOOTSTRAP_SUPERADMIN", "true" if env.get("SUPERADMIN_PASSWORD") else "false")
 env.setdefault("RATE_LIMIT_BACKEND", "db")
+# Vercel X-Forwarded-For'ni o'zi yozadi (mijoz soxtalay olmaydi); busiz barcha mijozlar bitta IP bo'lib,
+# chastota cheklovi butun sayt uchun umumiy bo'lib qoladi.
+env.setdefault("TRUST_PROXY_HEADERS", "true")
 env.setdefault("CORS_ORIGINS", "")
 
 from app.main import app, prepare

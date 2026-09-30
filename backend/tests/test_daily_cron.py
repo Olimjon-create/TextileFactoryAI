@@ -4,10 +4,11 @@ import time
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from sqlalchemy import func, select, update
 
 from app.core.config import settings
 from app.core.database import SessionLocal
-from app.models import Factory, RateLimitHit
+from app.models import Factory, Order, OrderItem, RateLimitHit
 from app.services import daily_service, store_service, telegram_service
 from tests.conftest import API
 from tests.test_store import checkout, pay, shop
@@ -90,3 +91,18 @@ def test_server_error_alerts_admin_once(client, bot, monkeypatch):
     alerts = [m for m in bot if m["chat_id"] == "900"]
     assert len(alerts) == 1
     assert "GET /api/v1/store/factories" in alerts[0]["text"] and "baza javob bermadi" in alerts[0]["text"]
+
+
+def test_cleanup_removes_old_unpaid_orders(client, shop):
+    old = checkout(client, shop).json()["order"]["public_token"]
+    fresh = checkout(client, shop).json()["order"]["public_token"]
+    paid_old = checkout(client, shop).json()["order"]["public_token"]
+    pay(client, paid_old)
+    with SessionLocal() as db:
+        long_ago = datetime.now(timezone.utc) - timedelta(days=daily_service.UNPAID_ORDER_TTL_DAYS + 1)
+        db.execute(update(Order).where(Order.public_token.in_([old, paid_old])).values(created_at=long_ago))
+        db.commit()
+        assert daily_service.cleanup(db)["unpaid_orders"] == 1
+        left = set(db.scalars(select(Order.public_token)))
+        assert left == {fresh, paid_old}
+        assert db.scalar(select(func.count(OrderItem.id)).where(OrderItem.order_id.not_in(select(Order.id)))) == 0

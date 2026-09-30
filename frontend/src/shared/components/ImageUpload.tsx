@@ -11,7 +11,7 @@ import {
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { api, getErrorMessage } from "@/shared/api/client";
-import { tr } from '@/i18n';
+import { tr } from "@/i18n";
 
 const MAX_MB = 5;
 const ACCEPT = "image/jpeg,image/png,image/webp";
