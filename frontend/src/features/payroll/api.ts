@@ -63,4 +63,8 @@ export const payrollApi = {
   pay: (employeeId: number, month: string) =>
     api.post<PayrollRow>('/payroll/payments', { employee_id: employeeId, month }).then((r) => r.data),
   cancelPayment: (id: number) => api.delete(`/payroll/payments/${id}`).then(() => undefined),
+  sendPayslips: (month: string, factoryId?: number | '') =>
+    api
+      .post<{ sent: number; not_linked: number }>('/payroll/payslips/send', { month }, { params: { factory_id: factoryId || undefined } })
+      .then((r) => r.data),
 };

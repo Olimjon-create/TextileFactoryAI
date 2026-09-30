@@ -1978,5 +1978,10 @@
  "Uzunlik (lng)": "Longitude (lng)",
  "Xaritada ko'rish": "Show on map",
  "Xodim Telegram botda «📍 Keldim / Ketdim» tugmasini bosib joylashuvini yuboradi — zavod radiusi ichida bo'lsa vaqti belgilanadi": "The employee taps «📍 Check in / out» in the Telegram bot and sends their location — within the factory radius the time is recorded",
- "Zavod nuqtasidan shu masofagacha «keldi» deb qabul qilinadi (GPS xatoligi uchun 150–300 m tavsiya etiladi)": "Check-ins within this distance of the factory point are accepted (150–300 m recommended for GPS error)"
+ "Zavod nuqtasidan shu masofagacha «keldi» deb qabul qilinadi (GPS xatoligi uchun 150–300 m tavsiya etiladi)": "Check-ins within this distance of the factory point are accepted (150–300 m recommended for GPS error)",
+ "Hisob varaqalarini botga yuborish": "Send payslips to the bot",
+ "Hisob varaqalarini yuborish": "Send payslips",
+ "{0} oyi hisob varaqasi Telegram botga ulangan barcha xodimlarga yuborilsinmi?": "Send the {0} payslips to all employees connected to the Telegram bot?",
+ "{0} ta xodimga yuborildi, {1} tasi botga ulanmagan": "Sent to {0} employees, {1} not connected to the bot",
+ "{0} ta xodimga yuborildi": "Sent to {0} employees"
 }

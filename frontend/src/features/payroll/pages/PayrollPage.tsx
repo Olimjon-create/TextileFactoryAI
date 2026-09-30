@@ -31,6 +31,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import TelegramIcon from '@mui/icons-material/Telegram';
 import { useAuth } from '@/features/auth/AuthContext';
 import { factoriesApi } from '@/features/factories/api';
 import { DEPARTMENT_LABELS, PAY_TYPE_LABELS } from '@/features/resources/constants';
@@ -215,6 +216,7 @@ export default function PayrollPage() {
   const [editing, setEditing] = useState<PayrollRow | null>(null);
   const [paying, setPaying] = useState<PayrollRow | null>(null);
   const [cancelling, setCancelling] = useState<PayrollRow | null>(null);
+  const [sendingSlips, setSendingSlips] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -254,6 +256,23 @@ export default function PayrollPage() {
     }
   };
 
+  const confirmSendSlips = async () => {
+    setBusy(true);
+    try {
+      const r = await payrollApi.sendPayslips(month, factoryId);
+      toast.success(
+        r.not_linked
+          ? tr("{0} ta xodimga yuborildi, {1} tasi botga ulanmagan", r.sent, r.not_linked)
+          : tr("{0} ta xodimga yuborildi", r.sent),
+      );
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setBusy(false);
+      setSendingSlips(false);
+    }
+  };
+
   const confirmCancel = async () => {
     if (!cancelling?.payment_id) return;
     setBusy(true);
@@ -287,9 +306,14 @@ export default function PayrollPage() {
         title={tr('Ish haqi')}
         subtitle={tr("Oylik, soatbay va ishbay ish haqi — davomat va ishlab chiqarish jurnalidan avtomatik hisoblanadi")}
         action={
-          <Button variant="outlined" color="inherit" startIcon={<FileDownloadOutlinedIcon />} onClick={exportCsv} disabled={!data}>
-            {tr('Excel')}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button variant="outlined" color="inherit" startIcon={<TelegramIcon />} onClick={() => setSendingSlips(true)} disabled={!data || data.rows.length === 0}>
+              {tr('Hisob varaqalarini botga yuborish')}
+            </Button>
+            <Button variant="outlined" color="inherit" startIcon={<FileDownloadOutlinedIcon />} onClick={exportCsv} disabled={!data}>
+              {tr('Excel')}
+            </Button>
+          </Box>
         }
       />
 
@@ -445,6 +469,15 @@ export default function PayrollPage() {
         loading={busy}
         onConfirm={confirmCancel}
         onClose={() => setCancelling(null)}
+      />
+      <ConfirmDialog
+        open={sendingSlips}
+        title={tr('Hisob varaqalarini yuborish')}
+        message={tr("{0} oyi hisob varaqasi Telegram botga ulangan barcha xodimlarga yuborilsinmi?", monthTitle(month))}
+        confirmText={tr('Yuborish')}
+        loading={busy}
+        onConfirm={confirmSendSlips}
+        onClose={() => setSendingSlips(false)}
       />
     </>
   );

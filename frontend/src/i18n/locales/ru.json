@@ -1978,5 +1978,10 @@
  "Uzunlik (lng)": "Долгота (lng)",
  "Xaritada ko'rish": "Показать на карте",
  "Xodim Telegram botda «📍 Keldim / Ketdim» tugmasini bosib joylashuvini yuboradi — zavod radiusi ichida bo'lsa vaqti belgilanadi": "Сотрудник нажимает в Telegram-боте «📍 Пришёл / Ушёл» и отправляет геолокацию — если он в радиусе фабрики, время отмечается",
- "Zavod nuqtasidan shu masofagacha «keldi» deb qabul qilinadi (GPS xatoligi uchun 150–300 m tavsiya etiladi)": "В пределах этого расстояния от точки фабрики отметка принимается (из-за погрешности GPS рекомендуется 150–300 м)"
+ "Zavod nuqtasidan shu masofagacha «keldi» deb qabul qilinadi (GPS xatoligi uchun 150–300 m tavsiya etiladi)": "В пределах этого расстояния от точки фабрики отметка принимается (из-за погрешности GPS рекомендуется 150–300 м)",
+ "Hisob varaqalarini botga yuborish": "Отправить расчётные листы в бот",
+ "Hisob varaqalarini yuborish": "Отправка расчётных листов",
+ "{0} oyi hisob varaqasi Telegram botga ulangan barcha xodimlarga yuborilsinmi?": "Отправить расчётные листы за {0} всем сотрудникам, подключённым к Telegram-боту?",
+ "{0} ta xodimga yuborildi, {1} tasi botga ulanmagan": "Отправлено: {0}, не подключены к боту: {1}",
+ "{0} ta xodimga yuborildi": "Отправлено сотрудникам: {0}"
 }

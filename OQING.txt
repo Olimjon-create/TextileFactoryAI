@@ -70,6 +70,7 @@ Sozlamalar          Profil, parol, til (UZ/RU/EN), zavod nomi, Telegram, tannarx
 Zavod egasi:  Sozlamalar -> Telegram -> "Botni ochish" -> Start. Keyin yangi buyurtma,
               material tugashi, mashina buzilishi, javob so'rovlari va kunlik hisobot keladi.
               Yangi buyurtma xabarida "Tasdiqlash" / "Bekor qilish" tugmalari bor.
+              Zavod chatida: /report - bugungi hisobot hozir; /absent - kim kelmagan va kechikkan.
 Mijoz:        /start -> "Do'konni ochish" (katalog Telegram ichida). Buyurtma holati botga keladi.
               Zavodning do'kon havolasi: Sozlamalar -> Telegram -> "Mijozlar uchun do'kon havolasi".
 Xodim:        Xodimlar -> Telegram belgisi -> QR. /me - bugungi va oylik natija, ish haqi.
@@ -82,6 +83,7 @@ Xodim:        Xodimlar -> Telegram belgisi -> QR. /me - bugungi va oylik natija,
               (zavod ichida telefondan "Joriy joylashuvimni olish"). Xodim botda "Keldim / Ketdim" ->
               "Joylashuvni yuborish"; radius ichida bo'lsa kelgan/ketgan vaqti yoziladi.
               Hisob varaqasi: "To'lash" bosilganda xodimga botda avtomatik keladi; /payslip - o'tgan oy.
+              Ish haqi sahifasida "Hisob varaqalarini botga yuborish" - oy bo'yicha hammaga bir bosishda.
 Buyruqlar:    /start  /shop  /orders  /me  /leave  /payslip  /help
 
 ----------------------------------------------------

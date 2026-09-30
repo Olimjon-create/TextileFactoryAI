@@ -425,3 +425,18 @@ MESSAGES.update({
     'Ishbay (donabay)': _m('Сдельная', 'Piece rate'),
     "📄 <b>Hisob varaqasi · {month}</b>\n{name} ({code})\n{pay_type}\n\n🧵 {pieces} dona · ⏱ {hours} soat · 📅 {days} kun (kelmagan: {absent})\n\nAsosiy: {base} so'm\n➕ Bonus: {bonus} so'm\n➖ Jarima: {deduction} so'm\n➖ Avans: {advance} so'm\n💰 Hisoblangan: {accrued} so'm\n💵 <b>Qo'lingizga: {to_pay} so'm</b> ({status})": _m('📄 <b>Расчётный лист · {month}</b>\n{name} ({code})\n{pay_type}\n\n🧵 {pieces} шт · ⏱ {hours} ч · 📅 {days} дн. (пропуски: {absent})\n\nОсновное: {base} сум\n➕ Премия: {bonus} сум\n➖ Штраф: {deduction} сум\n➖ Аванс: {advance} сум\n💰 Начислено: {accrued} сум\n💵 <b>К выплате: {to_pay} сум</b> ({status})', '📄 <b>Payslip · {month}</b>\n{name} ({code})\n{pay_type}\n\n🧵 {pieces} pcs · ⏱ {hours} h · 📅 {days} days (absent: {absent})\n\nBase: {base} UZS\n➕ Bonus: {bonus} UZS\n➖ Penalty: {deduction} UZS\n➖ Advance: {advance} UZS\n💰 Accrued: {accrued} UZS\n💵 <b>Take-home: {to_pay} UZS</b> ({status})'),
 })
+
+# Rahbar buyruqlari (/report, /absent) va /me dagi bugungi davomat
+MESSAGES.update({
+    'Bu buyruq faqat zavod chatida ishlaydi (saytda Sozlamalar → Telegram).': _m('Эта команда работает только в чате фабрики (на сайте: Настройки → Telegram).', 'This command only works in the factory chat (on the site: Settings → Telegram).'),
+    '📋 <b>Bugungi davomat</b> · {factory}\nKeldi: {present}/{total} · Kechikdi: {late} · Kelmagan/belgilanmagan: {missing}': _m('📋 <b>Посещаемость сегодня</b> · {factory}\nПришли: {present}/{total} · Опоздали: {late} · Нет/не отмечены: {missing}', "📋 <b>Today's attendance</b> · {factory}\nPresent: {present}/{total} · Late: {late} · Absent/not marked: {missing}"),
+    '❌ <b>Ishda emas:</b>': _m('❌ <b>Нет на работе:</b>', '❌ <b>Not at work:</b>'),
+    '⏰ <b>Kechikkanlar:</b>': _m('⏰ <b>Опоздали:</b>', '⏰ <b>Late:</b>'),
+    "✅ Hamma o'z vaqtida keldi.": _m('✅ Все пришли вовремя.', '✅ Everyone arrived on time.'),
+    'belgilanmagan': _m('не отмечен', 'not marked'),
+    'kelmadi': _m('не пришёл', 'absent'),
+    'kasal': _m('болеет', 'sick'),
+    'javob olgan': _m('отпросился', 'on leave'),
+    "ta'tilda": _m('в отпуске', 'on vacation'),
+    '🕘 Bugun: keldi {check_in} · ketdi {check_out}': _m('🕘 Сегодня: пришёл {check_in} · ушёл {check_out}', '🕘 Today: in {check_in} · out {check_out}'),
+})

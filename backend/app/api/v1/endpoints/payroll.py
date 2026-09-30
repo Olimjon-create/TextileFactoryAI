@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -45,6 +46,21 @@ def delete_adjustment(adjustment_id: int, db: Session = Depends(get_db), actor: 
 @router.post("/payments", response_model=PayrollRow, status_code=status.HTTP_201_CREATED)
 def pay(data: PaymentCreate, db: Session = Depends(get_db), actor: User = Depends(can_pay)):
     return payroll_service.pay(db, actor, data)
+
+
+class PayslipSend(BaseModel):
+    month: str = Field(pattern=MONTH_PATTERN)
+
+
+class PayslipSendResult(BaseModel):
+    sent: int
+    not_linked: int
+
+
+@router.post("/payslips/send", response_model=PayslipSendResult)
+def send_payslips(data: PayslipSend, factory_id: int | None = None, db: Session = Depends(get_db), actor: User = Depends(can_pay)):
+    """Hisob varaqalarini Telegram botga ulangan xodimlarga yuborish."""
+    return payroll_service.send_payslips(db, actor, data.month, factory_id)
 
 
 @router.delete("/payments/{payment_id}", status_code=status.HTTP_204_NO_CONTENT)

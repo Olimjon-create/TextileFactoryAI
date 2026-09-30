@@ -190,6 +190,21 @@ def pay(db: Session, actor: User, data: PaymentCreate) -> PayrollRow:
     return report(db, actor, data.month, employee_id=e.id).rows[0]
 
 
+def send_payslips(db: Session, actor: User, month: str, factory_id: int | None = None) -> dict:
+    """Oy bo'yicha hisob varaqalarini botga ulangan barcha xodimlarga yuborish (to'langan-to'lanmaganidan qat'i nazar)."""
+    from app.core.config import settings
+    from app.services import employee_bot_service
+
+    if not settings.telegram_enabled:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, t("Telegram bot sozlanmagan"))
+    rows = report(db, actor, month, factory_id).rows
+    linked = {e.id for e in db.scalars(select(Employee).where(Employee.id.in_([r.employee_id for r in rows] or [0]),
+                                                             Employee.telegram_chat_id.is_not(None)))}
+    for employee_id in linked:
+        employee_bot_service.send_payslip(db, employee_id, month)
+    return {"sent": len(linked), "not_linked": len(rows) - len(linked)}
+
+
 def cancel_payment(db: Session, actor: User, payment_id: int) -> None:
     p = db.get(PayrollPayment, payment_id)
     if p is None or not can_access(actor, p.factory_id):

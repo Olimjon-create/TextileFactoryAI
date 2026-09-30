@@ -94,16 +94,20 @@ def send_reports(db: Session, now: datetime | None = None) -> int:
     sent = 0
     factories = db.scalars(select(Factory).where(Factory.is_active.is_(True), Factory.telegram_chat_id.is_not(None)))
     for factory in factories:
-        r = factory_report(db, factory, now)
-        lang = factory.telegram_lang or "uz"
-        ok = telegram_service.send(
-            factory, REPORT, factory=factory.name, day=_day_label(r["day"], lang),
-            orders=r["orders"], amount=f"{float(r['amount']):,.0f} UZS".replace(",", " "),
-            open=r["open"], overdue=r["overdue"], wo_done=r["wo_done"], wo_qty=r["wo_qty"],
-            low=r["low"], broken=r["broken"], leaves=r["leaves"],
-        )
-        sent += int(ok)
+        sent += int(send_report(db, factory, now))
     return sent
+
+
+def send_report(db: Session, factory: Factory, now: datetime | None = None) -> bool:
+    """Bitta zavodga kunlik hisobot (cron va zavod chatidagi /report buyrug'i)."""
+    r = factory_report(db, factory, now)
+    lang = factory.telegram_lang or "uz"
+    return telegram_service.send(
+        factory, REPORT, factory=factory.name, day=_day_label(r["day"], lang),
+        orders=r["orders"], amount=f"{float(r['amount']):,.0f} UZS".replace(",", " "),
+        open=r["open"], overdue=r["overdue"], wo_done=r["wo_done"], wo_qty=r["wo_qty"],
+        low=r["low"], broken=r["broken"], leaves=r["leaves"],
+    )
 
 
 def cleanup(db: Session) -> dict:

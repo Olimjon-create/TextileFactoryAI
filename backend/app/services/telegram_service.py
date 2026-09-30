@@ -450,13 +450,26 @@ def employee_summary_text(db: Session, employee, lang: str) -> str:
         .where(ProductionLog.employee_id == employee.id, ProductionLog.work_date == today)
     ) or 0)
     status_label = t_lang(lang, "to'langan ✅") if row.payment_id else t_lang(lang, "hali to'lanmagan")
-    return t_lang(
+    text = t_lang(
         lang,
         "📊 <b>{name}</b>\n\n📅 Bugun: {today} dona\n🗓 Shu oy: {pieces} dona · {hours} soat · {days} kun\n\n"
         "💰 Hisoblangan: {accrued} so'm\n➖ Avans: {advance} so'm\n💵 Qo'lingizga: <b>{to_pay} so'm</b> ({status})",
         name=html.escape(employee.full_name), today=today_pieces, pieces=row.pieces, hours=row.hours, days=row.present_days,
         accrued=_sum(row.accrued), advance=_sum(row.advance), to_pay=_sum(row.to_pay), status=status_label,
     )
+    return text + _today_attendance_line(db, employee, today, lang)
+
+
+def _today_attendance_line(db: Session, employee, today, lang: str) -> str:
+    """/me: bugungi kelgan/ketgan vaqt (davomat belgilangan bo'lsa)."""
+    from app.models import Attendance
+    from app.models.attendance import AttendanceStatus
+
+    rec = db.scalar(select(Attendance).where(Attendance.employee_id == employee.id, Attendance.work_date == today))
+    if rec is None or rec.status != AttendanceStatus.PRESENT or rec.check_in is None:
+        return ""
+    return "\n\n" + t_lang(lang, "🕘 Bugun: keldi {check_in} · ketdi {check_out}",
+                             check_in=rec.check_in.strftime("%H:%M"), check_out=rec.check_out.strftime("%H:%M") if rec.check_out else "—")
 
 
 def employee_by_chat(db: Session, chat_id) -> object | None:
@@ -564,6 +577,10 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
     command = parts[0].split("@")[0].lower() if parts and parts[0].startswith("/") else ""
     if command == "/start":
         _handle_start(db, chat, user, parts[1] if len(parts) > 1 else "", lang, site)
+    elif command in ("/report", "/absent"):
+        from app.services import owner_bot_service
+
+        owner_bot_service.handle_command(db, chat, command, lang)
     elif chat.get("type") != "private":
         return
     elif msg.get("contact") and _handle_contact(db, msg, lang):
