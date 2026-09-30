@@ -53,6 +53,9 @@ Mijoz savollari     Katalogdagi "Savol berish" orqali kelgan savollar; qo'ng'iro
 Ish buyurtmalari    Kesish -> Tikuv -> Pardoz -> Sifat -> Qadoqlash; QR skaner.
 Xodimlar            Xodim kartochkasi, stavka (oylik / soatbay / ishbay).
                     Telegram belgisi -> xodimga shaxsiy QR/havola (bot orqali o'z natijasini ko'radi).
+Xodim qo'shish      Alohida sahifa: qo'lda kiritish yoki Telegram taklif havolasi/QR.
+                    Xodim havolani ochib raqamini yuboradi -> so'rov shu sahifaga va zavod chatiga keladi
+                    -> bo'limni tanlab "Qabul qilish" (xodim botga avtomatik ulanadi).
 Davomat             Kelish-ketish, kechikish, javob so'rovlari.
 Ish haqi            Oy bo'yicha avtomatik hisob; bonus, jarima, avans; "To'lash"; hisob varaqasi.
 Ombor               Materiallar, kirim-chiqim, ombor joylari, tayyor mahsulot.
@@ -70,6 +73,8 @@ Zavod egasi:  Sozlamalar -> Telegram -> "Botni ochish" -> Start. Keyin yangi buy
 Mijoz:        /start -> "Do'konni ochish" (katalog Telegram ichida). Buyurtma holati botga keladi.
               Zavodning do'kon havolasi: Sozlamalar -> Telegram -> "Mijozlar uchun do'kon havolasi".
 Xodim:        Xodimlar -> Telegram belgisi -> QR. /me - bugungi va oylik natija, ish haqi.
+              Yangi xodim: Xodim qo'shish -> Telegram taklif havolasi -> "Raqamni yuborish";
+              zavod chatida bo'lim tugmasini bosib qabul qilinadi yoki "Rad etish".
 Buyruqlar:    /start  /shop  /orders  /me  /help
 
 ----------------------------------------------------

@@ -1952,5 +1952,18 @@
  "To'lanmagan ish haqi": "Невыплаченная зарплата",
  "{0} xodim · to'langan {1}": "{0} сотр. · выплачено {1}",
  "Javob kutayotgan savollar": "Вопросы без ответа",
- "Katalogdagi «Savol berish» orqali": "Через «Задать вопрос» в каталоге"
+ "Katalogdagi «Savol berish» orqali": "Через «Задать вопрос» в каталоге",
+ "Kelgan so'rovlar": "Входящие заявки",
+ "Qo'lda kiriting yoki Telegram havolasini yuboring — xodim o'zi so'rov yuboradi, siz tasdiqlaysiz": "Введите вручную или отправьте ссылку в Telegram — сотрудник сам отправит заявку, вы подтвердите",
+ "Qo'lda kiritish": "Ввести вручную",
+ "Qolgan ma'lumotlarni (liniya, smena, me'yor) keyin Xodimlar sahifasida to'ldirishingiz mumkin.": "Остальные данные (линия, смена, норма) можно заполнить позже на странице «Сотрудники».",
+ "Telegram orqali taklif": "Приглашение через Telegram",
+ "Telegram'da yuborish": "Отправить в Telegram",
+ "Xodim QR kodni skanerlaydi yoki havolani ochadi, «📱 Raqamni yuborish» tugmasini bosadi. So'rov shu sahifaga va zavod Telegram chatiga keladi — bo'limni tanlab qabul qilasiz. Qabul qilingan xodim botda o'z natijasi va ish haqini darhol ko'radi.": "Сотрудник сканирует QR-код или открывает ссылку и нажимает «📱 Отправить номер». Заявка придёт на эту страницу и в Telegram-чат фабрики — выберите отдел и примите. Принятый сотрудник сразу видит в боте свои результаты и зарплату.",
+ "Xodim qo'shish": "Добавить сотрудника",
+ "Xodim qo'shish uchun ruxsat yo'q": "Нет прав на добавление сотрудников",
+ "Xodimlar ro'yxati": "Список сотрудников",
+ "Zavod Telegram chati ulanmagan — so'rovlar faqat shu sahifada ko'rinadi. Sozlamalar → Telegram bo'limidan ulang.": "Telegram-чат фабрики не подключён — заявки видны только на этой странице. Подключите в Настройки → Telegram.",
+ "{0} so'rovi rad etildi": "Заявка {0} отклонена",
+ "{0} ta so'rov": "Заявок: {0}"
 }

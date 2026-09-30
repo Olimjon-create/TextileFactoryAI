@@ -5,6 +5,7 @@ from app.models.password_reset import PasswordResetToken
 from app.models.rate_limit import RateLimitHit
 from app.models.customer import Customer
 from app.models.factory import Factory
+from app.models.join_request import EmployeeJoinRequest, JoinRequestStatus
 from app.models.inventory import Material, MovementType, StockMovement, WarehouseLocation
 from app.models.logistics import ProductMovementType, ProductStockMovement, Shipment, ShipmentItem, ShipmentStatus
 from app.models.order import Order, OrderItem
@@ -26,6 +27,7 @@ from app.models.user import User
 from app.models.vision import Device, DeviceEvent, VisionRule
 
 __all__ = [
+    "JoinRequestStatus",
     "Attendance",
     "AttendanceStatus",
     "LeaveRequest",
@@ -37,6 +39,7 @@ __all__ = [
     "Device",
     "DeviceEvent",
     "Employee",
+    "EmployeeJoinRequest",
     "Factory",
     "FactorySettings",
     "Machine",

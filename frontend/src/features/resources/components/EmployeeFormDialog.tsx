@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, Divider, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { getErrorMessage } from '@/shared/api/client';
 import SaveButton from '@/shared/components/SaveButton';
 import { useToast } from '@/shared/components/Toast';
@@ -16,6 +16,8 @@ interface Props {
   employee: Employee | null;
   onClose: () => void;
   onSaved: (e: Employee) => void;
+  /** Dialog emas, sahifa ichida karta sifatida (Xodim qo'shish sahifasi); saqlangach forma tozalanadi. */
+  inline?: boolean;
 }
 
 const EMPTY = {
@@ -37,7 +39,7 @@ const EMPTY = {
 
 const num = (v: string) => (v.trim() === '' ? null : Number(v.replace(/\s/g, '').replace(',', '.')));
 
-export default function EmployeeFormDialog({ open, employee, onClose, onSaved }: Props) {
+export default function EmployeeFormDialog({ open, employee, onClose, onSaved, inline = false }: Props) {
   const { canSeePay } = useResourcePermissions();
   const needsFactory = useNeedsFactory(!employee);
   const [form, setForm] = useState(EMPTY);
@@ -106,21 +108,24 @@ export default function EmployeeFormDialog({ open, employee, onClose, onSaved }:
       const saved = await save.run(() => (employee ? resourcesApi.updateEmployee(employee.id, payload) : resourcesApi.createEmployee(payload)));
       toast.success(employee ? tr("O'zgarishlar saqlandi") : tr("Xodim qo'shildi: {0}", saved.employee_code));
       onSaved(saved);
+      if (inline) {
+        setForm((f) => ({ ...EMPTY, factory_id: f.factory_id }));
+        save.reset();
+      }
     } catch (err) {
       setError(getErrorMessage(err));
     }
   };
 
-  return (
-    <Dialog open={open} onClose={save.busy ? undefined : onClose} maxWidth="sm" fullWidth>
+  const body = (
       <form onSubmit={handleSubmit} noValidate>
-        <DialogTitle>{employee ? tr("Xodimni tahrirlash") : tr("Yangi xodim")}</DialogTitle>
+        <DialogTitle>{employee ? tr("Xodimni tahrirlash") : inline ? tr("Qo'lda kiritish") : tr("Yangi xodim")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             {error && <Alert severity="error">{error}</Alert>}
             {needsFactory && <FactoryField value={form.factory_id} onChange={(id) => set('factory_id', id)} />}
             <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '2fr 1fr' } }}>
-              <TextField label="F.I.Sh." required autoFocus value={form.full_name} onChange={(e) => set('full_name', e.target.value)} />
+              <TextField label="F.I.Sh." required autoFocus={!inline} value={form.full_name} onChange={(e) => set('full_name', e.target.value)} />
               <TextField
                 label={tr("Tabel raqami")}
                 value={form.employee_code}
@@ -209,12 +214,19 @@ export default function EmployeeFormDialog({ open, employee, onClose, onSaved }:
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={onClose} color="inherit" disabled={save.busy}>
-            {tr("Bekor qilish")}
+          <Button onClick={inline ? () => setForm((f) => ({ ...EMPTY, factory_id: f.factory_id })) : onClose} color="inherit" disabled={save.busy}>
+            {inline ? tr("Tozalash") : tr("Bekor qilish")}
           </Button>
           <SaveButton status={save.status} disabled={!valid} />
         </DialogActions>
       </form>
+  );
+
+  return inline ? (
+    <Card>{body}</Card>
+  ) : (
+    <Dialog open={open} onClose={save.busy ? undefined : onClose} maxWidth="sm" fullWidth>
+      {body}
     </Dialog>
   );
 }

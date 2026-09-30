@@ -107,6 +107,29 @@ export interface EmployeePayload {
   factory_id?: number;
 }
 
+export interface JoinLink {
+  enabled: boolean;
+  link_url: string | null;
+  factory_linked: boolean;
+  pending: number;
+}
+
+export interface JoinRequest {
+  id: number;
+  factory_id: number;
+  factory_name: string;
+  full_name: string;
+  phone: string | null;
+  created_at: string;
+}
+
+export interface JoinApprovePayload {
+  department: Department;
+  position?: string | null;
+  pay_type?: PayType;
+  pay_rate?: number | null;
+}
+
 export interface EmployeeFilters {
   search?: string;
   department?: Department | '';

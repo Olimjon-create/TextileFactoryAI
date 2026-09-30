@@ -13,7 +13,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.core.i18n import MONTHS_FULL
-from app.models import Factory, LeaveRequest, Machine, Material, Order, PasswordResetToken, RateLimitHit, StockMovement, WorkOrder
+from app.models import EmployeeJoinRequest, Factory, JoinRequestStatus, LeaveRequest, Machine, Material, Order, PasswordResetToken, RateLimitHit, StockMovement, WorkOrder
 from app.models.attendance import LeaveStatus
 from app.models.order import OrderStatus, PaymentStatus
 from app.models.production import WorkOrderStatus
@@ -116,8 +116,13 @@ def cleanup(db: Session) -> dict:
         Order.payment_status != PaymentStatus.PAID,
         Order.created_at < now - timedelta(days=UNPAID_ORDER_TTL_DAYS),
     ).execution_options(synchronize_session=False)).rowcount
+    # Botda ishga qo'shilish havolasini ochib, raqamini yubormay qolganlar.
+    joins = db.execute(delete(EmployeeJoinRequest).where(
+        EmployeeJoinRequest.status == JoinRequestStatus.AWAITING_CONTACT,
+        EmployeeJoinRequest.created_at < now - timedelta(days=UNPAID_ORDER_TTL_DAYS),
+    ).execution_options(synchronize_session=False)).rowcount
     db.commit()
-    return {"rate_limit_hits": hits or 0, "reset_tokens": tokens or 0, "unpaid_orders": unpaid or 0}
+    return {"rate_limit_hits": hits or 0, "reset_tokens": tokens or 0, "unpaid_orders": unpaid or 0, "join_requests": joins or 0}
 
 
 def send_employee_reports(db: Session, now: datetime | None = None) -> int:

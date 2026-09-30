@@ -9,11 +9,9 @@ import { DAY_STATE_COLORS, DAY_STATE_LABELS, hhmm } from '@/features/attendance/
 import { ATTENDANCE_VIEW_ROLES } from '@/features/attendance/permissions';
 import type { DailyBoard, DailyRow, DayState } from '@/features/attendance/types';
 import { resourcesApi } from '@/features/resources/api';
-import EmployeeFormDialog from '@/features/resources/components/EmployeeFormDialog';
 import { DEPARTMENT_LABELS } from '@/features/resources/constants';
 import { useResourcePermissions } from '@/features/resources/permissions';
 import type { Employee } from '@/features/resources/types';
-import { useToast } from '@/shared/components/Toast';
 import { tr } from '@/i18n';
 
 const LIMIT = 7;
@@ -30,7 +28,6 @@ function initials(name: string) {
 
 export default function EmployeesCard() {
   const navigate = useNavigate();
-  const toast = useToast();
   const { hasRole } = useAuth();
   const { canEditWorkforce } = useResourcePermissions();
   const canSeeAttendance = hasRole(...ATTENDANCE_VIEW_ROLES);
@@ -38,7 +35,6 @@ export default function EmployeesCard() {
   const [total, setTotal] = useState(0);
   const [board, setBoard] = useState<DailyBoard | null>(null);
   const [failed, setFailed] = useState(false);
-  const [adding, setAdding] = useState(false);
 
   const load = useCallback(() => {
     resourcesApi
@@ -72,11 +68,6 @@ export default function EmployeesCard() {
               {board?.now ? tr(" · {0} holati", hhmm(board.now)) : ''}
             </Typography>
           </Box>
-          {canEditWorkforce && (
-            <Button size="small" variant="contained" startIcon={<PersonAddAlt1RoundedIcon />} onClick={() => setAdding(true)} sx={{ flexShrink: 0 }}>
-              {tr("Qo'shish")}
-            </Button>
-          )}
         </Box>
 
         {s && s.total > 0 && (
@@ -108,7 +99,7 @@ export default function EmployeesCard() {
                 {tr("Xodimlarni qo'shing — davomat, ish haqi va ishlab chiqarish hisobi shu ro'yxatdan yuritiladi")}
               </Typography>
               {canEditWorkforce && (
-                <Button variant="outlined" size="small" startIcon={<PersonAddAlt1RoundedIcon />} onClick={() => setAdding(true)}>
+                <Button variant="outlined" size="small" startIcon={<PersonAddAlt1RoundedIcon />} onClick={() => navigate('/employees/new')}>
                   {tr("Birinchi xodimni qo'shish")}
                 </Button>
               )}
@@ -155,17 +146,6 @@ export default function EmployeesCard() {
           </Box>
         )}
       </CardContent>
-
-      <EmployeeFormDialog
-        open={adding}
-        employee={null}
-        onClose={() => setAdding(false)}
-        onSaved={(e) => {
-          setAdding(false);
-          toast.success(tr("{0} qo'shildi", e.full_name));
-          load();
-        }}
-      />
     </Card>
   );
 }

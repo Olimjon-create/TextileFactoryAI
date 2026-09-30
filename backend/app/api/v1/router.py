@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     cron,
     customers,
     dashboard,
+    employee_join,
     factories,
     finance,
     inventory,
@@ -39,6 +40,7 @@ api_router.include_router(finance.router)
 api_router.include_router(questions.router)
 api_router.include_router(inventory.router)
 api_router.include_router(resources.router)
+api_router.include_router(employee_join.router)
 api_router.include_router(attendance.router)
 api_router.include_router(production.router)
 api_router.include_router(procurement.router)

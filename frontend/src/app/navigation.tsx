@@ -15,6 +15,7 @@ import QrCodeScannerOutlinedIcon from '@mui/icons-material/QrCodeScannerOutlined
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import PersonAddAlt1OutlinedIcon from '@mui/icons-material/PersonAddAlt1Outlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
@@ -33,7 +34,7 @@ import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalance
 import { ATTENDANCE_VIEW_ROLES } from '@/features/attendance/permissions';
 import { CUSTOMER_VIEW_ROLES } from '@/features/customers/permissions';
 import { AUDIT_VIEW_ROLES, INVENTORY_EDITOR_ROLES, INVENTORY_VIEW_ROLES } from '@/features/inventory/permissions';
-import { MACHINE_VIEW_ROLES, PAY_VIEW_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
+import { MACHINE_VIEW_ROLES, PAY_VIEW_ROLES, WORKFORCE_EDITOR_ROLES, WORKFORCE_VIEW_ROLES } from '@/features/resources/permissions';
 import { KPI_VIEW_ROLES, PRODUCTION_VIEW_ROLES } from '@/features/production/permissions';
 import { ORDER_VIEW_ROLES } from '@/features/orders/permissions';
 import { PROCUREMENT_VIEW_ROLES } from '@/features/procurement/permissions';
@@ -99,6 +100,7 @@ export const NAVIGATION: NavSection[] = [
     title: tr("Resurslar"),
     items: [
       { label: tr("Xodimlar"), path: '/employees', icon: <BadgeOutlinedIcon />, roles: WORKFORCE_VIEW_ROLES },
+      { label: tr("Xodim qo'shish"), path: '/employees/new', icon: <PersonAddAlt1OutlinedIcon />, roles: WORKFORCE_EDITOR_ROLES },
       { label: tr("Davomat"), path: '/attendance', icon: <EventNoteOutlinedIcon />, roles: ATTENDANCE_VIEW_ROLES },
       { label: tr("Ish haqi"), path: '/payroll', icon: <PaymentsOutlinedIcon />, roles: PAY_VIEW_ROLES },
       { label: tr("Liniyalar va smenalar"), path: '/lines', icon: <ViewTimelineOutlinedIcon />, roles: WORKFORCE_VIEW_ROLES },

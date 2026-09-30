@@ -1952,5 +1952,18 @@
  "To'lanmagan ish haqi": "Unpaid payroll",
  "{0} xodim · to'langan {1}": "{0} employees · paid {1}",
  "Javob kutayotgan savollar": "Questions awaiting reply",
- "Katalogdagi «Savol berish» orqali": "Via “Ask a question” in the catalog"
+ "Katalogdagi «Savol berish» orqali": "Via “Ask a question” in the catalog",
+ "Kelgan so'rovlar": "Incoming requests",
+ "Qo'lda kiriting yoki Telegram havolasini yuboring — xodim o'zi so'rov yuboradi, siz tasdiqlaysiz": "Enter manually or send a Telegram link — the employee sends a request and you approve it",
+ "Qo'lda kiritish": "Enter manually",
+ "Qolgan ma'lumotlarni (liniya, smena, me'yor) keyin Xodimlar sahifasida to'ldirishingiz mumkin.": "Other details (line, shift, norm) can be filled in later on the Employees page.",
+ "Telegram orqali taklif": "Invite via Telegram",
+ "Telegram'da yuborish": "Send in Telegram",
+ "Xodim QR kodni skanerlaydi yoki havolani ochadi, «📱 Raqamni yuborish» tugmasini bosadi. So'rov shu sahifaga va zavod Telegram chatiga keladi — bo'limni tanlab qabul qilasiz. Qabul qilingan xodim botda o'z natijasi va ish haqini darhol ko'radi.": "The employee scans the QR code or opens the link and taps «📱 Share phone number». The request arrives on this page and in the factory Telegram chat — pick a department and accept. The accepted employee immediately sees their results and pay in the bot.",
+ "Xodim qo'shish": "Add employee",
+ "Xodim qo'shish uchun ruxsat yo'q": "You are not allowed to add employees",
+ "Xodimlar ro'yxati": "Employee list",
+ "Zavod Telegram chati ulanmagan — so'rovlar faqat shu sahifada ko'rinadi. Sozlamalar → Telegram bo'limidan ulang.": "The factory Telegram chat is not connected — requests appear only on this page. Connect it in Settings → Telegram.",
+ "{0} so'rovi rad etildi": "{0}'s request was rejected",
+ "{0} ta so'rov": "{0} requests"
 }

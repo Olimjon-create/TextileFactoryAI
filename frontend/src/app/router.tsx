@@ -42,6 +42,7 @@ const FinancePage = lazy(() => import('@/features/finance/pages/FinancePage'));
 const WarehouseMobilePage = lazy(() => import('@/features/inventory/pages/WarehouseMobilePage'));
 const LocationsPage = lazy(() => import('@/features/inventory/pages/LocationsPage'));
 const EmployeesPage = lazy(() => import('@/features/resources/pages/EmployeesPage'));
+const AddEmployeePage = lazy(() => import('@/features/resources/pages/AddEmployeePage'));
 const AttendancePage = lazy(() => import('@/features/attendance/pages/AttendancePage'));
 const LinesShiftsPage = lazy(() => import('@/features/resources/pages/LinesShiftsPage'));
 const MachinesPage = lazy(() => import('@/features/resources/pages/MachinesPage'));
@@ -180,6 +181,7 @@ export const router = createBrowserRouter([
             element: <RoleGuard roles={WORKFORCE_VIEW_ROLES} />,
             children: [
               { path: '/employees', element: <EmployeesPage /> },
+              { path: '/employees/new', element: <AddEmployeePage /> },
               { path: '/lines', element: <LinesShiftsPage /> },
             ],
           },

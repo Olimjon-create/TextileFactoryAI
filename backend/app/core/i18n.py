@@ -331,3 +331,45 @@ MESSAGES.update({
     "📊 Mening natijam": _m("📊 Мои результаты", "📊 My results"),
     "Fabrika topilmadi": _m("Фабрика не найдена", "Factory not found"),
 })
+
+# Xodimlarning Telegram orqali ishga qo'shilishi
+MESSAGES.update({
+    "Tikuv": _m("Пошив", "Sewing"),
+    "Kesish": _m("Раскрой", "Cutting"),
+    "Pardoz": _m("Отделка", "Finishing"),
+    "Sifat nazorati": _m("ОТК", "Quality control"),
+    "Qadoqlash": _m("Упаковка", "Packing"),
+    "Ombor": _m("Склад", "Warehouse"),
+    "Mexaniklar": _m("Механики", "Maintenance"),
+    "Ma'muriyat": _m("Администрация", "Administration"),
+    "Boshqa": _m("Другое", "Other"),
+    "📱 Raqamni yuborish": _m("📱 Отправить номер", "📱 Share phone number"),
+    "❌ Rad etish": _m("❌ Отклонить", "❌ Reject"),
+    "❌ Rad etildi": _m("❌ Отклонено", "❌ Rejected"),
+    "✅ Qabul qilindi: {department}": _m("✅ Принят: {department}", "✅ Accepted: {department}"),
+    "So'rov topilmadi": _m("Заявка не найдена", "Request not found"),
+    "Bu so'rov allaqachon ko'rib chiqilgan": _m("Эта заявка уже рассмотрена", "This request has already been handled"),
+    "Afsuski, {factory} ishga qo'shilish so'rovingizni rad etdi.": _m(
+        "К сожалению, {factory} отклонила вашу заявку.", "Unfortunately, {factory} rejected your request to join."),
+    "Siz allaqachon {factory} xodimi sifatida ulangansiz. Natijangiz: /me": _m(
+        "Вы уже подключены как сотрудник {factory}. Ваши результаты: /me",
+        "You are already connected as an employee of {factory}. Your results: /me"),
+    "So'rovingiz rahbarga yuborilgan — javobni shu yerda kuting.": _m(
+        "Ваша заявка уже отправлена руководителю — ждите ответа здесь.",
+        "Your request has already been sent to the manager — wait for the answer here."),
+    "Hozir ko'rib chiqilmagan so'rovlar juda ko'p. Keyinroq urinib ko'ring.": _m(
+        "Сейчас слишком много нерассмотренных заявок. Попробуйте позже.",
+        "There are too many pending requests right now. Please try again later."),
+    "👋 <b>{factory}</b> — ishga qo'shilish.\n\nPastdagi «📱 Raqamni yuborish» tugmasini bosing: ismingiz va telefoningiz rahbarga yuboriladi. Tasdiqlangach, shu botda natijangiz va ish haqingizni ko'rasiz.": _m(
+        "👋 <b>{factory}</b> — вступление в команду.\n\nНажмите кнопку «📱 Отправить номер» ниже: ваше имя и телефон получит руководитель. После подтверждения здесь будут ваши результаты и зарплата.",
+        "👋 <b>{factory}</b> — join the team.\n\nTap «📱 Share phone number» below: your name and phone will be sent to the manager. Once approved, you will see your results and pay here."),
+    "Iltimos, o'zingizning raqamingizni «📱 Raqamni yuborish» tugmasi orqali yuboring.": _m(
+        "Пожалуйста, отправьте свой номер кнопкой «📱 Отправить номер».",
+        "Please share your own number using the «📱 Share phone number» button."),
+    "✅ So'rovingiz {factory} rahbariga yuborildi. Tasdiqlangach shu yerga xabar keladi.": _m(
+        "✅ Заявка отправлена руководителю {factory}. После подтверждения придёт сообщение.",
+        "✅ Your request was sent to the {factory} manager. You will get a message here once approved."),
+    "🙋 <b>Yangi xodim so'rovi</b>\n{name}, {phone}\n\nQaysi bo'limga qabul qilinsin?": _m(
+        "🙋 <b>Новая заявка сотрудника</b>\n{name}, {phone}\n\nВ какой отдел принять?",
+        "🙋 <b>New employee request</b>\n{name}, {phone}\n\nWhich department should they join?"),
+})

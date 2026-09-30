@@ -150,6 +150,13 @@ def _send_chat(chat_id: str | int, lang: str, template: str, /, reply_markup: di
         return False
 
 
+def send_to_chat(chat_id: str | int, lang: str, template: str, /, reply_markup: dict | None = None, **kwargs) -> bool:
+    """Istalgan chatga (xodim, ishga qo'shilayotgan odam) tarjima qilingan xabar."""
+    if not settings.telegram_enabled:
+        return False
+    return _send_chat(chat_id, lang, template, reply_markup=reply_markup, **kwargs)
+
+
 def send(target: Factory | None, template: str, /, **kwargs) -> bool:
     """Zavod chatiga xabar (zavod tanlagan tilda). Ulanmagan/sozlanmagan bo'lsa — jim o'tadi.
     Pozitsion parametrlar: shablonda {factory} kabi nomlar bemalol ishlatiladi."""
@@ -195,7 +202,7 @@ def notify_new_order(db: Session, order: Order, template: str, /, **kwargs) -> N
     _send_chat(factory.telegram_chat_id, lang, template, reply_markup=markup, **kwargs)
 
 
-def _order_actor(db: Session, factory_id: int):
+def factory_actor(db: Session, factory_id: int):
     from app.core.roles import Role
     from app.models import User
 
@@ -207,14 +214,14 @@ def _order_actor(db: Session, factory_id: int):
     )
 
 
-def _answer(cq: dict, text: str = "", alert: bool = False) -> None:
+def answer_callback(cq: dict, text: str = "", alert: bool = False) -> None:
     try:
         _call("answerCallbackQuery", timeout=5, callback_query_id=cq["id"], text=text[:190], show_alert=alert)
     except Exception as exc:
         print(exc)
 
 
-def _edit_markup(cq: dict, markup: dict) -> None:
+def edit_callback_markup(cq: dict, markup: dict) -> None:
     msg = cq.get("message") or {}
     try:
         _call("editMessageReplyMarkup", timeout=5, chat_id=msg["chat"]["id"], message_id=msg["message_id"], reply_markup=markup)
@@ -227,40 +234,40 @@ def _handle_order_action(db: Session, cq: dict) -> None:
 
     parts = (cq.get("data") or "").split(":")
     if len(parts) != 3 or not parts[2].isdigit():
-        _answer(cq)
+        answer_callback(cq)
         return
     action, order_id = parts[1], int(parts[2])
     chat_id = str(((cq.get("message") or {}).get("chat") or {}).get("id", ""))
     order = db.get(Order, order_id)
     factory = db.get(Factory, order.factory_id) if order else None
     if factory is None or not factory.telegram_chat_id or factory.telegram_chat_id != chat_id:
-        _answer(cq, t_lang("uz", "Ruxsat yo'q"), alert=True)
+        answer_callback(cq, t_lang("uz", "Ruxsat yo'q"), alert=True)
         return
     lang = factory.telegram_lang or "uz"
     if action == "x":
-        _edit_markup(cq, {"inline_keyboard": [
+        edit_callback_markup(cq, {"inline_keyboard": [
             [{"text": t_lang(lang, "Ha, bekor qilinsin"), "callback_data": f"o:xx:{order_id}"},
              {"text": t_lang(lang, "Yo'q"), "callback_data": f"o:k:{order_id}"}]]})
-        _answer(cq, t_lang(lang, "Buyurtma {number} bekor qilinsinmi?", number=order.order_number))
+        answer_callback(cq, t_lang(lang, "Buyurtma {number} bekor qilinsinmi?", number=order.order_number))
         return
     if action == "k":
-        _edit_markup(cq, order_keyboard(order_id, lang) if order.status == OrderStatus.NEW else _result_keyboard(order_id, t_lang(lang, STATUS_LABELS[order.status])))
-        _answer(cq)
+        edit_callback_markup(cq, order_keyboard(order_id, lang) if order.status == OrderStatus.NEW else _result_keyboard(order_id, t_lang(lang, STATUS_LABELS[order.status])))
+        answer_callback(cq)
         return
     target = {"c": OrderStatus.CONFIRMED, "xx": OrderStatus.CANCELLED}.get(action)
-    actor = _order_actor(db, factory.id)
+    actor = factory_actor(db, factory.id)
     if target is None or actor is None:
-        _answer(cq, t_lang(lang, "Amalni bajarib bo'lmadi"), alert=True)
+        answer_callback(cq, t_lang(lang, "Amalni bajarib bo'lmadi"), alert=True)
         return
     try:
         order_service.update_status(db, actor, order_id, target)
     except HTTPException as exc:
         db.rollback()
-        _answer(cq, t_lang(lang, str(exc.detail)), alert=True)
+        answer_callback(cq, t_lang(lang, str(exc.detail)), alert=True)
         return
     label = t_lang(lang, "✅ Tasdiqlandi") if target == OrderStatus.CONFIRMED else t_lang(lang, "❌ Bekor qilindi")
-    _edit_markup(cq, _result_keyboard(order_id, label))
-    _answer(cq, label)
+    edit_callback_markup(cq, _result_keyboard(order_id, label))
+    answer_callback(cq, label)
 
 
 def verify_init_data(init_data: str | None) -> dict | None:
@@ -369,6 +376,11 @@ def employee_link_code(employee_id: int) -> str:
     return f"e{employee_id}-{_sign(f'tg-emp:{employee_id}')[:10]}"
 
 
+def join_link_code(factory_id: int) -> str:
+    """Zavodga ishga qo'shilish havolasi (xodim o'zi so'rov yuboradi, rahbar tasdiqlaydi)."""
+    return f"j{factory_id}-{_sign(f'tg-join:{factory_id}')[:10]}"
+
+
 def employee_status(employee) -> dict:
     username = bot_username()
     return {
@@ -400,6 +412,13 @@ def _link_employee(db: Session, chat_id: int, arg: str, lang: str) -> None:
         other.telegram_chat_id = None
     employee.telegram_chat_id, employee.telegram_lang = str(chat_id), lang
     db.commit()
+    welcome_employee(db, employee, lang)
+
+
+def welcome_employee(db: Session, employee, lang: str) -> None:
+    if not settings.telegram_enabled or not employee.telegram_chat_id:
+        return
+    chat_id = employee.telegram_chat_id
     _send_chat(chat_id, lang,
                "👋 {name}, siz TextileCore'ga ulandingiz.\n\nBu yerda bugungi va oylik natijangizni hamda taxminiy ish haqingizni ko'rasiz. Har kuni kechqurun qisqa hisobot keladi.",
                reply_markup=_me_keyboard(lang), name=employee.full_name)
@@ -470,6 +489,11 @@ def _handle_start(db: Session, chat: dict, user: dict, arg: str, lang: str, site
     if arg.startswith("e") and "-" in arg:
         _link_employee(db, chat_id, arg, lang)
         return
+    if arg.startswith("j") and "-" in arg:
+        from app.services import join_request_service
+
+        join_request_service.bot_start(db, chat_id, arg, lang)
+        return
     factory = None
     if arg.startswith("shop"):
         try:
@@ -495,6 +519,11 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         if (cq.get("data") or "").startswith("o:"):
             _handle_order_action(db, cq)
             return
+        if (cq.get("data") or "").startswith("j:"):
+            from app.services import join_request_service
+
+            join_request_service.bot_decision(db, cq)
+            return
         try:
             _call("answerCallbackQuery", timeout=5, callback_query_id=cq["id"])
         except Exception as exc:
@@ -517,6 +546,8 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         _handle_start(db, chat, user, parts[1] if len(parts) > 1 else "", lang, site)
     elif chat.get("type") != "private":
         return
+    elif msg.get("contact") and _handle_contact(db, msg, lang):
+        return
     elif command == "/orders":
         _send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
     elif command == "/me":
@@ -531,6 +562,12 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
     else:
         _send_chat(chat["id"], lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇",
                    reply_markup=_shop_keyboard(lang, site))
+
+
+def _handle_contact(db: Session, msg: dict, lang: str) -> bool:
+    from app.services import join_request_service
+
+    return join_request_service.bot_contact(db, msg, lang)
 
 
 def _answer_with_assistant(db: Session, chat_id: int, user: dict, text: str, lang: str, site: str) -> None:
