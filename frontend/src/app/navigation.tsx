@@ -50,7 +50,7 @@ export interface NavItem {
   path: string;
   icon: ReactNode;
   roles?: Role[];
-  badge?: 'newOrders';
+  badge?: 'newOrders' | 'joinRequests' | 'pendingLeaves';
   external?: boolean;
 }
 
@@ -100,8 +100,8 @@ export const NAVIGATION: NavSection[] = [
     title: tr("Resurslar"),
     items: [
       { label: tr("Xodimlar"), path: '/employees', icon: <BadgeOutlinedIcon />, roles: WORKFORCE_VIEW_ROLES },
-      { label: tr("Xodim qo'shish"), path: '/employees/new', icon: <PersonAddAlt1OutlinedIcon />, roles: WORKFORCE_EDITOR_ROLES },
-      { label: tr("Davomat"), path: '/attendance', icon: <EventNoteOutlinedIcon />, roles: ATTENDANCE_VIEW_ROLES },
+      { label: tr("Xodim qo'shish"), path: '/employees/new', icon: <PersonAddAlt1OutlinedIcon />, roles: WORKFORCE_EDITOR_ROLES, badge: 'joinRequests' },
+      { label: tr("Davomat"), path: '/attendance', icon: <EventNoteOutlinedIcon />, roles: ATTENDANCE_VIEW_ROLES, badge: 'pendingLeaves' },
       { label: tr("Ish haqi"), path: '/payroll', icon: <PaymentsOutlinedIcon />, roles: PAY_VIEW_ROLES },
       { label: tr("Liniyalar va smenalar"), path: '/lines', icon: <ViewTimelineOutlinedIcon />, roles: WORKFORCE_VIEW_ROLES },
       { label: tr("Mashinalar"), path: '/machines', icon: <PrecisionManufacturingOutlinedIcon />, roles: MACHINE_VIEW_ROLES },

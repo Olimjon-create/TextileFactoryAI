@@ -19,6 +19,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import FactoryOutlinedIcon from '@mui/icons-material/FactoryOutlined';
 import { useAuth } from '@/features/auth/AuthContext';
 import { useNewOrders } from '@/features/orders/NewOrdersContext';
+import { usePendingBadges } from './usePendingBadges';
 import BrandLogo from '@/shared/components/BrandLogo';
 import BrandWordmark from '@/shared/components/BrandWordmark';
 import { tr } from '@/i18n';
@@ -27,6 +28,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const theme = useTheme();
   const { user, hasRole } = useAuth();
   const { newCount } = useNewOrders();
+  const { joinRequests, pendingLeaves } = usePendingBadges();
   const { pathname } = useLocation();
   const [onlyFactory, setOnlyFactory] = useState<string | null>(null);
   const isSuper = user?.role === 'SUPER_ADMIN';
@@ -49,7 +51,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   const renderItem = (item: NavItem) => {
     const active = !item.external && isActive(item.path);
-    const badge = item.badge === 'newOrders' ? newCount : 0;
+    const badge = item.badge ? { newOrders: newCount, joinRequests, pendingLeaves }[item.badge] : 0;
     const linkProps = item.external
       ? { component: 'a' as const, href: item.path, target: '_blank', rel: 'noopener' }
       : { component: NavLink, to: item.path };

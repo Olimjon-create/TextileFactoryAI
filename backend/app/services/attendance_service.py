@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.core.config import settings
 from app.core.roles import Role
 from app.core.scope import can_access, scoped
-from app.models import Attendance, Employee, LeaveRequest, User
+from app.models import Attendance, Employee, Factory, LeaveRequest, User
 from app.models.attendance import AttendanceStatus, LeaveStatus, LeaveType
 from app.models.audit import AuditAction
 from app.models.resources import EmployeeStatus, Shift
@@ -38,7 +38,7 @@ from app.schemas.attendance import (
 )
 from app.services import audit_service
 from app.core.i18n import t
-from app.services import telegram_service
+from app.services import employee_bot_service, telegram_service
 
 ATTENDANCE_VIEW_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER, Role.QUALITY_MANAGER, Role.WAREHOUSE_MANAGER)
 ATTENDANCE_EDITOR_ROLES = (Role.SUPER_ADMIN, Role.FACTORY_OWNER, Role.MANAGER, Role.PRODUCTION_MANAGER)
@@ -450,7 +450,8 @@ def _decide(db: Session, actor: User, lr: LeaveRequest, new_status: LeaveStatus,
     lr.decision_note = note
 
 
-def create_leave(db: Session, actor: User, data: LeaveCreate) -> LeaveOut:
+def create_leave(db: Session, actor: User, data: LeaveCreate, *, via_bot: bool = False) -> LeaveOut:
+    """via_bot — xodim o'zi Telegram'dan so'ragan (actor — zavod rahbari, audit izohida belgilanadi)."""
     e = _load_employee(db, actor, data.employee_id)
     overlap = db.scalar(
         select(LeaveRequest.id).where(
@@ -472,7 +473,9 @@ def create_leave(db: Session, actor: User, data: LeaveCreate) -> LeaveOut:
     summary = f"Javob so'rovi: {e.full_name}, {data.start_date.isoformat()}" + (
         f" — {data.end_date.isoformat()}" if data.end_date != data.start_date else ""
     )
-    if data.approve and actor.role in LEAVE_APPROVER_ROLES:
+    if via_bot:
+        summary += " (xodim Telegram orqali so'radi)"
+    if data.approve and actor.role in LEAVE_APPROVER_ROLES and not via_bot:
         _decide(db, actor, lr, LeaveStatus.APPROVED, None)
         _apply_leave(db, lr, actor)
         summary += " (darhol tasdiqlandi)"
@@ -480,8 +483,10 @@ def create_leave(db: Session, actor: User, data: LeaveCreate) -> LeaveOut:
     db.commit()
     if lr.status == LeaveStatus.PENDING:
         period = data.start_date.strftime("%d.%m.%Y") + (f" — {data.end_date.strftime('%d.%m.%Y')}" if data.end_date != data.start_date else "")
-        telegram_service.notify(db, e.factory_id, "🙋 Javob so'rovi: <b>{name}</b>, {period}\nSabab: {reason}\nTasdiqlash: Davomat → Javob so'rovlari",
-                                name=e.full_name, period=period, reason=data.reason or "—")
+        factory = db.get(Factory, e.factory_id)
+        telegram_service.send(factory, "🙋 Javob so'rovi: <b>{name}</b>, {period}\nSabab: {reason}\nTasdiqlash: Davomat → Javob so'rovlari",
+                              reply_markup=employee_bot_service.decision_keyboard(lr.id, (factory.telegram_lang if factory else None) or "uz"),
+                              name=e.full_name, period=period, reason=data.reason or "—")
     return _leave_out(_load_leave(db, actor, lr.id))
 
 
@@ -494,6 +499,7 @@ def approve_leave(db: Session, actor: User, leave_id: int, data: LeaveDecision) 
     audit_service.record(db, actor, entity="leave_request", entity_id=lr.id, action=AuditAction.UPDATE,
                          summary=f"Javob berildi: {lr.employee.full_name}", factory_id=lr.factory_id)
     db.commit()
+    employee_bot_service.notify_decision(db, lr)
     return _leave_out(_load_leave(db, actor, lr.id))
 
 
@@ -505,6 +511,7 @@ def reject_leave(db: Session, actor: User, leave_id: int, data: LeaveDecision) -
     audit_service.record(db, actor, entity="leave_request", entity_id=lr.id, action=AuditAction.UPDATE,
                          summary=f"Javob rad etildi: {lr.employee.full_name}", factory_id=lr.factory_id)
     db.commit()
+    employee_bot_service.notify_decision(db, lr)
     return _leave_out(_load_leave(db, actor, lr.id))
 
 

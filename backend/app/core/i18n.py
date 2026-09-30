@@ -373,3 +373,34 @@ MESSAGES.update({
         "🙋 <b>Новая заявка сотрудника</b>\n{name}, {phone}\n\nВ какой отдел принять?",
         "🙋 <b>New employee request</b>\n{name}, {phone}\n\nWhich department should they join?"),
 })
+
+# Xodim kabineti: botdan javob so'rash
+MESSAGES.update({
+    "📝 Javob so'rash": _m("📝 Отпроситься", "📝 Request leave"),
+    "📝 <b>Javob so'rash</b>\n\nSababi qanday?": _m("📝 <b>Отпроситься</b>\n\nКакая причина?", "📝 <b>Request leave</b>\n\nWhat is the reason?"),
+    "📅 Qaysi kunlarga? ({kind})": _m("📅 На какие дни? ({kind})", "📅 Which days? ({kind})"),
+    "✍️ Sababini shu xabarga javob qilib yozing.\n\n{kind}: {period}\n{marker}": _m(
+        "✍️ Напишите причину ответом на это сообщение.\n\n{kind}: {period}\n{marker}",
+        "✍️ Write the reason as a reply to this message.\n\n{kind}: {period}\n{marker}"),
+    "Sabab...": _m("Причина...", "Reason..."),
+    "Shaxsiy ish": _m("Личные дела", "Personal matters"),
+    "Oilaviy sabab": _m("Семейные обстоятельства", "Family reasons"),
+    "Kasallik": _m("Болезнь", "Sick leave"),
+    "Ta'til": _m("Отпуск", "Vacation"),
+    "Bugun": _m("Сегодня", "Today"),
+    "Ertaga": _m("Завтра", "Tomorrow"),
+    "Bugun va ertaga": _m("Сегодня и завтра", "Today and tomorrow"),
+    "3 kun (bugundan)": _m("3 дня (с сегодня)", "3 days (from today)"),
+    "1 hafta (ertadan)": _m("1 неделя (с завтра)", "1 week (from tomorrow)"),
+    "Sababini matn bilan yozing (kamida 2 belgi).": _m("Напишите причину текстом (не менее 2 символов).", "Write the reason as text (at least 2 characters)."),
+    "So'rov eskirgan. Qaytadan boshlang: /leave": _m("Запрос устарел. Начните заново: /leave", "This request is outdated. Start again: /leave"),
+    "✅ So'rovingiz rahbarga yuborildi: {kind}, {period}. Javob shu yerga keladi.": _m(
+        "✅ Заявка отправлена руководителю: {kind}, {period}. Ответ придёт сюда.",
+        "✅ Your request was sent to the manager: {kind}, {period}. The answer will come here."),
+    "✅ Javob so'rovingiz tasdiqlandi: {period}{note}": _m("✅ Ваша заявка одобрена: {period}{note}", "✅ Your leave request was approved: {period}{note}"),
+    "❌ Javob so'rovingiz rad etildi: {period}{note}": _m("❌ Ваша заявка отклонена: {period}{note}", "❌ Your leave request was rejected: {period}{note}"),
+    "Izoh": _m("Комментарий", "Note"),
+    "Javob so'rash (xodimlar uchun)": _m("Отпроситься (для сотрудников)", "Request leave (for employees)"),
+    "Bu kunlarga xodimning boshqa javob so'rovi bor": _m("На эти дни уже есть другая заявка", "There is already another request for these days"),
+    "So'rov allaqachon ko'rib chiqilgan": _m("Заявка уже рассмотрена", "The request has already been handled"),
+})

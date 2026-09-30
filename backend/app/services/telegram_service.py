@@ -394,7 +394,8 @@ ME_KEYBOARD_TEXT = "📊 Mening natijam"
 
 
 def _me_keyboard(lang: str) -> dict:
-    return {"inline_keyboard": [[{"text": t_lang(lang, ME_KEYBOARD_TEXT), "callback_data": "me"}]]}
+    return {"inline_keyboard": [[{"text": t_lang(lang, ME_KEYBOARD_TEXT), "callback_data": "me"}],
+                                [{"text": t_lang(lang, "📝 Javob so'rash"), "callback_data": "lv"}]]}
 
 
 def _link_employee(db: Session, chat_id: int, arg: str, lang: str) -> None:
@@ -425,7 +426,7 @@ def welcome_employee(db: Session, employee, lang: str) -> None:
     _send_raw(chat_id, employee_summary_text(db, employee, lang), _me_keyboard(lang))
 
 
-def _tashkent_today():
+def tashkent_today():
     from datetime import datetime, timedelta, timezone
 
     return datetime.now(timezone(timedelta(hours=5))).date()
@@ -439,7 +440,7 @@ def employee_summary_text(db: Session, employee, lang: str) -> str:
     from app.models import ProductionLog
     from app.services import payroll_service
 
-    today = _tashkent_today()
+    today = tashkent_today()
     month = today.strftime("%Y-%m")
     row = payroll_service.build(db, [employee], month).rows[0]
     today_pieces = int(db.scalar(
@@ -456,14 +457,14 @@ def employee_summary_text(db: Session, employee, lang: str) -> str:
     )
 
 
-def _employee_by_chat(db: Session, chat_id) -> object | None:
+def employee_by_chat(db: Session, chat_id) -> object | None:
     from app.models import Employee
 
     return db.scalar(select(Employee).where(Employee.telegram_chat_id == str(chat_id)).limit(1))
 
 
 def _send_me(db: Session, chat_id, lang: str) -> None:
-    employee = _employee_by_chat(db, chat_id)
+    employee = employee_by_chat(db, chat_id)
     if employee is None:
         _send_chat(chat_id, lang, "Siz xodim sifatida ulanmagansiz. Rahbaringizdan shaxsiy havolani so'rang.")
         return
@@ -519,6 +520,15 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         if (cq.get("data") or "").startswith("o:"):
             _handle_order_action(db, cq)
             return
+        data = cq.get("data") or ""
+        if data.startswith("l:") or data == "lv" or data.startswith(("lt:", "ld:")):
+            from app.services import employee_bot_service
+
+            if data.startswith("l:"):
+                employee_bot_service.handle_decision(db, cq)
+            else:
+                employee_bot_service.handle_employee_callback(db, cq, lang)
+            return
         if (cq.get("data") or "").startswith("j:"):
             from app.services import join_request_service
 
@@ -548,6 +558,12 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         return
     elif msg.get("contact") and _handle_contact(db, msg, lang):
         return
+    elif msg.get("reply_to_message") and not command and _handle_reply(db, msg, lang):
+        return
+    elif command == "/leave":
+        from app.services import employee_bot_service
+
+        employee_bot_service.leave_menu(db, chat["id"], lang)
     elif command == "/orders":
         _send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
     elif command == "/me":
@@ -562,6 +578,12 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
     else:
         _send_chat(chat["id"], lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇",
                    reply_markup=_shop_keyboard(lang, site))
+
+
+def _handle_reply(db: Session, msg: dict, lang: str) -> bool:
+    from app.services import employee_bot_service
+
+    return employee_bot_service.handle_reply(db, msg, lang)
 
 
 def _handle_contact(db: Session, msg: dict, lang: str) -> bool:
@@ -607,6 +629,7 @@ def setup_bot(base_url: str) -> dict:
                     {"command": "shop", "description": t_lang(lang, "Do'konni ochish")},
                     {"command": "orders", "description": t_lang(lang, "Buyurtmalarim")},
                     {"command": "me", "description": t_lang(lang, "Mening natijam (xodimlar uchun)")},
+                    {"command": "leave", "description": t_lang(lang, "Javob so'rash (xodimlar uchun)")},
                     {"command": "help", "description": t_lang(lang, "Yordam")}]
         _call("setMyCommands", commands=commands, **scope)
         _call("setMyDescription", description=t_lang(lang, BOT_DESCRIPTION), **scope)

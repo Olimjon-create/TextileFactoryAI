@@ -75,7 +75,10 @@ Mijoz:        /start -> "Do'konni ochish" (katalog Telegram ichida). Buyurtma ho
 Xodim:        Xodimlar -> Telegram belgisi -> QR. /me - bugungi va oylik natija, ish haqi.
               Yangi xodim: Xodim qo'shish -> Telegram taklif havolasi -> "Raqamni yuborish";
               zavod chatida bo'lim tugmasini bosib qabul qilinadi yoki "Rad etish".
-Buyruqlar:    /start  /shop  /orders  /me  /help
+              Javob so'rash: xodim /leave (yoki "Javob so'rash" tugmasi) -> sabab turi -> kunlar ->
+              sababini yozadi. Rahbar zavod chatida "Tasdiqlash"/"Rad etish" bosadi (yoki saytda
+              Davomat -> Javob so'rovlari); natija xodimga botda keladi.
+Buyruqlar:    /start  /shop  /orders  /me  /leave  /help
 
 ----------------------------------------------------
 5. XAVFSIZLIK
