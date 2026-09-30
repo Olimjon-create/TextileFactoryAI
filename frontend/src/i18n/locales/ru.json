@@ -1965,5 +1965,18 @@
  "Xodimlar ro'yxati": "Список сотрудников",
  "Zavod Telegram chati ulanmagan — so'rovlar faqat shu sahifada ko'rinadi. Sozlamalar → Telegram bo'limidan ulang.": "Telegram-чат фабрики не подключён — заявки видны только на этой странице. Подключите в Настройки → Telegram.",
  "{0} so'rovi rad etildi": "Заявка {0} отклонена",
- "{0} ta so'rov": "Заявок: {0}"
+ "{0} ta so'rov": "Заявок: {0}",
+ "Aniqlanmoqda...": "Определяем...",
+ "Bot orqali davomat yoqilgan": "Отметка через бота включена",
+ "Botdan davomat (joylashuv)": "Отметка через бота (геолокация)",
+ "Brauzeringiz joylashuvni aniqlay olmaydi — koordinatalarni qo'lda kiriting": "Браузер не умеет определять местоположение — введите координаты вручную",
+ "Joriy joylashuvimni olish": "Взять моё текущее местоположение",
+ "Joylashuvni olib bo'lmadi — brauzerda ruxsat bering yoki koordinatalarni qo'lda kiriting": "Не удалось получить местоположение — разрешите доступ в браузере или введите координаты вручную",
+ "Kenglik (lat)": "Широта (lat)",
+ "Maslahat: bu sahifani zavod ichida telefondan ochib «Joriy joylashuvimni olish» tugmasini bosing.": "Совет: откройте эту страницу с телефона на территории фабрики и нажмите «Взять моё текущее местоположение».",
+ "Ruxsat etilgan radius": "Допустимый радиус",
+ "Uzunlik (lng)": "Долгота (lng)",
+ "Xaritada ko'rish": "Показать на карте",
+ "Xodim Telegram botda «📍 Keldim / Ketdim» tugmasini bosib joylashuvini yuboradi — zavod radiusi ichida bo'lsa vaqti belgilanadi": "Сотрудник нажимает в Telegram-боте «📍 Пришёл / Ушёл» и отправляет геолокацию — если он в радиусе фабрики, время отмечается",
+ "Zavod nuqtasidan shu masofagacha «keldi» deb qabul qilinadi (GPS xatoligi uchun 150–300 m tavsiya etiladi)": "В пределах этого расстояния от точки фабрики отметка принимается (из-за погрешности GPS рекомендуется 150–300 м)"
 }

@@ -357,7 +357,7 @@ def _orders_text(db: Session, telegram_id: str, lang: str) -> str:
     return "\n\n".join([t_lang(lang, "📦 <b>Buyurtmalaringiz</b>"), *items])
 
 
-def _send_raw(chat_id: int | str, text: str, reply_markup: dict | None = None) -> None:
+def send_raw(chat_id: int | str, text: str, reply_markup: dict | None = None) -> None:
     params = {"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
     if reply_markup:
         params["reply_markup"] = reply_markup
@@ -395,7 +395,9 @@ ME_KEYBOARD_TEXT = "📊 Mening natijam"
 
 def _me_keyboard(lang: str) -> dict:
     return {"inline_keyboard": [[{"text": t_lang(lang, ME_KEYBOARD_TEXT), "callback_data": "me"}],
-                                [{"text": t_lang(lang, "📝 Javob so'rash"), "callback_data": "lv"}]]}
+                                [{"text": t_lang(lang, "📝 Javob so'rash"), "callback_data": "lv"},
+                                 {"text": t_lang(lang, "📍 Keldim / Ketdim"), "callback_data": "geo"}],
+                                [{"text": t_lang(lang, "📄 Hisob varaqasi"), "callback_data": "ps"}]]}
 
 
 def _link_employee(db: Session, chat_id: int, arg: str, lang: str) -> None:
@@ -423,7 +425,7 @@ def welcome_employee(db: Session, employee, lang: str) -> None:
     _send_chat(chat_id, lang,
                "👋 {name}, siz TextileCore'ga ulandingiz.\n\nBu yerda bugungi va oylik natijangizni hamda taxminiy ish haqingizni ko'rasiz. Har kuni kechqurun qisqa hisobot keladi.",
                reply_markup=_me_keyboard(lang), name=employee.full_name)
-    _send_raw(chat_id, employee_summary_text(db, employee, lang), _me_keyboard(lang))
+    send_raw(chat_id, employee_summary_text(db, employee, lang), _me_keyboard(lang))
 
 
 def tashkent_today():
@@ -468,7 +470,7 @@ def _send_me(db: Session, chat_id, lang: str) -> None:
     if employee is None:
         _send_chat(chat_id, lang, "Siz xodim sifatida ulanmagansiz. Rahbaringizdan shaxsiy havolani so'rang.")
         return
-    _send_raw(chat_id, employee_summary_text(db, employee, employee.telegram_lang or lang), _me_keyboard(lang))
+    send_raw(chat_id, employee_summary_text(db, employee, employee.telegram_lang or lang), _me_keyboard(lang))
 
 
 def _handle_start(db: Session, chat: dict, user: dict, arg: str, lang: str, site: str) -> None:
@@ -540,9 +542,17 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
             print(exc)
         chat_id = (cq.get("message") or {}).get("chat", {}).get("id") or user.get("id")
         if cq.get("data") == "orders" and chat_id:
-            _send_raw(chat_id, _orders_text(db, str(user["id"]), lang), _shop_keyboard(lang, site))
+            send_raw(chat_id, _orders_text(db, str(user["id"]), lang), _shop_keyboard(lang, site))
         elif cq.get("data") == "me" and chat_id:
             _send_me(db, chat_id, lang)
+        elif cq.get("data") == "geo" and chat_id:
+            from app.services import geo_attendance_service
+
+            geo_attendance_service.prompt(db, chat_id, lang)
+        elif cq.get("data") == "ps" and chat_id:
+            from app.services import employee_bot_service
+
+            employee_bot_service.payslip_on_request(db, chat_id, lang)
         return
 
     msg = update.get("message")
@@ -558,19 +568,25 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
         return
     elif msg.get("contact") and _handle_contact(db, msg, lang):
         return
+    elif msg.get("location") and _handle_location(db, msg, lang):
+        return
     elif msg.get("reply_to_message") and not command and _handle_reply(db, msg, lang):
         return
+    elif command == "/payslip":
+        from app.services import employee_bot_service
+
+        employee_bot_service.payslip_on_request(db, chat["id"], lang)
     elif command == "/leave":
         from app.services import employee_bot_service
 
         employee_bot_service.leave_menu(db, chat["id"], lang)
     elif command == "/orders":
-        _send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
+        send_raw(chat["id"], _orders_text(db, str(user.get("id")), lang), _shop_keyboard(lang, site))
     elif command == "/me":
         _send_me(db, chat["id"], lang)
     elif command == "/help":
         text = t_lang(lang, HELP_TEXT) + (t_lang(lang, HELP_AI) if settings.assistant_enabled else "")
-        _send_raw(chat["id"], text, _shop_keyboard(lang, site))
+        send_raw(chat["id"], text, _shop_keyboard(lang, site))
     elif command == "/shop":
         _send_chat(chat["id"], lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇", reply_markup=_shop_keyboard(lang, site))
     elif not command and msg.get("text") and settings.assistant_enabled:
@@ -578,6 +594,12 @@ def handle_update(db: Session, update: dict, base_url: str) -> None:
     else:
         _send_chat(chat["id"], lang, "Buyurtma berish uchun «Do'konni ochish» tugmasini bosing 👇",
                    reply_markup=_shop_keyboard(lang, site))
+
+
+def _handle_location(db: Session, msg: dict, lang: str) -> bool:
+    from app.services import geo_attendance_service
+
+    return geo_attendance_service.handle_location(db, msg, lang)
 
 
 def _handle_reply(db: Session, msg: dict, lang: str) -> bool:
@@ -601,7 +623,7 @@ def _answer_with_assistant(db: Session, chat_id: int, user: dict, text: str, lan
         _call("sendChatAction", timeout=5, chat_id=chat_id, action="typing")
         reply, products = assistant_service.ask(db, [{"role": "user", "content": text[:2000]}], lang)
     except HTTPException as exc:
-        _send_raw(chat_id, html.escape(str(exc.detail)), _shop_keyboard(lang, site))
+        send_raw(chat_id, html.escape(str(exc.detail)), _shop_keyboard(lang, site))
         return
     except Exception as exc:
         print("tg assistant:", exc)
@@ -611,7 +633,7 @@ def _answer_with_assistant(db: Session, chat_id: int, user: dict, text: str, lan
               "web_app": {"url": f"{site}/store/factories/{p.factory_id}?product={p.id}"}}] for p in products]
     keyboard = _shop_keyboard(lang, site)
     keyboard["inline_keyboard"] = rows + keyboard["inline_keyboard"]
-    _send_raw(chat_id, html.escape(reply), keyboard)
+    send_raw(chat_id, html.escape(reply), keyboard)
 
 
 def setup_bot(base_url: str) -> dict:
@@ -630,6 +652,7 @@ def setup_bot(base_url: str) -> dict:
                     {"command": "orders", "description": t_lang(lang, "Buyurtmalarim")},
                     {"command": "me", "description": t_lang(lang, "Mening natijam (xodimlar uchun)")},
                     {"command": "leave", "description": t_lang(lang, "Javob so'rash (xodimlar uchun)")},
+                    {"command": "payslip", "description": t_lang(lang, "Hisob varaqasi (xodimlar uchun)")},
                     {"command": "help", "description": t_lang(lang, "Yordam")}]
         _call("setMyCommands", commands=commands, **scope)
         _call("setMyDescription", description=t_lang(lang, BOT_DESCRIPTION), **scope)

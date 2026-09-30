@@ -210,3 +210,63 @@ def handle_decision(db: Session, cq: dict) -> None:
         return
     telegram_service.edit_callback_markup(cq, {"inline_keyboard": [[{"text": label, "callback_data": "o:done"}]]})
     telegram_service.answer_callback(cq, label)
+
+
+# --- Hisob varaqasi ----------------------------------------------------------------------------------
+
+UZ_MONTHS = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"]
+PAY_TYPE_NAMES = {"MONTHLY": "Oylik", "HOURLY": "Soatbay", "PIECE": "Ishbay (donabay)"}
+
+
+def _month_label(month: str, lang: str) -> str:
+    from app.core.i18n import MONTHS_NOMINATIVE
+
+    year, mon = int(month[:4]), int(month[5:7])
+    return f"{MONTHS_NOMINATIVE.get(lang, UZ_MONTHS)[mon - 1]} {year}"
+
+
+def previous_month() -> str:
+    first = telegram_service.tashkent_today().replace(day=1)
+    return (first - timedelta(days=1)).strftime("%Y-%m")
+
+
+def payslip_text(db: Session, employee: Employee, month: str, lang: str) -> str:
+    import html
+
+    from app.services import payroll_service
+
+    row = payroll_service.build(db, [employee], month).rows[0]
+    money = telegram_service._sum
+    status_label = t_lang(lang, "to'langan ✅") if row.payment_id else t_lang(lang, "hali to'lanmagan")
+    return t_lang(
+        lang,
+        "📄 <b>Hisob varaqasi · {month}</b>\n{name} ({code})\n{pay_type}\n\n"
+        "🧵 {pieces} dona · ⏱ {hours} soat · 📅 {days} kun (kelmagan: {absent})\n\n"
+        "Asosiy: {base} so'm\n➕ Bonus: {bonus} so'm\n➖ Jarima: {deduction} so'm\n➖ Avans: {advance} so'm\n"
+        "💰 Hisoblangan: {accrued} so'm\n💵 <b>Qo'lingizga: {to_pay} so'm</b> ({status})",
+        month=_month_label(month, lang), name=html.escape(employee.full_name), code=html.escape(employee.employee_code),
+        pay_type=t_lang(lang, PAY_TYPE_NAMES.get(row.pay_type.value, row.pay_type.value)),
+        pieces=row.pieces, hours=row.hours, days=row.present_days, absent=row.absent_days,
+        base=money(row.base), bonus=money(row.bonus), deduction=money(row.deduction), advance=money(row.advance),
+        accrued=money(row.accrued), to_pay=money(row.to_pay), status=status_label,
+    )
+
+
+def send_payslip(db: Session, employee_id: int, month: str) -> None:
+    """To'lov belgilanganda xodimga hisob varaqasi (botga ulangan bo'lsa). Xato asosiy amalni to'xtatmaydi."""
+    employee = db.get(Employee, employee_id)
+    if employee is None or not employee.telegram_chat_id:
+        return
+    try:
+        telegram_service.send_raw(employee.telegram_chat_id, payslip_text(db, employee, month, employee.telegram_lang or "uz"))
+    except Exception as exc:
+        print("tg payslip:", exc)
+
+
+def payslip_on_request(db: Session, chat_id, lang: str) -> None:
+    """"📄 Hisob varaqasi" tugmasi / /payslip: o'tgan oy (to'liq yopilgan oy)."""
+    employee = _employee(db, chat_id)
+    if employee is None:
+        _not_connected(chat_id, lang)
+        return
+    telegram_service.send_raw(chat_id, payslip_text(db, employee, previous_month(), employee.telegram_lang or lang))

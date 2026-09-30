@@ -184,6 +184,9 @@ def pay(db: Session, actor: User, data: PaymentCreate) -> PayrollRow:
     audit_service.record(db, actor, entity="payroll", entity_id=payment.id, action=AuditAction.STATUS, factory_id=e.factory_id,
                          summary=f"Ish haqi to'landi: {e.full_name}, {data.month}, {payment.amount}")
     db.commit()
+    from app.services import employee_bot_service
+
+    employee_bot_service.send_payslip(db, e.id, data.month)
     return report(db, actor, data.month, employee_id=e.id).rows[0]
 
 

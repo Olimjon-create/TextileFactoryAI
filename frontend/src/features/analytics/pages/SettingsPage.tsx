@@ -5,6 +5,8 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { useColorMode } from '@/app/ColorModeContext';
 import { useAuth } from '@/features/auth/AuthContext';
+import GeoAttendanceCard from '@/features/attendance/components/GeoAttendanceCard';
+import { ATTENDANCE_EDITOR_ROLES } from '@/features/attendance/permissions';
 import ChangePasswordDialog from '@/features/auth/components/ChangePasswordDialog';
 import { telegramApi, type TelegramStatus } from '@/features/auth/api';
 import LanguageSwitcher from '@/shared/components/LanguageSwitcher';
@@ -34,6 +36,7 @@ export default function SettingsPage() {
   const { hasRole } = useAuth();
   const canFinance = hasRole(...FINANCE_ROLES);
   const canTelegram = hasRole('SUPER_ADMIN', 'FACTORY_OWNER', 'MANAGER');
+  const canGeo = hasRole(...ATTENDANCE_EDITOR_ROLES);
   return (
     <>
       <PageHeader title={tr("Sozlamalar")} subtitle={tr("Profilingiz, zavod ma'lumotlari va hisob-kitob sozlamalari")} />
@@ -42,6 +45,7 @@ export default function SettingsPage() {
         <FactoryNameCard />
         {canTelegram && <TelegramCard />}
         {canFinance && <FinanceSettingsCard />}
+        {canGeo && <GeoAttendanceCard />}
       </Box>
     </>
   );

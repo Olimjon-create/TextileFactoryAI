@@ -7,7 +7,7 @@ Bu yerda faqat fabrikaning o'zi sozlaydigan qiymatlar (kodga qattiq yozilmaydi).
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint, false, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base, TimestampMixin
@@ -29,6 +29,11 @@ class FactorySettings(Base, TimestampMixin):
     monthly_work_hours: Mapped[Decimal] = mapped_column(Numeric(6, 1), default=SETTINGS_DEFAULTS["monthly_work_hours"])
     defect_alert_percent: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=SETTINGS_DEFAULTS["defect_alert_percent"])
     low_margin_percent: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=SETTINGS_DEFAULTS["low_margin_percent"])
+    # Telegram bot orqali davomat: xodim joylashuvini yuboradi, zavoddan radius ichida bo'lsa kelgan/ketgan belgilanadi.
+    geo_enabled: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    geo_lat: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    geo_lng: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    geo_radius_m: Mapped[int] = mapped_column(Integer, default=200, server_default="200")
 
 
 class NotificationRead(Base):

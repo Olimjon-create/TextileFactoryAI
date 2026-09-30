@@ -142,3 +142,10 @@ export interface LeavePayload {
   reason: string;
   approve?: boolean;
 }
+
+export interface GeoSettings {
+  enabled: boolean;
+  lat: number | null;
+  lng: number | null;
+  radius_m: number;
+}

@@ -5,6 +5,7 @@ import type {
   DailyBoard,
   DailyFilters,
   EmployeeMonthDetail,
+  GeoSettings,
   LeavePage,
   LeavePayload,
   LeaveRequest,
@@ -33,4 +34,8 @@ export const attendanceApi = {
   approveLeave: (id: number, note?: string) => api.post<LeaveRequest>(`/leave-requests/${id}/approve`, { note: note || null }).then((r) => r.data),
   rejectLeave: (id: number, note?: string) => api.post<LeaveRequest>(`/leave-requests/${id}/reject`, { note: note || null }).then((r) => r.data),
   removeLeave: (id: number) => api.delete(`/leave-requests/${id}`),
+  geoSettings: (factoryId?: number | '') =>
+    api.get<GeoSettings>('/attendance/geo-settings', { params: clean({ factory_id: factoryId }) }).then((r) => r.data),
+  updateGeoSettings: (data: GeoSettings, factoryId?: number | '') =>
+    api.put<GeoSettings>('/attendance/geo-settings', data, { params: clean({ factory_id: factoryId }) }).then((r) => r.data),
 };

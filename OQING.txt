@@ -78,7 +78,11 @@ Xodim:        Xodimlar -> Telegram belgisi -> QR. /me - bugungi va oylik natija,
               Javob so'rash: xodim /leave (yoki "Javob so'rash" tugmasi) -> sabab turi -> kunlar ->
               sababini yozadi. Rahbar zavod chatida "Tasdiqlash"/"Rad etish" bosadi (yoki saytda
               Davomat -> Javob so'rovlari); natija xodimga botda keladi.
-Buyruqlar:    /start  /shop  /orders  /me  /leave  /help
+              Keldim/Ketdim: Sozlamalar -> "Botdan davomat (joylashuv)" -> yoqing, zavod nuqtasi va radius
+              (zavod ichida telefondan "Joriy joylashuvimni olish"). Xodim botda "Keldim / Ketdim" ->
+              "Joylashuvni yuborish"; radius ichida bo'lsa kelgan/ketgan vaqti yoziladi.
+              Hisob varaqasi: "To'lash" bosilganda xodimga botda avtomatik keladi; /payslip - o'tgan oy.
+Buyruqlar:    /start  /shop  /orders  /me  /leave  /payslip  /help
 
 ----------------------------------------------------
 5. XAVFSIZLIK
@@ -87,6 +91,9 @@ Buyruqlar:    /start  /shop  /orders  /me  /leave  /help
   dasturning tepasida ogohlantirish chiqadi.
 - backend\.env faylidagi kalitlarni hech kimga bermang va chatga yozmang.
 - Server xatosi bo'lsa administrator Telegram'iga "Server xatosi" xabari keladi.
+- Vercel'da ENVIRONMENT=production avtomatik yoqiladi (/docs yopiladi). Sozlama xavfsiz bo'lmasa
+  (masalan, SUPERADMIN_PASSWORD 12 belgidan qisqa) sayt to'xtamaydi: Vercel -> Logs'da "OGOHLANTIRISH"
+  chiqadi va oddiy rejimda ishlaydi - sababini tuzatib qayta deploy qiling.
 
 ----------------------------------------------------
 6. IXTIYORIY SOZLAMALAR (backend\.env va Vercel -> Environment Variables)

@@ -404,3 +404,24 @@ MESSAGES.update({
     "Bu kunlarga xodimning boshqa javob so'rovi bor": _m("На эти дни уже есть другая заявка", "There is already another request for these days"),
     "So'rov allaqachon ko'rib chiqilgan": _m("Заявка уже рассмотрена", "The request has already been handled"),
 })
+
+# Xodim kabineti: joylashuv bo'yicha davomat va hisob varaqasi
+MESSAGES.update({
+    '📍 Joylashuvni yuborish': _m('📍 Отправить геолокацию', '📍 Send location'),
+    '📍 Keldim / Ketdim': _m('📍 Пришёл / Ушёл', '📍 Check in / out'),
+    '📄 Hisob varaqasi': _m('📄 Расчётный лист', '📄 Payslip'),
+    'Hisob varaqasi (xodimlar uchun)': _m('Расчётный лист (для сотрудников)', 'Payslip (for employees)'),
+    'Zavodingizda bot orqali davomat yoqilmagan.': _m('На вашей фабрике отметка через бота не включена.', 'Check-in via the bot is not enabled at your factory.'),
+    '📍 Zavod hududida turib pastdagi «📍 Joylashuvni yuborish» tugmasini bosing — kelgan yoki ketgan vaqtingiz belgilanadi.': _m('📍 Находясь на территории фабрики, нажмите кнопку «📍 Отправить геолокацию» ниже — будет отмечено время прихода или ухода.', '📍 While on the factory premises, tap «📍 Send location» below — your arrival or departure time will be recorded.'),
+    'Joylashuvni faqat «📍 Joylashuvni yuborish» tugmasi orqali yuboring.': _m('Отправляйте геолокацию только кнопкой «📍 Отправить геолокацию».', 'Send your location only with the «📍 Send location» button.'),
+    'Joylashuv eskirgan — tugmani qayta bosing.': _m('Геолокация устарела — нажмите кнопку ещё раз.', 'The location is outdated — tap the button again.'),
+    '❌ Siz zavoddan {dist} m uzoqdasiz (ruxsat: {radius} m). Zavod hududiga kirib qayta yuboring.': _m('❌ Вы в {dist} м от фабрики (допустимо: {radius} м). Зайдите на территорию и отправьте снова.', '❌ You are {dist} m away from the factory (allowed: {radius} m). Enter the premises and send again.'),
+    'Bugun kelgan ({check_in}) va ketgan ({check_out}) vaqtingiz allaqachon belgilangan.': _m('Сегодня приход ({check_in}) и уход ({check_out}) уже отмечены.', "Today's arrival ({check_in}) and departure ({check_out}) are already recorded."),
+    '🏁 Ketdingiz: {time}. Ishlangan vaqt: {worked} soat.': _m('🏁 Уход: {time}. Отработано: {worked} ч.', '🏁 Checked out: {time}. Worked: {worked} h.'),
+    '✅ Keldingiz: {time}. Kechikish: {late} daq.': _m('✅ Приход: {time}. Опоздание: {late} мин.', '✅ Checked in: {time}. Late by {late} min.'),
+    '✅ Keldingiz: {time}. Xayrli ish kuni!': _m('✅ Приход: {time}. Хорошего рабочего дня!', '✅ Checked in: {time}. Have a good working day!'),
+    'Oylik': _m('Оклад', 'Monthly'),
+    'Soatbay': _m('Почасовая', 'Hourly'),
+    'Ishbay (donabay)': _m('Сдельная', 'Piece rate'),
+    "📄 <b>Hisob varaqasi · {month}</b>\n{name} ({code})\n{pay_type}\n\n🧵 {pieces} dona · ⏱ {hours} soat · 📅 {days} kun (kelmagan: {absent})\n\nAsosiy: {base} so'm\n➕ Bonus: {bonus} so'm\n➖ Jarima: {deduction} so'm\n➖ Avans: {advance} so'm\n💰 Hisoblangan: {accrued} so'm\n💵 <b>Qo'lingizga: {to_pay} so'm</b> ({status})": _m('📄 <b>Расчётный лист · {month}</b>\n{name} ({code})\n{pay_type}\n\n🧵 {pieces} шт · ⏱ {hours} ч · 📅 {days} дн. (пропуски: {absent})\n\nОсновное: {base} сум\n➕ Премия: {bonus} сум\n➖ Штраф: {deduction} сум\n➖ Аванс: {advance} сум\n💰 Начислено: {accrued} сум\n💵 <b>К выплате: {to_pay} сум</b> ({status})', '📄 <b>Payslip · {month}</b>\n{name} ({code})\n{pay_type}\n\n🧵 {pieces} pcs · ⏱ {hours} h · 📅 {days} days (absent: {absent})\n\nBase: {base} UZS\n➕ Bonus: {bonus} UZS\n➖ Penalty: {deduction} UZS\n➖ Advance: {advance} UZS\n💰 Accrued: {accrued} UZS\n💵 <b>Take-home: {to_pay} UZS</b> ({status})'),
+})

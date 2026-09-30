@@ -1965,5 +1965,18 @@
  "Xodimlar ro'yxati": "Employee list",
  "Zavod Telegram chati ulanmagan — so'rovlar faqat shu sahifada ko'rinadi. Sozlamalar → Telegram bo'limidan ulang.": "The factory Telegram chat is not connected — requests appear only on this page. Connect it in Settings → Telegram.",
  "{0} so'rovi rad etildi": "{0}'s request was rejected",
- "{0} ta so'rov": "{0} requests"
+ "{0} ta so'rov": "{0} requests",
+ "Aniqlanmoqda...": "Locating...",
+ "Bot orqali davomat yoqilgan": "Check-in via bot enabled",
+ "Botdan davomat (joylashuv)": "Bot check-in (location)",
+ "Brauzeringiz joylashuvni aniqlay olmaydi — koordinatalarni qo'lda kiriting": "Your browser can't detect location — enter the coordinates manually",
+ "Joriy joylashuvimni olish": "Use my current location",
+ "Joylashuvni olib bo'lmadi — brauzerda ruxsat bering yoki koordinatalarni qo'lda kiriting": "Couldn't get the location — allow access in the browser or enter the coordinates manually",
+ "Kenglik (lat)": "Latitude (lat)",
+ "Maslahat: bu sahifani zavod ichida telefondan ochib «Joriy joylashuvimni olish» tugmasini bosing.": "Tip: open this page on your phone inside the factory and tap «Use my current location».",
+ "Ruxsat etilgan radius": "Allowed radius",
+ "Uzunlik (lng)": "Longitude (lng)",
+ "Xaritada ko'rish": "Show on map",
+ "Xodim Telegram botda «📍 Keldim / Ketdim» tugmasini bosib joylashuvini yuboradi — zavod radiusi ichida bo'lsa vaqti belgilanadi": "The employee taps «📍 Check in / out» in the Telegram bot and sends their location — within the factory radius the time is recorded",
+ "Zavod nuqtasidan shu masofagacha «keldi» deb qabul qilinadi (GPS xatoligi uchun 150–300 m tavsiya etiladi)": "Check-ins within this distance of the factory point are accepted (150–300 m recommended for GPS error)"
 }

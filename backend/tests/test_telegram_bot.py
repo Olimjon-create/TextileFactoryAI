@@ -178,4 +178,4 @@ def test_setup_sets_descriptions_in_three_languages(client, bot):
     descriptions = [p for m, p in bot["calls"] if m == "setMyDescription"]
     assert len(descriptions) == 3 and {p.get("language_code") for p in descriptions} == {None, "ru", "en"}
     commands = [p for m, p in bot["calls"] if m == "setMyCommands"][0]["commands"]
-    assert [c["command"] for c in commands] == ["start", "shop", "orders", "me", "leave", "help"]
+    assert [c["command"] for c in commands] == ["start", "shop", "orders", "me", "leave", "payslip", "help"]

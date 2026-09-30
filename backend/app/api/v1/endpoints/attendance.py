@@ -25,6 +25,7 @@ from app.schemas.attendance import (
     MonthlyReport,
 )
 from app.services import attendance_service as svc
+from app.services import geo_attendance_service as geo
 
 router = APIRouter(tags=["Attendance: davomat va javob so'rovlari"])
 view = require_roles(*svc.ATTENDANCE_VIEW_ROLES)
@@ -122,3 +123,14 @@ def reject_leave(leave_id: int, data: LeaveDecision | None = None, db: Session =
 @router.delete("/leave-requests/{leave_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_leave(leave_id: int, db: Session = Depends(get_db), actor: User = Depends(edit)):
     svc.delete_leave(db, actor, leave_id)
+
+
+@router.get("/attendance/geo-settings", response_model=geo.GeoSettings)
+def geo_settings(factory_id: int | None = None, db: Session = Depends(get_db), actor: User = Depends(edit)):
+    """Telegram bot orqali davomat: zavod nuqtasi va radius."""
+    return geo.get_settings(db, actor, factory_id)
+
+
+@router.put("/attendance/geo-settings", response_model=geo.GeoSettings)
+def update_geo_settings(data: geo.GeoSettings, factory_id: int | None = None, db: Session = Depends(get_db), actor: User = Depends(edit)):
+    return geo.update_settings(db, actor, data, factory_id)
