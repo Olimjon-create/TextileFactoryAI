@@ -39,7 +39,24 @@ env.setdefault("RATE_LIMIT_BACKEND", "db")
 env.setdefault("TRUST_PROXY_HEADERS", "true")
 env.setdefault("CORS_ORIGINS", "")
 
-from app.main import app, prepare
+# Ochiq saytda production rejimi: xavfli sozlamalar tekshiriladi, /docs yopiladi. Demo to'lov katalogda
+# hozirgidek ishlashi uchun (haqiqiy provayder ulanmaguncha) aniq ruxsat beriladi.
+explicit_environment = "ENVIRONMENT" in env
+env.setdefault("ENVIRONMENT", "production")
+if env.get("PAYMENT_PROVIDER", "demo") == "demo":
+    env.setdefault("ALLOW_DEMO_PAYMENTS", "true")
+
+from app.core.config import settings  # noqa: E402
+
+if not explicit_environment:
+    # ENVIRONMENT qo'lda berilmagan bo'lsa — sozlama muammosi saytni to'xtatmaydi: ogohlantirib, oddiy rejimda qoladi.
+    try:
+        settings.validate_for_production()
+    except RuntimeError as exc:
+        print(f"OGOHLANTIRISH: production rejimi yoqilmadi — {exc}")
+        settings.ENVIRONMENT = "development"
+
+from app.main import app, prepare  # noqa: E402
 
 prepare()
 
