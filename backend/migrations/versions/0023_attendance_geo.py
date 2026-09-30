@@ -17,11 +17,20 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    # Takroriy ishga tushirishga chidamli: mavjud ustunlar qayta qo'shilmaydi.
+    existing = {c["name"] for c in sa.inspect(op.get_bind()).get_columns("factory_settings")}
+    columns = [
+        sa.Column("geo_enabled", sa.Boolean(), server_default=sa.false(), nullable=False),
+        sa.Column("geo_lat", sa.Numeric(9, 6), nullable=True),
+        sa.Column("geo_lng", sa.Numeric(9, 6), nullable=True),
+        sa.Column("geo_radius_m", sa.Integer(), server_default="200", nullable=False),
+    ]
+    missing = [c for c in columns if c.name not in existing]
+    if not missing:
+        return
     with op.batch_alter_table("factory_settings") as batch:
-        batch.add_column(sa.Column("geo_enabled", sa.Boolean(), server_default=sa.false(), nullable=False))
-        batch.add_column(sa.Column("geo_lat", sa.Numeric(9, 6), nullable=True))
-        batch.add_column(sa.Column("geo_lng", sa.Numeric(9, 6), nullable=True))
-        batch.add_column(sa.Column("geo_radius_m", sa.Integer(), server_default="200", nullable=False))
+        for column in missing:
+            batch.add_column(column)
 
 
 def downgrade() -> None:

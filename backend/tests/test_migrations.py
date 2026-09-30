@@ -80,3 +80,13 @@ def test_downgrade_to_base_and_upgrade_again(fresh_engine):
     assert inspect(fresh_engine).get_table_names() == ["alembic_version"]
     migrations.run_migrations()
     assert _diff(fresh_engine) == []
+
+
+def test_rerun_after_version_stamped_back(fresh_engine):
+    """Versiya yozuvi eski kod uchun 0021 ga qaytarilgan, jadval/ustunlar esa joyida — upgrade yiqilmaydi."""
+    migrations.run_migrations()
+    _alembic(fresh_engine, command.stamp, "0021_employee_telegram_expenses")
+    migrations.run_migrations()
+    assert _diff(fresh_engine) == []
+    with fresh_engine.connect() as conn:
+        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == _head()

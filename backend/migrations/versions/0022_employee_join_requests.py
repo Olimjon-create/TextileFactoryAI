@@ -19,6 +19,9 @@ STATUSES = ("AWAITING_CONTACT", "NEW", "APPROVED", "REJECTED")
 
 
 def upgrade() -> None:
+    # Takroriy ishga tushirishga chidamli: jadval allaqachon bo'lsa (versiya yozuvi qo'lda qaytarilgan) — o'tkaziladi.
+    if "employee_join_requests" in sa.inspect(op.get_bind()).get_table_names():
+        return
     op.create_table(
         "employee_join_requests",
         sa.Column("id", sa.Integer(), primary_key=True),
